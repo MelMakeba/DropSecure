@@ -1,0 +1,51 @@
+<!-- Hero Section -->
+<div class="flex flex-col items-center justify-center py-16 bg-gradient-to-b from-[#800020] to-[#D4AF37] text-white">
+  <h1 class="text-5xl font-bold font-poppins mb-4 animate-fade-in">DropSecure Courier</h1>
+  <p class="text-xl font-inter mb-8 max-w-xl text-center">Fast, secure, and reliable courier service for your important packages. Experience the future of delivery today.</p>
+  <div class="flex gap-4">
+    <button class="bg-[#D4AF37] text-[#800020] px-6 py-3 rounded-[6px] font-semibold shadow-md hover:shadow-lg transition-all duration-200"
+      (click)="openAuth('register')">Get Started</button>
+    <button class="bg-white text-[#800020] px-6 py-3 rounded-[6px] font-semibold border border-[#D4AF37] hover:bg-[#F3F4F6] transition-all duration-200"
+      (click)="openAuth('login')">Login</button>
+  </div>
+</div>
+
+<!-- Service Overview Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8 px-8 py-12">
+  <div class="bg-white rounded-[8px] shadow-card p-6 flex flex-col items-center">
+    <img src="/assets/icons/speed.svg" alt="Fast Delivery" class="w-12 h-12 mb-4">
+    <h3 class="text-xl font-semibold mb-2">Fast Delivery</h3>
+    <p class="text-gray-600 text-center">Get your packages delivered quickly with our optimized routes and real-time tracking.</p>
+  </div>
+  <div class="bg-white rounded-[8px] shadow-card p-6 flex flex-col items-center">
+    <img src="/assets/icons/secure.svg" alt="Secure Handling" class="w-12 h-12 mb-4">
+    <h3 class="text-xl font-semibold mb-2">Secure Handling</h3>
+    <p class="text-gray-600 text-center">Your items are safe with us. We use tamper-proof packaging and trusted couriers.</p>
+  </div>
+  <div class="bg-white rounded-[8px] shadow-card p-6 flex flex-col items-center">
+    <img src="/assets/icons/support.svg" alt="24/7 Support" class="w-12 h-12 mb-4">
+    <h3 class="text-xl font-semibold mb-2">24/7 Support</h3>
+    <p class="text-gray-600 text-center">Our support team is available around the clock to assist you with any queries.</p>
+  </div>
+</div>
+
+<!-- Package Tracking Widget -->
+<div class="flex flex-col items-center py-8 bg-[#F3F4F6]">
+  <h2 class="text-2xl font-bold mb-4">Track Your Package</h2>
+  <form class="flex gap-2 w-full max-w-md">
+    <input type="text" placeholder="Enter Tracking Number" class="flex-1 px-4 py-2 rounded-[4px] border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#800020] transition-all" />
+    <button type="submit" class="bg-[#800020] text-white px-6 py-2 rounded-[6px] font-semibold hover:bg-[#D4AF37] hover:text-[#800020] transition-all">Track</button>
+  </form>
+</div>
+
+<!-- Footer -->
+<footer class="mt-auto bg-[#800020] text-white py-6 text-center">
+  <div class="mb-2">&copy; 2025 DropSecure Courier. All rights reserved.</div>
+  <div class="text-sm">Contact: info@dropsecure.com | +1 234 567 8900</div>
+</footer>
+
+<app-auth-modal 
+  [show]="showAuth()" 
+  [mode]="authMode()" 
+  (close)="closeAuth()">
+</app-auth-modal>

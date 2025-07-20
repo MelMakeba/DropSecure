@@ -1,0 +1,59 @@
+<div 
+  class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 transition-opacity duration-300"
+  [ngClass]="{ 'opacity-100 pointer-events-auto': show, 'opacity-0 pointer-events-none': !show }"
+>
+  <div class="bg-white rounded-[8px] shadow-2xl p-8 w-full max-w-md relative animate-fade-in-up">
+    <button class="absolute top-3 right-3 text-gray-400 hover:text-[#800020] text-2xl" (click)="close.emit()">&times;</button>
+    <ng-container [ngSwitch]="mode">
+      <!-- Login Form -->
+      <form *ngSwitchCase="'login'" (ngSubmit)="onLogin()" class="flex flex-col gap-4">
+        <h2 class="text-2xl font-bold text-[#800020] mb-2">Login</h2>
+        <input required type="email" placeholder="Email" class="input" />
+        <input required type="password" placeholder="Password" class="input" />
+        <div class="flex justify-between items-center">
+          <label class="flex items-center gap-2 text-sm">
+            <input type="checkbox" /> Remember me
+          </label>
+          <a class="text-[#800020] text-sm hover:underline cursor-pointer" (click)="mode='forgot'">Forgot password?</a>
+        </div>
+        <button type="submit" class="btn-primary" [disabled]="loading()">Login</button>
+        <div class="text-sm text-center mt-2">
+          Don't have an account? 
+          <span class="text-[#800020] hover:underline cursor-pointer" (click)="mode='register'">Register</span>
+        </div>
+        <div *ngIf="loading()" class="text-[#800020] text-center">Loading...</div>
+        <div *ngIf="error()" class="text-red-600 text-center">{{ error() }}</div>
+        <div *ngIf="success()" class="text-green-600 text-center">{{ success() }}</div>
+      </form>
+      <!-- Register Form -->
+      <form *ngSwitchCase="'register'" (ngSubmit)="onRegister()" class="flex flex-col gap-4">
+        <h2 class="text-2xl font-bold text-[#800020] mb-2">Register</h2>
+        <input required type="text" placeholder="Full Name" class="input" />
+        <input required type="email" placeholder="Email" class="input" />
+        <input required type="password" placeholder="Password" class="input" />
+        <input required type="password" placeholder="Confirm Password" class="input" />
+        <button type="submit" class="btn-primary" [disabled]="loading()">Register</button>
+        <div class="text-sm text-center mt-2">
+          Already have an account? 
+          <span class="text-[#800020] hover:underline cursor-pointer" (click)="mode='login'">Login</span>
+        </div>
+        <div *ngIf="loading()" class="text-[#800020] text-center">Loading...</div>
+        <div *ngIf="error()" class="text-red-600 text-center">{{ error() }}</div>
+        <div *ngIf="success()" class="text-green-600 text-center">{{ success() }}</div>
+      </form>
+      <!-- Forgot Password Form -->
+      <form *ngSwitchCase="'forgot'" (ngSubmit)="onForgot()" class="flex flex-col gap-4">
+        <h2 class="text-2xl font-bold text-[#800020] mb-2">Reset Password</h2>
+        <input required type="email" placeholder="Email" class="input" />
+        <button type="submit" class="btn-primary" [disabled]="loading()">Send Reset Link</button>
+        <div class="text-sm text-center mt-2">
+          Remembered? 
+          <span class="text-[#800020] hover:underline cursor-pointer" (click)="mode='login'">Login</span>
+        </div>
+        <div *ngIf="loading()" class="text-[#800020] text-center">Loading...</div>
+        <div *ngIf="error()" class="text-red-600 text-center">{{ error() }}</div>
+        <div *ngIf="success()" class="text-green-600 text-center">{{ success() }}</div>
+      </form>
+    </ng-container>
+  </div>
+</div>

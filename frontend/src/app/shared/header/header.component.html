@@ -1,0 +1,25 @@
+<!-- Header Navigation -->
+<nav class="w-full bg-white shadow-card py-4 px-8 flex justify-between items-center sticky top-0 z-20">
+  <div class="flex items-center gap-2 cursor-pointer" (click)="goHome()">
+    <img src="/assets/logo.svg" alt="DropSecure Logo" class="h-8 w-8">
+    <span class="text-[#800020] font-bold text-xl font-poppins">DropSecure</span>
+  </div>
+  <div class="flex gap-6">
+    <a 
+      routerLink="/" 
+      routerLinkActive="font-bold text-[#D4AF37]" 
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="text-[#800020] font-medium hover:text-[#D4AF37] transition-all"
+    >Home</a>
+    <a 
+      routerLink="/about" 
+      routerLinkActive="font-bold text-[#D4AF37]" 
+      class="text-[#800020] font-medium hover:text-[#D4AF37] transition-all"
+    >About Us</a>
+    <a 
+      routerLink="/contact" 
+      routerLinkActive="font-bold text-[#D4AF37]" 
+      class="text-[#800020] font-medium hover:text-[#D4AF37] transition-all"
+    >Contact Us</a>
+  </div>
+</nav>

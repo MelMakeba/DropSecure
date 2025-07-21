@@ -1,0 +1,26 @@
+<div class="bg-white rounded-xl shadow-lg p-6">
+  <h3 class="text-xl font-bold text-[#800020] mb-4">{{ title }}</h3>
+  <div *ngIf="packages.length; else empty">
+    <ul class="divide-y divide-gray-100">
+      <li 
+        *ngFor="let pkg of packages"
+        class="py-4 flex items-center justify-between hover:bg-[#D4AF37]/10 rounded-lg px-2 cursor-pointer transition"
+        (click)="select.emit(pkg)"
+      >
+        <div>
+          <div class="font-semibold text-gray-800">{{ pkg.trackingId }}</div>
+          <div class="text-xs text-gray-500">{{ pkg.status | titlecase }}</div>
+        </div>
+        <div class="text-sm text-gray-700">
+          {{ pkg.receiverName }}
+        </div>
+        <div class="text-xs text-gray-400">
+          {{ pkg.preferredPickupDate | date:'shortDate' }}
+        </div>
+      </li>
+    </ul>
+  </div>
+  <ng-template #empty>
+    <div class="text-gray-400 text-center py-8">No packages found.</div>
+  </ng-template>
+</div>

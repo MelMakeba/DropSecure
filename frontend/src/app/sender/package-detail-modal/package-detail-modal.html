@@ -1,0 +1,48 @@
+<div class="modal-backdrop" *ngIf="show" [@fadeInOut]>
+  <div class="modal-container">
+    <button class="modal-close" (click)="closeModal()" aria-label="Close">&times;</button>
+    <h2 class="text-2xl font-bold text-[#800020] mb-4">Package Details</h2>
+    <div *ngIf="package">
+      <div class="mb-4">
+        <span class="font-semibold text-gray-700">Tracking ID:</span>
+        <span class="ml-2 text-[#700018]">{{ package.trackingId }}</span>
+      </div>
+      <div class="mb-2">
+        <span class="font-semibold text-gray-700">Sender:</span>
+        <span class="ml-2">{{ package.senderId }}</span>
+      </div>
+      <div class="mb-2">
+        <span class="font-semibold text-gray-700">Recipient:</span>
+        <span class="ml-2">{{ package.receiverName }}</span>
+      </div>
+      <div class="mb-2">
+        <span class="font-semibold text-gray-700">Status:</span>
+        <span class="ml-2">{{ package.status | titlecase }}</span>
+      </div>
+      <div class="mb-2">
+        <span class="font-semibold text-gray-700">Delivery Address:</span>
+        <span class="ml-2">{{ package.receiverAddress }}</span>
+      </div>
+      <div class="mb-2">
+        <span class="font-semibold text-gray-700">Sent On:</span>
+        <span class="ml-2">{{ package.createdAt | date:'medium' }}</span>
+      </div>
+      <div class="mb-2" *ngIf="package.actualDeliveryDate">
+        <span class="font-semibold text-gray-700">Delivered On:</span>
+        <span class="ml-2">{{ package.actualDeliveryDate | date:'medium' }}</span>
+      </div>
+      <div class="mb-2" *ngIf="package.specialInstructions">
+        <span class="font-semibold text-gray-700">Notes:</span>
+        <span class="ml-2">{{ package.specialInstructions }}</span>
+      </div>
+      <app-package-status-timeline [statusHistory]="statusHistory"></app-package-status-timeline>
+    </div>
+    <div *ngIf="!package" class="text-gray-500 text-center py-8">
+      No package selected.
+    </div>
+    <app-review-form
+      [packageId]="package?.id"
+      (submitReview)="handleReview($event)"
+    ></app-review-form>
+  </div>
+</div>

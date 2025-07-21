@@ -1,0 +1,361 @@
+{
+  "admins": [
+    {
+      "id": "admin_1",
+      "email": "admin@courier.com",
+      "password": "admin123",
+      "name": "John Admin",
+      "phone": "+254712345678",
+      "role": "admin",
+      "createdAt": "2024-01-15T10:00:00Z",
+      "isActive": true
+    }
+  ],
+  "customers": [
+    {
+      "id": "cust_1",
+      "email": "mary@gmail.com",
+      "password": "password123",
+      "name": "Mary Wanjiku",
+      "role": "customer",
+      "address": "Nairobi, Kenya",
+      "createdAt": "2024-01-20T14:30:00Z",
+      "isActive": true,
+      "totalPackagesSent": 15,
+      "totalPackagesReceived": 8
+    },
+    {
+      "id": "cust_2",
+      "email": "james@yahoo.com",
+      "password": "password123",
+      "name": "James Mwangi",
+      "phone": "+254733445566",
+      "role": "customer",
+      "address": "Mombasa, Kenya",
+      "createdAt": "2024-02-01T09:15:00Z",
+      "isActive": true,
+      "totalPackagesSent": 5,
+      "totalPackagesReceived": 12
+    },
+    {
+      "id": "cust_3",
+      "email": "grace@gmail.com",
+      "password": "password123",
+      "name": "Grace Akinyi",
+      "phone": "+254744556677",
+      "role": "customer",
+      "address": "Kisumu, Kenya",
+      "createdAt": "2024-02-10T11:45:00Z",
+      "isActive": true,
+      "totalPackagesSent": 3,
+      "totalPackagesReceived": 7
+    },
+    {
+      "id": "a82a",
+      "email": "melissamakeba@gmail.com",
+      "password": "mel123",
+      "name": "Mellisa Waititu",
+      "role": "customer",
+      "createdAt": "2025-07-21T10:31:51.010Z",
+      "isActive": true,
+      "totalPackagesSent": 0,
+      "totalPackagesReceived": 0
+    },
+    {
+      "id": "customer_mdczjscm_mkor",
+      "role": "customer",
+      "email": "melissa.waititu@strathmore.edu",
+      "password": "mel1234",
+      "name": "Mellisa Waititu",
+      "address": "16355-L",
+      "createdAt": "2025-07-21T10:51:24.358Z",
+      "isActive": true,
+      "totalPackagesSent": 0,
+      "totalPackagesReceived": 0
+    }
+  ],
+  "couriers": [
+    {
+      "id": "courier_1",
+      "email": "peter@courier.com",
+      "password": "courier123",
+      "name": "Peter Kiprotich",
+      "phone": "+254755667788",
+      "role": "courier",
+      "vehicleType": "motorcycle",
+      "licenseNumber": "DL123456",
+      "zone": "Nairobi",
+      "isAvailable": true,
+      "rating": 4.8,
+      "totalDeliveries": 145,
+      "createdAt": "2024-01-10T08:00:00Z",
+      "isActive": true
+    },
+    {
+      "id": "courier_2",
+      "email": "sarah@courier.com",
+      "password": "courier123",
+      "name": "Sarah Njeri",
+      "phone": "+254766778899",
+      "role": "courier",
+      "vehicleType": "van",
+      "licenseNumber": "DL789012",
+      "zone": "Mombasa",
+      "isAvailable": false,
+      "rating": 4.6,
+      "totalDeliveries": 98,
+      "createdAt": "2024-01-12T10:30:00Z",
+      "isActive": true
+    },
+    {
+      "id": "courier_3",
+      "email": "david@courier.com",
+      "password": "courier123",
+      "name": "David Otieno",
+      "phone": "+254777889900",
+      "role": "courier",
+      "vehicleType": "bicycle",
+      "licenseNumber": "DL345678",
+      "zone": "Kisumu",
+      "isAvailable": true,
+      "rating": 4.9,
+      "totalDeliveries": 67,
+      "createdAt": "2024-01-18T13:20:00Z",
+      "isActive": true
+    }
+  ],
+  "packages": [
+    {
+      "id": "pkg_1",
+      "trackingNumber": "CK2024001",
+      "senderId": "cust_1",
+      "senderName": "Mary Wanjiku",
+      "senderPhone": "+254722334455",
+      "senderAddress": "Nairobi CBD, Kenya",
+      "receiverId": "cust_2",
+      "receiverName": "James Mwangi",
+      "receiverPhone": "+254733445566",
+      "receiverAddress": "Nyali, Mombasa, Kenya",
+      "courierId": "courier_2",
+      "courierName": "Sarah Njeri",
+      "packageType": "documents",
+      "weight": 0.5,
+      "dimensions": "30x20x5 cm",
+      "value": 5000,
+      "description": "Legal documents",
+      "status": "delivered",
+      "paymentStatus": "paid",
+      "paymentMethod": "mpesa",
+      "deliveryFee": 500,
+      "createdAt": "2024-07-15T09:00:00Z",
+      "updatedAt": "2024-07-16T15:30:00Z",
+      "deliveredAt": "2024-07-16T15:30:00Z",
+      "estimatedDelivery": "2024-07-16T18:00:00Z",
+      "actualDelivery": "2024-07-16T15:30:00Z",
+      "notes": "Handle with care",
+      "priority": "normal",
+      "signature": "James M.",
+      "rating": 5
+    },
+    {
+      "id": "pkg_2",
+      "trackingNumber": "CK2024002",
+      "senderId": "cust_2",
+      "senderName": "James Mwangi",
+      "senderPhone": "+254733445566",
+      "senderAddress": "Nyali, Mombasa, Kenya",
+      "receiverId": "cust_3",
+      "receiverName": "Grace Akinyi",
+      "receiverPhone": "+254744556677",
+      "receiverAddress": "Milimani, Kisumu, Kenya",
+      "courierId": "courier_3",
+      "courierName": "David Otieno",
+      "packageType": "electronics",
+      "weight": 2.5,
+      "dimensions": "40x30x15 cm",
+      "value": 25000,
+      "description": "Mobile phone",
+      "status": "in_transit",
+      "paymentStatus": "paid",
+      "paymentMethod": "card",
+      "deliveryFee": 800,
+      "createdAt": "2024-07-20T11:30:00Z",
+      "updatedAt": "2024-07-21T08:15:00Z",
+      "estimatedDelivery": "2024-07-22T12:00:00Z",
+      "notes": "Fragile item",
+      "priority": "urgent",
+      "currentLocation": "Nakuru Transit Hub"
+    },
+    {
+      "id": "pkg_3",
+      "trackingNumber": "CK2024003",
+      "senderId": "cust_1",
+      "senderName": "Mary Wanjiku",
+      "senderPhone": "+254722334455",
+      "senderAddress": "Westlands, Nairobi, Kenya",
+      "receiverId": "cust_2",
+      "receiverName": "James Mwangi",
+      "receiverPhone": "+254733445566",
+      "receiverAddress": "Tudor, Mombasa, Kenya",
+      "courierId": "courier_1",
+      "courierName": "Peter Kiprotich",
+      "packageType": "clothing",
+      "weight": 1,
+      "dimensions": "35x25x10 cm",
+      "value": 8000,
+      "description": "Designer clothes",
+      "status": "pending",
+      "paymentStatus": "pending",
+      "paymentMethod": "cash",
+      "deliveryFee": 600,
+      "createdAt": "2024-07-21T14:20:00Z",
+      "updatedAt": "2024-07-21T14:20:00Z",
+      "estimatedDelivery": "2024-07-23T16:00:00Z",
+      "notes": "Call before delivery",
+      "priority": "normal"
+    }
+  ],
+  "statusHistory": {
+    "pkg_1": [
+      {
+        "id": "hist_1",
+        "packageId": "pkg_1",
+        "status": "pending",
+        "location": "Nairobi CBD",
+        "timestamp": "2024-07-15T09:00:00Z",
+        "notes": "Package created and payment pending"
+      },
+      {
+        "id": "hist_2",
+        "packageId": "pkg_1",
+        "status": "confirmed",
+        "location": "Nairobi CBD",
+        "timestamp": "2024-07-15T09:30:00Z",
+        "notes": "Payment confirmed, package ready for pickup"
+      },
+      {
+        "id": "hist_3",
+        "packageId": "pkg_1",
+        "status": "picked_up",
+        "location": "Nairobi CBD",
+        "timestamp": "2024-07-15T10:15:00Z",
+        "notes": "Package picked up by courier Sarah Njeri"
+      },
+      {
+        "id": "hist_4",
+        "packageId": "pkg_1",
+        "status": "in_transit",
+        "location": "Nakuru Transit Hub",
+        "timestamp": "2024-07-15T14:30:00Z",
+        "notes": "Package in transit via Nakuru"
+      },
+      {
+        "id": "hist_5",
+        "packageId": "pkg_1",
+        "status": "out_for_delivery",
+        "location": "Mombasa Depot",
+        "timestamp": "2024-07-16T08:00:00Z",
+        "notes": "Out for delivery in Mombasa"
+      },
+      {
+        "id": "hist_6",
+        "packageId": "pkg_1",
+        "status": "delivered",
+        "location": "Nyali, Mombasa",
+        "timestamp": "2024-07-16T15:30:00Z",
+        "notes": "Package delivered successfully. Signed by James M."
+      }
+    ],
+    "pkg_2": [
+      {
+        "id": "hist_7",
+        "packageId": "pkg_2",
+        "status": "pending",
+        "location": "Nyali, Mombasa",
+        "timestamp": "2024-07-20T11:30:00Z",
+        "notes": "Package created"
+      },
+      {
+        "id": "hist_8",
+        "packageId": "pkg_2",
+        "status": "confirmed",
+        "location": "Nyali, Mombasa",
+        "timestamp": "2024-07-20T12:00:00Z",
+        "notes": "Payment confirmed via card"
+      },
+      {
+        "id": "hist_9",
+        "packageId": "pkg_2",
+        "status": "picked_up",
+        "location": "Nyali, Mombasa",
+        "timestamp": "2024-07-20T15:45:00Z",
+        "notes": "Package picked up by courier David Otieno"
+      },
+      {
+        "id": "hist_10",
+        "packageId": "pkg_2",
+        "status": "in_transit",
+        "location": "Nakuru Transit Hub",
+        "timestamp": "2024-07-21T08:15:00Z",
+        "notes": "Package in transit to Kisumu"
+      }
+    ]
+  },
+  "settings": {
+    "deliveryZones": [
+      "Nairobi",
+      "Mombasa",
+      "Kisumu",
+      "Nakuru",
+      "Eldoret"
+    ],
+    "packageTypes": [
+      "documents",
+      "electronics",
+      "clothing",
+      "food",
+      "medical",
+      "other"
+    ],
+    "vehicleTypes": [
+      "motorcycle",
+      "van",
+      "truck",
+      "bicycle"
+    ],
+    "paymentMethods": [
+      "cash",
+      "mpesa",
+      "card",
+      "bank_transfer"
+    ],
+    "packageStatuses": [
+      "pending",
+      "confirmed",
+      "picked_up",
+      "in_transit",
+      "out_for_delivery",
+      "delivered",
+      "cancelled",
+      "returned"
+    ],
+    "priorities": [
+      "normal",
+      "urgent",
+      "express"
+    ],
+    "basePrices": {
+      "documents": 300,
+      "electronics": 500,
+      "clothing": 400,
+      "food": 350,
+      "medical": 600,
+      "other": 400
+    },
+    "distanceMultipliers": {
+      "local": 1,
+      "intercity": 1.5,
+      "longDistance": 2
+    }
+  }
+}

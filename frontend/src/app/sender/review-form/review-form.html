@@ -1,0 +1,14 @@
+<form (ngSubmit)="onSubmit()" class="bg-white rounded-xl shadow-lg p-6 flex flex-col gap-4 w-full max-w-md">
+  <h3 class="text-lg font-bold text-[#800020] mb-2">Leave a Review</h3>
+  <div class="flex items-center gap-2">
+    <ng-container *ngFor="let star of [1,2,3,4,5]">
+      <button type="button" (click)="setRating(star)" [class.text-yellow-400]="star <= rating" class="text-2xl focus:outline-none transition">
+        ★
+      </button>
+    </ng-container>
+  </div>
+  <textarea [(ngModel)]="comment" name="comment" rows="3" class="border rounded p-2 w-full" placeholder="Write your feedback..." required></textarea>
+  <button type="submit" class="bg-[#D4AF37] text-[#700018] font-semibold px-4 py-2 rounded hover:bg-[#c9a22d] transition">
+    Submit Review
+  </button>
+</form>

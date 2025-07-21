@@ -8,8 +8,23 @@
       <!-- Login Form -->
       <form *ngSwitchCase="'login'" (ngSubmit)="onLogin()" class="flex flex-col gap-4">
         <h2 class="text-2xl font-bold text-[#800020] mb-2">Login</h2>
-        <input required type="email" placeholder="Email" class="input" />
-        <input required type="password" placeholder="Password" class="input" />
+        <!-- Styled login form fields to match register form -->
+        <input
+          type="email"
+          [(ngModel)]="user.email"
+          name="email"
+          placeholder="Email"
+          class="input"
+          required
+        />
+        <input
+          type="password"
+          [(ngModel)]="user.password"
+          name="password"
+          placeholder="Password"
+          class="input"
+          required
+        />
         <div class="flex justify-between items-center">
           <label class="flex items-center gap-2 text-sm">
             <input type="checkbox" /> Remember me
@@ -18,7 +33,7 @@
         </div>
         <button type="submit" class="btn-primary" [disabled]="loading()">Login</button>
         <div class="text-sm text-center mt-2">
-          Don't have an account? 
+          Don't have an account?
           <span class="text-[#800020] hover:underline cursor-pointer" (click)="mode='register'">Register</span>
         </div>
         <div *ngIf="loading()" class="text-[#800020] text-center">Loading...</div>
@@ -28,11 +43,21 @@
       <!-- Register Form -->
       <form *ngSwitchCase="'register'" (ngSubmit)="onRegister()" class="flex flex-col gap-4">
         <h2 class="text-2xl font-bold text-[#800020] mb-2">Register</h2>
-        <input required type="text" placeholder="Full Name" class="input" />
-        <input required type="email" placeholder="Email" class="input" />
-        <input required type="password" placeholder="Password" class="input" />
-        <input required type="password" placeholder="Confirm Password" class="input" />
-        <button type="submit" class="btn-primary" [disabled]="loading()">Register</button>
+        <input required type="text" placeholder="Full Name" class="input" [(ngModel)]="user.name" name="name" />
+        <input required type="email" placeholder="Email" class="input" [(ngModel)]="user.email" name="email" />
+        <input required type="password" placeholder="Password" class="input" [(ngModel)]="user.password" name="password" />
+        <select required class="input" [(ngModel)]="user.role" name="role">
+          <option *ngFor="let r of roles" [value]="r">{{ r | titlecase }}</option>
+        </select>
+        <!-- Customer fields -->
+        <input *ngIf="user.role === 'customer'" required type="text" placeholder="Address" class="input" [(ngModel)]="user.address" name="address" />
+        <!-- Courier fields -->
+        <input *ngIf="user.role === 'courier'" required type="text" placeholder="Vehicle Type" class="input" [(ngModel)]="user.vehicleType" name="vehicleType" />
+        <input *ngIf="user.role === 'courier'" required type="text" placeholder="License Number" class="input" [(ngModel)]="user.licenseNumber" name="licenseNumber" />
+        <input *ngIf="user.role === 'courier'" required type="text" placeholder="Zone" class="input" [(ngModel)]="user.zone" name="zone" />
+        <!-- Admin fields (if any extra) -->
+        <!-- Add admin-specific fields here if needed -->
+        <button type="submit" class="btn-primary">Register</button>
         <div class="text-sm text-center mt-2">
           Already have an account? 
           <span class="text-[#800020] hover:underline cursor-pointer" (click)="mode='login'">Login</span>

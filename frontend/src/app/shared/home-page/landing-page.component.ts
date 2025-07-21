@@ -1,11 +1,12 @@
 import { Component, signal } from '@angular/core';
 import { AuthPages } from '../../auth-pages/auth-pages';
 import { Router } from '@angular/router';
+import { IonicModule } from '@ionic/angular';
 
 @Component({
   selector: 'app-landing-page',
   standalone: true,
-  imports: [AuthPages],
+  imports: [AuthPages, IonicModule],
   templateUrl: './landing-page.component.html',
   styleUrls: ['./landing-page.component.css']
 })

@@ -1,0 +1,23 @@
+<div *ngIf="statusHistory?.length; else noHistory" class="flex flex-col gap-6">
+  <div *ngFor="let event of statusHistory; let last = last" class="flex items-start gap-4">
+    <!-- Timeline Dot and Line -->
+    <div class="flex flex-col items-center">
+      <div class="w-4 h-4 rounded-full"
+           [ngClass]="{
+             'bg-[#D4AF37] border-2 border-[#800020]': !last,
+             'bg-green-500 border-2 border-green-700': last
+           }"></div>
+      <div *ngIf="!last" class="w-1 h-8 bg-[#D4AF37]"></div>
+    </div>
+    <!-- Event Details -->
+    <div>
+      <div class="font-semibold text-[#800020]">{{ event.status | titlecase }}</div>
+      <div class="text-xs text-gray-500">{{ event.timestamp | date:'medium' }}</div>
+      <div *ngIf="event.location" class="text-xs text-gray-400">📍 {{ event.location }}</div>
+      <div *ngIf="event.notes" class="text-xs text-gray-400 italic">{{ event.notes }}</div>
+    </div>
+  </div>
+</div>
+<ng-template #noHistory>
+  <div class="text-gray-400 text-center py-4">No status history available.</div>
+</ng-template>

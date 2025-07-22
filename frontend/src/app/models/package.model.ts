@@ -1,18 +1,18 @@
 export interface Package {
   id: string;
   trackingId: string;
+  trackingNumber?: string;
 
   senderId: string;
-  senderName?: string; 
+  senderName: string; 
+  senderPhone?: string;
+  senderAddress?: string;
   receiverId?: string;
-  receiverName?: string; 
-  receiverEmail: string;
-  receiverPhone: string;
-  receiverAddress: string;
-  receiverCity: string;
-  receiverState: string;
-  receiverZipCode: string;
-  receiverCountry: string;
+  receiverName: string; 
+  receiverPhone?: string;
+  receiverAddress?: string;
+  courierId?: string;
+  courierName?: string;
 
   createdById: string;
 
@@ -25,9 +25,9 @@ export interface Package {
   preferredDeliveryDate?: string;
   actualPickupDate?: string;
   actualDeliveryDate?: string;
+  estimatedDelivery?: string; // or Date if you prefer
 
   status: string; 
-  courierId?: string;
 
   estimatedCost?: number;
   actualCost?: number;

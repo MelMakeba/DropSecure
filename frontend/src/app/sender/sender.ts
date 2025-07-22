@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ReviewForm } from './review-form/review-form';
 import { PackageDetailModal } from './package-detail-modal/package-detail-modal';
-import { PackageStatusTimeline } from './package-status-timeline/package-status-timeline';
 import { PackageList } from './package-list/package-list';
 import { DashboardCards } from './dashboard-cards/dashboard-cards';
 import { CommonModule } from '@angular/common';
@@ -9,10 +8,11 @@ import { trigger, transition, style, animate } from '@angular/animations';
 import { Package } from '../models/package.model';
 import { Packages, StatusEvent } from '../services/packages/packages';
 import { Router } from '@angular/router';
+import { Sidebar } from '../shared/sidebar/sidebar';
 
 @Component({
   selector: 'app-sender',
-  imports: [CommonModule, ReviewForm, PackageDetailModal, PackageStatusTimeline, PackageList, DashboardCards], 
+  imports: [CommonModule, ReviewForm, PackageDetailModal, PackageList, DashboardCards, Sidebar], 
   templateUrl: './sender.html',
   styleUrls: ['./sender.css'],
   animations: [
@@ -37,8 +37,8 @@ import { Router } from '@angular/router';
   ]
 })
 export class Sender implements OnInit {
-  sidebarOpen = true;
-  sidebarCollapsed = false;
+    sidebarCollapsed = false;
+
 
   headerHeight = 0;
   footerHeight = 0;
@@ -80,26 +80,15 @@ export class Sender implements OnInit {
     localStorage.removeItem('dropsecure_user');
     window.location.href = '/';
   }
+
+  navItems = [
+    { label: 'Dashboard', icon: 'home-outline', route: '/sender/dashboard', roles: ['sender'] },
+    { label: 'My Packages', icon: 'cube-outline', route: '/sender/sent-packages', fragment: 'my-packages', roles: ['sender'] },
+    { label: 'Received', icon: 'checkmark-done-outline', route: '/sender/received-packages', fragment: 'received', roles: ['sender'] },
+    { label: 'Track', icon: 'locate-outline', route: '/sender/track', roles: ['sender', 'courier', 'admin'] },
+    // ...add courier/admin links as needed
+  ];
+
   
-  toggleSidebar() {
-    this.sidebarOpen = !this.sidebarOpen;
-  }
-
-  toggleSidebarCollapse() {
-    this.sidebarCollapsed = !this.sidebarCollapsed;
-  }
-
-  closeSidebarOnMobile() {
-    if (window.innerWidth < 1200) {
-      this.sidebarOpen = false;
-    }
-  }
-
-  isActive(path: string): boolean {
-    return this.router.url === path;
-  }
-
-  isActiveFragment(fragment: string): boolean {
-    return this.router.url.includes(fragment);
-  }
+  // ...rest of your logic...
 }

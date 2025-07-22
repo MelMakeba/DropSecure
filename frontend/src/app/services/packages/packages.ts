@@ -35,4 +35,14 @@ export class Packages {
       );
   }
 
+  getPackageByTrackingNumber(trackingNumber: string): Observable<Package | undefined> {
+    return this.http.get<Package[]>(`${this.apiUrl}/packages?trackingNumber=${trackingNumber}`)
+      .pipe(
+        map(pkgs => pkgs[0]) // Return the first match or undefined
+      );
+  }
+
+  getAssignmentsForCourier(courierId: string): Observable<Package[]> {
+    return this.http.get<Package[]>(`${this.apiUrl}/packages?courierId=${courierId}`);
+  }
 }

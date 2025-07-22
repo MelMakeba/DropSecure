@@ -1,0 +1,67 @@
+<section class="max-w-3xl mx-auto py-10 px-4">
+
+  <app-sidebar
+    [role]="'sender'"
+    [loggedInName]="loggedInSenderName"
+    [navItems]="navItems"
+  ></app-sidebar>
+  
+  <h2 class="text-3xl font-bold text-[#800020] mb-6 text-center">Track Your Package</h2>
+  <form class="flex flex-col sm:flex-row gap-4 w-full mb-8" (submit)="onTrackSubmit($event)">
+    <div class="relative flex-1">
+      <input
+        type="text"
+        [(ngModel)]="trackingInput"
+        name="trackingInput"
+        required
+        placeholder="Enter Tracking Number"
+        class="w-full pl-4 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#800020] focus:border-transparent transition-all"
+      />
+    </div>
+    <button
+      type="submit"
+      class="bg-gradient-to-r from-[#800020] to-[#A00030] text-white px-8 py-3 rounded-lg font-semibold shadow-md hover:shadow-lg hover:opacity-90 transition-all flex items-center justify-center gap-2"
+    >
+      Track
+    </button>
+  </form>
+  <div *ngIf="error" class="text-red-600 text-center text-lg font-semibold mb-4">{{ error }}</div>
+
+  <ng-container *ngIf="packageData">
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+      <div class="flex flex-col md:flex-row md:justify-between gap-4">
+        <div>
+          <div class="font-semibold text-[#D4AF37]">Sender:</div>
+          <div>{{ packageData.senderName }} ({{ packageData.senderPhone }})</div>
+          <div class="text-sm text-gray-500">{{ packageData.senderAddress }}</div>
+        </div>
+        <div>
+          <div class="font-semibold text-[#D4AF37]">Receiver:</div>
+          <div>{{ packageData.receiverName }} ({{ packageData.receiverPhone }})</div>
+          <div class="text-sm text-gray-500">{{ packageData.receiverAddress }}</div>
+        </div>
+        <div>
+          <div class="font-semibold text-[#D4AF37]">Courier:</div>
+          <div>{{ packageData.courierName }}</div>
+        </div>
+      </div>
+      <div class="mt-4 flex flex-col md:flex-row md:justify-between gap-4">
+        <div>
+          <span class="font-semibold">Status:</span>
+          <span class="px-2 py-1 rounded bg-[#F3F4F6] text-[#800020] font-semibold">
+            {{ packageData.status | uppercase }}
+          </span>
+        </div>
+        <div>
+          <span class="font-semibold">Estimated Delivery:</span>
+          <span>{{ packageData.estimatedDelivery | date:'medium' }}</span>
+        </div>
+      </div>
+    </div>
+    <!-- Map Section -->
+    <div class="mb-6">
+      <h3 class="text-lg font-bold mb-2 text-[#800020]">Courier Location</h3>
+      <div id="map" class="w-full h-64 rounded-lg"></div>
+    </div>
+  </ng-container>
+</section>

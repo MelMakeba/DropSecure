@@ -1,0 +1,50 @@
+<div class="p-6">
+
+  <app-sidebar
+    [role]="'courier'"
+    [loggedInName]="loggedInCourierName"
+    [navItems]="navItems"
+  ></app-sidebar>
+ <main  class="flex-1 ml-0 transition-all duration-300 min-h-screen"
+    [ngClass]="{
+      'md:ml-64': !sidebarCollapsed,
+      'md:ml-16': sidebarCollapsed
+    }">
+  <h2 class="text-2xl font-bold text-[#800020] mb-4">My Assignments</h2>
+  <div *ngIf="loading" class="text-gray-500">Loading...</div>
+  <div *ngIf="!loading && assignments.length === 0" class="text-gray-500">No assignments found.</div>
+  <ul *ngIf="assignments.length > 0" class="divide-y divide-gray-200">
+    <li *ngFor="let pkg of assignments" class="py-4 cursor-pointer hover:bg-[#F3F4F6] rounded">
+      <div class="flex justify-between items-center">
+        <div (click)="selectedPackage = pkg; showPackageModal = true">
+          <div class="font-semibold">{{ pkg.trackingNumber }}</div>
+          <div class="text-sm text-gray-600">{{ pkg.receiverName }} ({{ pkg.receiverAddress }})</div>
+          <div class="text-xs text-gray-400">Status: {{ pkg.status | uppercase }}</div>
+        </div>
+        <div class="flex gap-2">
+          <button class="bg-green-500 text-white px-3 py-1 rounded" (click)="openConfirm('accept', pkg)">Accept</button>
+          <button class="bg-red-500 text-white px-3 py-1 rounded" (click)="openConfirm('decline', pkg)">Decline</button>
+        </div>
+      </div>
+    </li>
+  </ul>
+
+  <!-- Package Detail Modal -->
+  <app-package-detail-modal
+    [show]="showPackageModal"
+    [package]="selectedPackage"
+    (close)="showPackageModal = false"
+  ></app-package-detail-modal>
+
+  <app-confirmation-modal
+    [show]="showConfirmModal"
+    [title]="confirmAction === 'accept' ? 'Accept Assignment' : 'Decline Assignment'"
+    [message]="confirmAction === 'accept'
+      ? 'Are you sure you want to accept this assignment?'
+      : 'Are you sure you want to decline this assignment?'"
+    [confirmText]="confirmAction === 'accept' ? 'Accept' : 'Decline'"
+    (confirm)="onConfirm()"
+    (cancel)="onCancel()"
+  ></app-confirmation-modal>
+</main>
+</div>

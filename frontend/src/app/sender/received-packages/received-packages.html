@@ -1,0 +1,41 @@
+<section class="min-h-screen bg-gradient-to-br from-[#F3F4F6] via-[#fff8f2] to-[#f9fafb] flex relative">
+  <app-sidebar
+    [role]="'sender'"
+    [loggedInName]="loggedInSenderName"
+    [navItems]="navItems"
+  ></app-sidebar>
+
+  <main 
+    class="flex-1 ml-0 transition-all duration-300 min-h-screen"
+      [ngClass]="{
+        'md:ml-64': !sidebarCollapsed,
+        'md:ml-16': sidebarCollapsed
+      }"
+  >
+    <div class="p-6">
+      <h2 class="text-2xl font-bold text-[#800020] mb-4">My Received Packages</h2>
+      <div *ngIf="loading" class="text-gray-500">Loading...</div>
+      <div *ngIf="!loading && receivedPackages.length === 0" class="text-gray-500">No received packages found.</div>
+      <ul *ngIf="receivedPackages.length > 0" class="divide-y divide-gray-200">
+        <li *ngFor="let pkg of receivedPackages" class="py-4 cursor-pointer hover:bg-[#F3F4F6] rounded"
+            (click)="selectedPackage = pkg; showPackageModal = true">
+          <div class="flex justify-between items-center">
+            <div>
+              <div class="font-semibold">{{ pkg.trackingNumber }}</div>
+              <div class="text-sm text-gray-600">{{ pkg.senderName }} ({{ pkg.senderAddress }})</div>
+              <div class="text-xs text-gray-400">Status: {{ pkg.status | uppercase }}</div>
+            </div>
+            <div class="text-xs text-gray-500">{{ pkg.estimatedDelivery | date:'medium' }}</div>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Package Detail Modal -->
+    <app-package-detail-modal
+      [show]="showPackageModal"
+      [package]="selectedPackage"
+      (close)="showPackageModal = false"
+    ></app-package-detail-modal>
+  </main>
+</section>

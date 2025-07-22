@@ -1,0 +1,396 @@
+<section class="min-h-screen bg-gradient-to-br from-[#fff8f2] via-[#f9fafb] to-[#F3F4F6] flex relative overflow-x-hidden">
+  <!-- Decorative Background Elements -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-[#800020]/10 to-transparent rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-blue-500/10 to-transparent rounded-full blur-3xl"></div>
+    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-purple-500/5 to-transparent rounded-full blur-3xl"></div>
+  </div>
+
+  <app-sidebar
+    [role]="'admin'"
+    [loggedInName]="loggedInAdminName"
+    [navItems]="navItems"
+  ></app-sidebar>
+
+  <main
+    class="flex-1 ml-0 transition-all duration-300 min-h-screen relative z-10 flex flex-col"
+    [ngClass]="{
+      'md:ml-64': !sidebarCollapsed,
+      'md:ml-16': sidebarCollapsed
+    }"
+  >
+    <!-- Enhanced Header -->
+    <header class="bg-white/90 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-20 shadow-sm">
+      <div class="px-6 py-5 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-gradient-to-r from-[#800020] to-[#b91c3c] rounded-2xl flex items-center justify-center shadow-lg">
+            <ion-icon name="cube-outline" class="text-white text-xl"></ion-icon>
+          </div>
+          <div>
+            <h1 class="text-3xl font-bold bg-gradient-to-r from-[#800020] to-[#b91c3c] bg-clip-text text-transparent">
+              Package Management
+            </h1>
+            <p class="text-gray-600 mt-1 flex items-center gap-2">
+              <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+              View, assign, and manage all packages in the system
+            </p>
+          </div>
+        </div>
+        
+        <!-- Header Actions -->
+        <div class="flex items-center gap-3">
+          <!-- Filter Dropdown -->
+          <div class="relative">
+            <select class="appearance-none bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl px-4 py-2 pr-8 text-sm font-medium text-gray-700 hover:border-[#800020] focus:outline-none focus:ring-2 focus:ring-[#800020]/20 focus:border-[#800020] transition-all duration-200">
+              <option>All Status</option>
+              <option>Pending</option>
+              <option>In Transit</option>
+              <option>Delivered</option>
+              <option>Cancelled</option>
+            </select>
+            <ion-icon name="chevron-down" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm pointer-events-none"></ion-icon>
+          </div>
+          
+          <!-- Search -->
+          <div class="relative">
+            <ion-icon name="search-outline" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></ion-icon>
+            <input type="text" placeholder="Search packages..." 
+                   class="pl-9 pr-4 py-2 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:border-[#800020] focus:outline-none focus:ring-2 focus:ring-[#800020]/20 focus:border-[#800020] transition-all duration-200 w-64">
+          </div>
+          
+          <!-- Create Package Button -->
+          <button (click)="openCreateModal()" class="bg-[#800020] text-white px-5 py-2 rounded-xl font-semibold shadow hover:bg-[#a8324a] transition-all duration-200">
+            + Create Package
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 p-6 flex flex-col">
+      <!-- Enhanced Table Container -->
+      <div class="flex-1 bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-gray-100/50 overflow-hidden">
+        <div class="p-6 border-b border-gray-100/50">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-gradient-to-r from-[#800020] to-[#b91c3c] rounded-xl flex items-center justify-center">
+                <ion-icon name="list-outline" class="text-white text-lg"></ion-icon>
+              </div>
+              <div>
+                <h3 class="text-xl font-bold text-gray-800">All Packages</h3>
+                <p class="text-sm text-gray-600">Manage and track package deliveries</p>
+              </div>
+            </div>
+            
+            <!-- Bulk Actions -->
+            <div class="flex items-center gap-2">
+              <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium">
+                Export
+              </button>
+              <button class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm font-medium">
+                Bulk Assign
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div *ngIf="loading" class="flex flex-col items-center justify-center py-16">
+          <div class="relative">
+            <div class="w-16 h-16 border-4 border-gray-200 border-t-[#800020] rounded-full animate-spin"></div>
+            <div class="absolute inset-0 w-16 h-16 border-4 border-transparent border-t-red-400 rounded-full animate-spin" style="animation-delay: 0.15s;"></div>
+          </div>
+          <p class="text-gray-600 mt-4 font-medium">Loading packages...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!loading && packages.length === 0" class="flex flex-col items-center justify-center py-16">
+          <div class="w-20 h-20 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full flex items-center justify-center mb-6">
+            <ion-icon name="cube-outline" class="text-gray-400 text-3xl"></ion-icon>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-700 mb-2">No packages found</h3>
+          <p class="text-gray-500 mb-6">Get started by creating your first package</p>
+          <button class="bg-gradient-to-r from-[#800020] to-[#b91c3c] text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105">
+            Create First Package
+          </button>
+        </div>
+
+        <!-- Enhanced Table -->
+        <div class="flex-1 overflow-hidden" *ngIf="!loading && packages.length > 0">
+          <div class="overflow-x-auto h-full">
+            <div class="min-w-max">
+              <table class="w-full">
+                <thead class="bg-gradient-to-r from-[#800020] to-[#b91c3c] sticky top-0 z-10">
+                  <tr>
+                    <th class="py-4 px-6 text-left text-white font-semibold text-sm tracking-wider">
+                      <div class="flex items-center gap-2">
+                        <ion-icon name="barcode-outline" class="text-lg"></ion-icon>
+                        Tracking Number
+                      </div>
+                    </th>
+                    <th class="py-4 px-6 text-left text-white font-semibold text-sm tracking-wider">
+                      <div class="flex items-center gap-2">
+                        <ion-icon name="person-outline" class="text-lg"></ion-icon>
+                        Sender
+                      </div>
+                    </th>
+                    <th class="py-4 px-6 text-left text-white font-semibold text-sm tracking-wider">
+                      <div class="flex items-center gap-2">
+                        <ion-icon name="location-outline" class="text-lg"></ion-icon>
+                        Receiver
+                      </div>
+                    </th>
+                    <th class="py-4 px-6 text-left text-white font-semibold text-sm tracking-wider">
+                      <div class="flex items-center gap-2">
+                        <ion-icon name="pulse-outline" class="text-lg"></ion-icon>
+                        Status
+                      </div>
+                    </th>
+                    <th class="py-4 px-6 text-left text-white font-semibold text-sm tracking-wider">
+                      <div class="flex items-center gap-2">
+                        <ion-icon name="bicycle-outline" class="text-lg"></ion-icon>
+                        Courier
+                      </div>
+                    </th>
+                    <th class="py-4 px-6 text-left text-white font-semibold text-sm tracking-wider">
+                      <div class="flex items-center gap-2">
+                        <ion-icon name="calendar-outline" class="text-lg"></ion-icon>
+                        Created
+                      </div>
+                    </th>
+                    <th class="py-4 px-6 text-center text-white font-semibold text-sm tracking-wider">
+                      <div class="flex items-center justify-center gap-2">
+                        <ion-icon name="settings-outline" class="text-lg"></ion-icon>
+                        Actions
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                  <tr *ngFor="let pkg of packages; let i = index" 
+                      class="hover:bg-gradient-to-r hover:from-gray-50 hover:to-blue-50/30 transition-all duration-200 group"
+                      [class.bg-gray-50]="i % 2 === 0">
+                  
+                    <!-- Tracking Number -->
+                    <td class="py-4 px-6">
+                      <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
+                          <ion-icon name="cube-outline" class="text-blue-600 text-lg"></ion-icon>
+                        </div>
+                        <div>
+                          <div class="font-bold text-gray-900 font-mono">{{ pkg.trackingNumber }}</div>
+                          <div class="text-xs text-gray-500">ID: {{ pkg.id }}</div>
+                        </div>
+                      </div>
+                    </td>
+  
+                    <!-- Sender -->
+                    <td class="py-4 px-6">
+                      <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full flex items-center justify-center">
+                          <ion-icon name="person-outline" class="text-purple-600 text-sm"></ion-icon>
+                        </div>
+                        <div>
+                          <div class="font-semibold text-gray-900">{{ pkg.senderName }}</div>
+                          <div class="text-xs text-gray-500 max-w-32 truncate">{{ pkg.senderAddress }}</div>
+                        </div>
+                      </div>
+                    </td>
+  
+                    <!-- Receiver -->
+                    <td class="py-4 px-6">
+                      <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 bg-gradient-to-r from-emerald-100 to-teal-100 rounded-full flex items-center justify-center">
+                          <ion-icon name="location-outline" class="text-emerald-600 text-sm"></ion-icon>
+                        </div>
+                        <div>
+                          <div class="font-semibold text-gray-900">{{ pkg.receiverName }}</div>
+                          <div class="text-xs text-gray-500 max-w-32 truncate">{{ pkg.receiverAddress }}</div>
+                        </div>
+                      </div>
+                    </td>
+  
+                    <!-- Status -->
+                    <td class="py-4 px-6">
+                      <div class="flex items-center gap-2">
+                        <div class="w-3 h-3 rounded-full animate-pulse"
+                             [ngClass]="{
+                               'bg-yellow-400': pkg.status === 'pending',
+                               'bg-blue-400': pkg.status === 'in_transit',
+                               'bg-green-400': pkg.status === 'delivered',
+                               'bg-red-400': pkg.status === 'cancelled'
+                             }"></div>
+                        <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold shadow-sm"
+                              [ngClass]="{
+                                'bg-gradient-to-r from-yellow-100 to-orange-100 text-yellow-800 border border-yellow-200': pkg.status === 'pending',
+                                'bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border border-blue-200': pkg.status === 'in_transit',
+                                'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border border-green-200': pkg.status === 'delivered',
+                                'bg-gradient-to-r from-red-100 to-pink-100 text-red-800 border border-red-200': pkg.status === 'cancelled'
+                              }">
+                          {{ pkg.status | titlecase }}
+                        </span>
+                      </div>
+                    </td>
+  
+                    <!-- Courier -->
+                    <td class="py-4 px-6">
+                      <div *ngIf="pkg.courierName; else unassigned" class="flex items-center gap-2">
+                        <div class="w-8 h-8 bg-gradient-to-r from-blue-100 to-cyan-100 rounded-full flex items-center justify-center">
+                          <span class="text-blue-600 text-xs font-bold">{{ pkg.courierName.charAt(0).toUpperCase() }}</span>
+                        </div>
+                        <div>
+                          <div class="font-semibold text-gray-900">{{ pkg.courierName }}</div>
+                          <div class="text-xs text-green-600 flex items-center gap-1">
+                            <ion-icon name="checkmark-circle" class="text-xs"></ion-icon>
+                            Active
+                          </div>
+                        </div>
+                      </div>
+                      <ng-template #unassigned>
+                        <div class="flex items-center gap-2">
+                          <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                            <ion-icon name="help-outline" class="text-gray-400 text-sm"></ion-icon>
+                          </div>
+                          <span class="text-gray-500 font-medium">Unassigned</span>
+                        </div>
+                      </ng-template>
+                    </td>
+  
+                    <!-- Created Date -->
+                    <td class="py-4 px-6">
+                      <div class="text-sm text-gray-600">
+                        {{ pkg.createdAt | date:'MMM dd, yyyy' }}
+                      </div>
+                      <div class="text-xs text-gray-400">
+                        {{ pkg.createdAt | date:'h:mm a' }}
+                      </div>
+                    </td>
+  
+                    <!-- Actions -->
+                    <td class="py-4 px-6">
+                      <div class="flex items-center justify-center gap-2">
+                        <button 
+                          class="group flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-gradient-to-r from-[#800020] to-[#b91c3c] text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105 font-semibold"
+                          (click)="openAssignModal(pkg.id)">
+                          <ion-icon name="person-add-outline" class="text-sm group-hover:scale-110 transition-transform"></ion-icon>
+                          Assign
+                        </button>
+                        <button class="group flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-gradient-to-r from-gray-100 to-gray-200 text-[#800020] hover:from-gray-200 hover:to-gray-300 transition-all duration-200 transform hover:scale-105 font-semibold"
+                          (click)="openDetailsModal(pkg)">
+                          <ion-icon name="eye-outline" class="text-sm group-hover:scale-110 transition-transform"></ion-icon>
+                          Details
+                        </button>
+                        <button 
+                          class="group flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 hover:from-green-200 hover:to-emerald-200 transition-all duration-200 transform hover:scale-105 font-semibold"
+                          (click)="openEditModal(pkg)">
+                          <ion-icon name="create-outline" class="text-sm group-hover:scale-110 transition-transform"></ion-icon>
+                          Edit
+                        </button>
+                        <button 
+                          class="text-xs px-3 py-1 rounded bg-red-100 text-red-700 hover:bg-red-200"
+                          (click)="openDeleteModal(pkg.id)">
+                          Delete
+                        </button>
+                        <button
+                         class="text-xs px-3 py-1 rounded bg-red-100 text-red-700 hover:bg-red-200"
+                         (click)="markAsPickedUp(pkg)" *ngIf="pkg.status === 'pending'">Picked Up </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</section>
+
+<!-- Create Package Modal -->
+<div *ngIf="showCreateModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+<div class="bg-white rounded-xl shadow-lg p-8 w-full max-w-lg relative">
+  <button (click)="closeCreateModal()" class="absolute top-3 right-3 text-gray-400 hover:text-[#800020] text-2xl">&times;</button>
+  <h2 class="text-xl font-bold text-[#800020] mb-4">
+    {{ editMode ? 'Edit Package' : 'Create New Package' }}
+  </h2>
+  <form #createForm="ngForm" (ngSubmit)="submitCreatePackage(createForm)">
+    <div class="grid grid-cols-1 gap-4">
+      <input class="border rounded p-2" name="senderName" [(ngModel)]="newPackage.senderName" placeholder="Sender Name" required>
+      <input class="border rounded p-2" name="senderEmail" [(ngModel)]="newPackage.senderEmail" placeholder="Sender Email" required>
+      <input class="border rounded p-2" name="senderPhone" [(ngModel)]="newPackage.senderPhone" placeholder="Sender Phone" required>
+      <input class="border rounded p-2" name="pickupAddress" [(ngModel)]="newPackage.senderAddress" placeholder="Pickup Address" required>
+      <input class="border rounded p-2" name="senderName" [(ngModel)]="newPackage.receiverName" placeholder="Receiver Name" required>
+      <input class="border rounded p-2" name="receiverEmail" [(ngModel)]="newPackage.receiverEmail" placeholder="Receiver Email" required>
+      <input class="border rounded p-2" name="receiverPhone" [(ngModel)]="newPackage.receiverPhone" placeholder="Receiver Phone" required>
+      <input class="border rounded p-2" name="deliveryAddress" [(ngModel)]="newPackage.receiverAddress" placeholder="Delivery Address" required>
+      <input class="border rounded p-2" type="number" name="weight" [(ngModel)]="newPackage.weight" placeholder="Package Weight (kg)" required>
+      <textarea class="border rounded p-2" name="description" [(ngModel)]="newPackage.description" placeholder="Package Description" required></textarea>
+    </div>
+    <button type="submit" [disabled]="createForm.invalid" class="mt-4 w-full bg-[#800020] text-white py-2 rounded font-semibold hover:bg-[#a8324a] transition">
+      {{ editMode ? 'Update Package' : 'Create Package' }}
+    </button>
+  </form>
+</div>
+</div>
+
+<!-- Assign Courier Modal -->
+<div *ngIf="showAssignModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 animate-fade-in">
+<div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md relative animate-modal-in border-t-4 border-[#D4AF37]">
+  <!-- Close Button -->
+  <button (click)="closeAssignModal()" class="absolute top-4 right-4 text-[#800020] hover:text-[#D4AF37] text-2xl transition-colors" aria-label="Close">
+    &times;
+  </button>
+  
+  <!-- Header with Icon -->
+  <div class="flex items-center mb-4">
+    <div class="bg-[#D4AF37]/10 p-3 rounded-full mr-3">
+      <i class="fas fa-box-open text-[#800020] text-xl"></i>
+    </div>
+    <h2 class="text-xl font-bold text-[#800020]">Assign Package to Courier</h2>
+  </div>
+  
+  <!-- Form -->
+  <form (ngSubmit)="assignPackageToCourier()">
+    <div class="mb-5">
+      <label class="block mb-2 text-sm font-medium text-[#800020]">Select Courier:</label>
+      <div class="select-container">
+        <select class="w-full border-2 border-[#D4AF37]/40 rounded-lg p-3 pr-10 text-[#800020] focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/30 transition"
+            [(ngModel)]="selectedCourierId" name="courier" required>
+          <option [ngValue]="null" disabled selected>Select a courier</option>
+          <option *ngFor="let courier of couriers" [ngValue]="courier.id">{{ courier.name }}</option>
+        </select>
+      </div>
+    </div>
+    <button type="submit" [disabled]="!selectedCourierId" 
+        class="w-full gold-gradient text-[#800020] py-3 rounded-lg font-bold shadow-lg hover:shadow-xl transition-all disabled:opacity-60 disabled:cursor-not-allowed">
+      <i class="fas fa-paper-plane mr-2"></i> Assign Package
+    </button>
+  </form>
+  
+  <!-- Additional Info -->
+  <div class="mt-4 pt-4 border-t border-[#D4AF37]/20 flex items-center">
+    <i class="fas fa-info-circle text-[#D4AF37] mr-2"></i>
+    <p class="text-sm text-gray-600">Packages assigned before 4 PM will ship today</p>
+  </div>
+</div>
+</div>
+
+
+<app-confirmation-modal
+[show]="showDeleteModal"
+title="Delete Package"
+message="Are you sure you want to delete this package? This action cannot be undone."
+confirmText="Delete"
+cancelText="Cancel"
+(confirm)="confirmDeletePackage()"
+(cancel)="closeDeleteModal()">
+</app-confirmation-modal>
+
+<app-package-detail-modal
+*ngIf="showDetailsModal"
+[show]="showDetailsModal"
+[package]="selectedPackage"
+[statusHistory]="selectedPackageStatusHistory"
+(closeModal)="closeDetailsModal()">
+</app-package-detail-modal>

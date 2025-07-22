@@ -100,8 +100,8 @@ export class TrackPackage implements OnInit, AfterViewInit, OnDestroy {
 
    navItems = [
     { label: 'Dashboard', icon: 'home-outline', route: '/sender/dashboard', roles: ['sender'] },
-    { label: 'My Packages', icon: 'cube-outline', route: '/sender/dashboard', fragment: 'my-packages', roles: ['sender'] },
-    { label: 'Received', icon: 'checkmark-done-outline', route: '/sender/dashboard', fragment: 'received', roles: ['sender'] },
+    { label: 'My Packages', icon: 'cube-outline', route: '/sender/sent-packages', fragment: 'my-packages', roles: ['sender'] },
+    { label: 'Received', icon: 'checkmark-done-outline', route: '/sender/received-packages', fragment: 'received', roles: ['sender'] },
     { label: 'Track', icon: 'locate-outline', route: '/sender/track', roles: ['sender', 'courier', 'admin'] },
   ];
 }

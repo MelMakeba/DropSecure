@@ -1,0 +1,25 @@
+@keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  .animation-delay-150 {
+    animation-delay: 0.15s;
+  }
+  
+  .animate-spin {
+    animation: spin 1s linear infinite;
+  }
+  
+  /* Hover effects for buttons */
+  button:active {
+    transform: scale(0.98);
+  }
+  
+  /* Smooth transitions for all interactive elements */
+  * {
+    transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }

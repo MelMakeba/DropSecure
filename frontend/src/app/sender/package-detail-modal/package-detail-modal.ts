@@ -27,9 +27,9 @@ import { ReviewForm } from '../review-form/review-form';
 export class PackageDetailModal implements OnChanges {
   @Input() show = false;
   @Input() package?: Package;
-  @Output() close = new EventEmitter<void>();
+  @Input () statusHistory: StatusEvent[] = [];
+  @Output() closeModal = new EventEmitter<void>();
 
-  statusHistory: StatusEvent[] = [];
 
   constructor(private packageService: Packages) {}
 
@@ -41,9 +41,6 @@ export class PackageDetailModal implements OnChanges {
     }
   }
 
-  closeModal() {
-    this.close.emit();
-  }
 
   handleReview(event: { rating: number; comment: string }) {
     // Save review to backend or show a success message

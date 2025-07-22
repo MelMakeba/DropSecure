@@ -9,10 +9,11 @@ import { Package } from '../models/package.model';
 import { Packages, StatusEvent } from '../services/packages/packages';
 import { Router } from '@angular/router';
 import { Sidebar } from '../shared/sidebar/sidebar';
+import { IonicModule } from '@ionic/angular';
 
 @Component({
   selector: 'app-sender',
-  imports: [CommonModule, ReviewForm, PackageDetailModal, PackageList, DashboardCards, Sidebar], 
+  imports: [CommonModule, ReviewForm, PackageDetailModal, PackageList, DashboardCards, Sidebar, IonicModule], 
   templateUrl: './sender.html',
   styleUrls: ['./sender.css'],
   animations: [
@@ -86,9 +87,7 @@ export class Sender implements OnInit {
     { label: 'My Packages', icon: 'cube-outline', route: '/sender/sent-packages', fragment: 'my-packages', roles: ['sender'] },
     { label: 'Received', icon: 'checkmark-done-outline', route: '/sender/received-packages', fragment: 'received', roles: ['sender'] },
     { label: 'Track', icon: 'locate-outline', route: '/sender/track', roles: ['sender', 'courier', 'admin'] },
-    // ...add courier/admin links as needed
   ];
 
   
-  // ...rest of your logic...
 }

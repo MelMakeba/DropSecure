@@ -6,11 +6,12 @@ import { Sidebar } from '../../shared/sidebar/sidebar';
 import { RouterModule } from '@angular/router';
 import { PackageDetailModal } from '../package-detail-modal/package-detail-modal';
 import { animate, style, transition, trigger } from '@angular/animations';
+import { IonicModule } from '@ionic/angular';
 
 @Component({
   selector: 'app-received-packages',
   standalone: true,
-  imports: [CommonModule, Sidebar, RouterModule, PackageDetailModal],
+  imports: [CommonModule, Sidebar, RouterModule, PackageDetailModal, IonicModule],
   templateUrl: './received-packages.html',
   styleUrls: ['./received-packages.css'],
   animations: [
@@ -62,8 +63,15 @@ export class ReceivedPackages implements OnInit {
 
   navItems = [
     { label: 'Dashboard', icon: 'home-outline', route: '/sender/dashboard', roles: ['sender'] },
-    { label: 'My Packages', icon: 'cube-outline', route: '/sender/dashboard', fragment: 'my-packages', roles: ['sender'] },
+    { label: 'My Packages', icon: 'cube-outline', route: '/sender/sent-packages', fragment: 'my-packages', roles: ['sender'] },
     { label: 'Received', icon: 'checkmark-done-outline', route: '/sender/received-packages', fragment: 'received', roles: ['sender'] },
     { label: 'Track', icon: 'locate-outline', route: '/sender/track', roles: ['sender', 'courier', 'admin'] },
   ];
+
+  onPackageClick(event: MouseEvent, pkg: Package) {
+    event.stopPropagation();
+    event.preventDefault();
+    this.selectedPackage = pkg;
+    this.showPackageModal = true;
+  }
 }

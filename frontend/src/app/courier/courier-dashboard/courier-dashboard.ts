@@ -33,9 +33,8 @@ export class CourierDashboard implements OnInit {
     { label: 'Dashboard', icon: 'home-outline', route: '/courier/dashboard', roles: ['courier'] },
     { label: 'Assignments', icon: 'mail-unread-outline', route: '/courier/assignments', roles: ['courier'] },
     { label: 'Route Planner', icon: 'navigate-outline', route: '/courier/route-planner', roles: ['courier'] },
-    { label: 'Earnings', icon: 'cash-outline', route: '/courier/earnings', roles: ['courier'] },
-    { label: 'Track', icon: 'locate-outline', route: '/courier/track', roles: ['courier', 'admin'] },
-    // Add more as needed
+    // { label: 'Earnings', icon: 'cash-outline', route: '/courier/earnings', roles: ['courier'] },
+    // { label: 'Track', icon: 'locate-outline', route: '/courier/track', roles: ['courier', 'admin'] },
   ];
 
   ngOnInit() {}

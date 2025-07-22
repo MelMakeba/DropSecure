@@ -1,4 +1,10 @@
 <section class="min-h-screen bg-gradient-to-br from-[#F3F4F6] via-[#fff8f2] to-[#f9fafb] flex relative">
+  <!-- Decorative background elements -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-[#800020]/10 to-transparent rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-[#D4AF37]/10 to-transparent rounded-full blur-3xl"></div>
+  </div>
+
   <app-sidebar
     [role]="'sender'"
     [loggedInName]="loggedInSenderName"
@@ -6,26 +12,84 @@
   ></app-sidebar>
 
   <main 
-    class="flex-1 ml-0 transition-all duration-300 min-h-screen"
-      [ngClass]="{
-        'md:ml-64': !sidebarCollapsed,
-        'md:ml-16': sidebarCollapsed
-      }"
+    class="flex-1 ml-0 transition-all duration-300 min-h-screen relative z-10"
+    [ngClass]="{
+      'md:ml-64': !sidebarCollapsed,
+      'md:ml-16': sidebarCollapsed
+    }"
   >
     <div class="p-6">
-      <h2 class="text-2xl font-bold text-[#800020] mb-4">My Sent Packages</h2>
-      <div *ngIf="loading" class="text-gray-500">Loading...</div>
-      <div *ngIf="!loading && sentPackages.length === 0" class="text-gray-500">No sent packages found.</div>
-      <ul *ngIf="sentPackages.length > 0" class="divide-y divide-gray-200">
-        <li *ngFor="let pkg of sentPackages" class="py-4 cursor-pointer hover:bg-[#F3F4F6] rounded"
-            (click)="selectedPackage = pkg; showPackageModal = true">
-          <div class="flex justify-between items-center">
-            <div>
-              <div class="font-semibold">{{ pkg.trackingNumber }}</div>
-              <div class="text-sm text-gray-600">{{ pkg.receiverName }} ({{ pkg.receiverAddress }})</div>
-              <div class="text-xs text-gray-400">Status: {{ pkg.status | uppercase }}</div>
+      <!-- Header with icon -->
+      <div class="flex items-center gap-4 mb-6">
+        <div class="w-12 h-12 bg-gradient-to-r from-[#800020] to-[#b91c3c] rounded-2xl flex items-center justify-center shadow-lg">
+          <ion-icon name="cube-outline" class="text-white text-xl"></ion-icon>
+        </div>
+        <h2 class="text-2xl font-bold bg-gradient-to-r from-[#800020] to-[#b91c3c] bg-clip-text text-transparent">
+          My Sent Packages
+        </h2>
+      </div>
+
+      <!-- Loading state -->
+      <div *ngIf="loading" class="flex flex-col items-center justify-center py-12">
+        <div class="w-12 h-12 border-4 border-[#800020]/20 rounded-full border-t-[#800020] animate-spin"></div>
+        <p class="mt-4 text-gray-600">Loading your packages...</p>
+      </div>
+
+      <!-- Empty state -->
+      <div *ngIf="!loading && sentPackages.length === 0" class="flex flex-col items-center justify-center py-12 text-center">
+        <div class="w-20 h-20 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full flex items-center justify-center mb-4">
+          <ion-icon name="cube-outline" class="text-gray-400 text-2xl"></ion-icon>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-700 mb-2">No packages sent yet</h3>
+        <p class="text-gray-500 max-w-md">Packages you send will appear here once they're on their way.</p>
+        <button class="mt-4 bg-[#800020] text-white px-5 py-2 rounded-xl font-semibold shadow hover:bg-[#a8324a] transition-all duration-200">
+          + Create New Package
+        </button>
+      </div>
+
+      <!-- Packages list -->
+      <ul *ngIf="sentPackages.length > 0" class="space-y-3">
+        <li *ngFor="let pkg of sentPackages" 
+            class="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer border border-gray-100 hover:border-[#800020]/20"
+            (click)="onPackageClick($event, pkg)">
+          <div class="flex justify-between items-start">
+            <div class="flex items-start gap-3">
+              <!-- Status indicator -->
+              <div class="flex flex-col items-center pt-1">
+                <div class="w-3 h-3 rounded-full animate-pulse"
+                     [ngClass]="{
+                       'bg-yellow-400': pkg.status === 'pending',
+                       'bg-blue-400': pkg.status === 'in_transit',
+                       'bg-green-400': pkg.status === 'delivered',
+                       'bg-red-400': pkg.status === 'cancelled'
+                     }"></div>
+              </div>
+              
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="font-semibold text-gray-900">{{ pkg.trackingNumber }}</span>
+                  <span class="text-xs px-2 py-1 rounded-full"
+                        [ngClass]="{
+                          'bg-yellow-100 text-yellow-800': pkg.status === 'pending',
+                          'bg-blue-100 text-blue-800': pkg.status === 'in_transit',
+                          'bg-green-100 text-green-800': pkg.status === 'delivered',
+                          'bg-red-100 text-red-800': pkg.status === 'cancelled'
+                        }">
+                    {{ pkg.status | uppercase }}
+                  </span>
+                </div>
+                <div class="mt-1 text-sm text-gray-600">
+                  To: {{ pkg.receiverName }} • {{ pkg.receiverAddress }}
+                </div>
+                <div class="mt-2 flex items-center gap-2 text-xs text-gray-500">
+                  <ion-icon name="calendar-outline" class="text-[#800020]"></ion-icon>
+                  Est. delivery: {{ pkg.estimatedDelivery | date:'MMM d, yyyy' }}
+                </div>
+              </div>
             </div>
-            <div class="text-xs text-gray-500">{{ pkg.estimatedDelivery | date:'medium' }}</div>
+            <div class="text-[#800020]">
+              <ion-icon name="chevron-forward-outline"></ion-icon>
+            </div>
           </div>
         </li>
       </ul>
@@ -35,7 +99,7 @@
     <app-package-detail-modal
       [show]="showPackageModal"
       [package]="selectedPackage"
-      (close)="showPackageModal = false"
+      (closeModal)="showPackageModal = false"
     ></app-package-detail-modal>
   </main>
 </section>

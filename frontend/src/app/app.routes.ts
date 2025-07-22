@@ -8,6 +8,9 @@ import { SentPackages } from './sender/sent-packages/sent-packages';
 import { ReceivedPackages } from './sender/received-packages/received-packages';
 import { CourierDashboard } from './courier/courier-dashboard/courier-dashboard';
 import { Assignments} from './courier/assignments/assignments';
+import { RoutePlanner } from './courier/route-planner/route-planner';
+import { AdminDashboard } from './admin/admin-dashboard/admin-dashboard';
+import { PackageManagement } from './admin/package-management/package-management';
 
 export const routes: Routes = [
   { path: '', component: LandingPageComponent },
@@ -18,6 +21,9 @@ export const routes: Routes = [
   {path: 'sender/sent-packages', component: SentPackages},
   {path: 'sender/received-packages', component: ReceivedPackages}, 
   {path: 'courier/dashboard', component: CourierDashboard},
-  {path: 'courier/assignments', component: Assignments}
+  {path: 'courier/assignments', component: Assignments},
+  {path: 'courier/route-planner', component:RoutePlanner},
+  {path: 'admin/dashboard', component: AdminDashboard},
+  {path: 'admin/packages', component:PackageManagement}
   // ...other routes will be added here step by step
 ];

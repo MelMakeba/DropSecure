@@ -32,6 +32,24 @@ export class HeaderComponent {
   goHome() {
     this.router.navigate(['/']);
   }
+  goToDashboard() {
+    const user = localStorage.getItem('dropsecure_user');
+    if (user) {
+      const parsed = JSON.parse(user);
+      if (parsed.role === 'admin') {
+        this.router.navigate(['/admin/dashboard']);
+      } else if (parsed.role === 'courier') {
+        this.router.navigate(['/courier/dashboard']);
+      } else if (parsed.role === 'user') {
+        this.router.navigate(['/sender/dashboard']);
+      } else {
+        this.router.navigate(['/']); // fallback
+      }
+    } else {
+      this.router.navigate(['/']); // fallback for not logged in
+    }
+  }
+
   logout() {
     localStorage.removeItem('dropsecure_user');
     this.router.navigate(['/']);

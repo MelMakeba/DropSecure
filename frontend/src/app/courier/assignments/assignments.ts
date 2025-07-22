@@ -5,11 +5,13 @@ import { Package } from '../../models/package.model';
 import { PackageDetailModal } from '../../sender/package-detail-modal/package-detail-modal';
 import { Sidebar } from '../../shared/sidebar/sidebar';
 import { ConfirmationModal } from '../../shared/confirmation-modal/confirmation-modal';
+import { IonicModule } from '@ionic/angular';
+import { StatusHistory } from '../../services/StatusHistory/status-history'
 
 @Component({
   selector: 'app-assignments',
   standalone: true,
-  imports: [CommonModule, PackageDetailModal, Sidebar, ConfirmationModal],
+  imports: [CommonModule, PackageDetailModal, Sidebar, ConfirmationModal, IonicModule],
   templateUrl: './assignments.html',
   styleUrls: ['./assignments.css']
 })
@@ -19,7 +21,8 @@ export class Assignments implements OnInit {
   showPackageModal = false;
   selectedPackage?: Package;
 
-  constructor(private packagesService: Packages) {}
+  constructor(private packagesService: Packages,
+              private packageStatusService: StatusHistory) {}
 
   ngOnInit() {
     const user = localStorage.getItem('dropsecure_user');
@@ -66,9 +69,8 @@ export class Assignments implements OnInit {
     { label: 'Dashboard', icon: 'home-outline', route: '/courier/dashboard', roles: ['courier'] },
     { label: 'Assignments', icon: 'mail-unread-outline', route: '/courier/assignments', roles: ['courier'] },
     { label: 'Route Planner', icon: 'navigate-outline', route: '/courier/route-planner', roles: ['courier'] },
-    { label: 'Earnings', icon: 'cash-outline', route: '/courier/earnings', roles: ['courier'] },
-    { label: 'Track', icon: 'locate-outline', route: '/courier/track', roles: ['courier', 'admin'] },
-    // Add more as needed
+    // { label: 'Earnings', icon: 'cash-outline', route: '/courier/earnings', roles: ['courier'] },
+    // { label: 'Track', icon: 'locate-outline', route: '/courier/track', roles: ['courier', 'admin'] },
   ];
 
   showConfirmModal = false;
@@ -99,4 +101,18 @@ export class Assignments implements OnInit {
     this.confirmAction = null;
     this.pendingPackage = null;
   }
+  changeStatus(pkg: Package, newStatus: string) {
+    const user = localStorage.getItem('dropsecure_user');
+    const courier = user ? JSON.parse(user) : { id: '', name: '' };
+    this.packageStatusService.changeStatus(
+      pkg.id,
+      newStatus,
+      { id: courier.id, role: 'courier', name: courier.name },
+      undefined,
+      `Status changed to ${newStatus} by courier`
+    ).subscribe(() => {
+      // Refresh assignments or update UI as needed
+      this.ngOnInit();
+    });
+}
 }

@@ -11,7 +11,9 @@
     <p class="text-xl md:text-2xl font-inter mb-10 max-w-2xl mx-auto leading-relaxed">
       Fast, secure, and reliable courier service for your important packages. Experience the future of delivery today.
     </p>
-    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+    
+    <!-- Show ONLY when NOT logged in -->
+    <div class="flex flex-col sm:flex-row gap-4 justify-center" *ngIf="!isLoggedIn()">
       <button 
         class="relative overflow-hidden bg-[#D4AF37] text-[#800020] px-8 py-4 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group"
         (click)="openAuth('register')">
@@ -23,6 +25,16 @@
         (click)="openAuth('login')">
         <span class="relative z-10">Login</span>
         <span class="absolute inset-0 bg-white opacity-0 group-hover:opacity-5 transition-opacity duration-300"></span>
+      </button>
+    </div>
+
+    <!-- Show ONLY when logged in -->
+    <div class="flex flex-col sm:flex-row gap-4 justify-center" *ngIf="isLoggedIn()">
+      <button 
+        class="relative overflow-hidden bg-[#D4AF37] text-[#800020] px-8 py-4 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group"
+        (click)="goToDashboard()">
+        <span class="relative z-10">Go to Dashboard</span>
+        <span class="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"></span>
       </button>
     </div>
   </div>

@@ -1,12 +1,15 @@
+import { Sender } from './../sender/sender';
 export interface Package {
   id: string;
-  trackingId: string;
+  trackingId?: string;
   trackingNumber?: string;
 
   senderId: string;
   senderName: string; 
   senderPhone?: string;
   senderAddress?: string;
+  senderEmail?: string;
+  receiverEmail?: string;
   receiverId?: string;
   receiverName: string; 
   receiverPhone?: string;
@@ -16,7 +19,7 @@ export interface Package {
 
   createdById: string;
 
-  weight: number;
+  weight?: number;
   description: string;
   specialInstructions?: string;
   value?: number;

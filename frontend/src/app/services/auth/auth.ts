@@ -3,6 +3,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { map, switchMap, catchError, tap } from 'rxjs/operators';
 import { Observable, of, forkJoin, throwError } from 'rxjs';
 import { Admin, Customer, Courier, AnyUser, UserRole } from '../../models/user.model';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,7 @@ import { Admin, Customer, Courier, AnyUser, UserRole } from '../../models/user.m
 export class AuthService {
   private apiUrl = 'http://localhost:3000';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private router: Router) {}
 
   login(email: string, password: string): Observable<{success: boolean; user?: AnyUser; token?: string; message: string}> {
     console.log('🔐 Login attempt:', { email, password });

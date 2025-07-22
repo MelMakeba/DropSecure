@@ -30,7 +30,6 @@ export class AuthPages {
   constructor(private authService: AuthService, private router: Router) {}
 
   onLogin() {
-  
     this.loading.set(true);
     this.error.set('');
     this.success.set('');
@@ -41,19 +40,17 @@ export class AuthPages {
     this.authService.login(this.user.email as string, this.user.password as string).subscribe(res => {
       this.loading.set(false);
       if (res.success && res.user) {
-      localStorage.setItem('dropsecure_user', JSON.stringify(res.user));
-      this.success.set(res.message);
-      // Redirect based on role
-      if (res.user?.role === 'customer') {
-        this.router.navigate(['/sender/dashboard']);
-      } else if (res.user?.role === 'admin') {
-        this.router.navigate(['/admin/dashboard']);
-      } else if (res.user?.role === 'courier') {
-        this.router.navigate(['/courier/dashboard']);
-      }
-      setTimeout(() => this.close.emit(), 1000);
+        localStorage.setItem('dropsecure_user', JSON.stringify(res.user));
+        this.success.set(res.message);
+        // Redirect based on role
+        if (res.user.role === 'admin') {
+          this.router.navigate(['/admin/dashboard']);
+        } else {
+          this.router.navigate(['/']);
+        }
+        setTimeout(() => this.close.emit(), 1000);
       } else {
-      this.error.set(res.message);
+        this.error.set(res.message);
       }
     }, err => {
       this.loading.set(false);

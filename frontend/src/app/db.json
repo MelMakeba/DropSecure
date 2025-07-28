@@ -72,6 +72,30 @@
       "isActive": true,
       "totalPackagesSent": 0,
       "totalPackagesReceived": 0
+    },
+    {
+      "id": "customer_mdfkc56l_ruba",
+      "role": "customer",
+      "email": "mellisawanja254@gmail.com",
+      "password": "1234meriken@",
+      "name": "Mellisa Waititu",
+      "address": "Kikuyu, Kenya",
+      "createdAt": "2025-07-23T06:08:52.029Z",
+      "isActive": true,
+      "totalPackagesSent": 0,
+      "totalPackagesReceived": 0
+    },
+    {
+      "id": "customer_mdfnrg0z_yqzw",
+      "role": "customer",
+      "email": "earljoe06@gmail.com",
+      "password": "earl123",
+      "name": "Earljoe K",
+      "address": "Chuka, Kenya",
+      "createdAt": "2025-07-23T07:44:44.771Z",
+      "isActive": true,
+      "totalPackagesSent": 0,
+      "totalPackagesReceived": 0
     }
   ],
   "couriers": [
@@ -205,6 +229,28 @@
       "isPaid": false,
       "createdAt": "2025-07-22T11:39:00.500Z",
       "updatedAt": "2025-07-22T11:42:14.763Z",
+      "courierId": "courier_1",
+      "courierName": "Peter Kiprotich"
+    },
+    {
+      "id": "4e23",
+      "trackingNumber": "PKG-1753257210370",
+      "senderId": "",
+      "senderName": "Mellisa Wanja",
+      "senderEmail": "mellisawanja254@gmail.com",
+      "senderPhone": "0113066448",
+      "senderAddress": "Nairobi, Kenya",
+      "receiverEmail": "earl06@gmail.com",
+      "receiverPhone": "0112272250",
+      "receiverAddress": "Chuka, Kenya",
+      "weight": 2,
+      "description": "Fashion",
+      "receiverName": "Earljoe  K",
+      "createdById": "",
+      "status": "pending",
+      "isPaid": false,
+      "createdAt": "2025-07-23T07:53:30.371Z",
+      "updatedAt": "2025-07-23T07:53:30.371Z",
       "courierId": "courier_1",
       "courierName": "Peter Kiprotich"
     }

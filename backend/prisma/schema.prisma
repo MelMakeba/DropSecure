@@ -1,0 +1,345 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  SENDER
+  COURIER
+}
+
+enum PackageStatus {
+  CREATED
+  COURIER_ASSIGNED
+  PICKED_UP
+  IN_TRANSIT
+  OUT_FOR_DELIVERY
+  DELIVERED
+  FAILED_DELIVERY
+  RETURNED
+  CANCELLED
+}
+
+enum CourierStatus {
+  OFFLINE
+  AVAILABLE
+  BUSY
+  ON_DELIVERY
+}
+
+enum DeliveryAttemptStatus {
+  SUCCESSFUL
+  FAILED
+  RECIPIENT_NOT_AVAILABLE
+  ADDRESS_NOT_FOUND
+  DAMAGED_PACKAGE
+  REFUSED_BY_RECIPIENT
+}
+
+model User {
+  id                    String   @id @default(uuid())
+  email                 String   @unique
+  password              String
+  firstName             String
+  lastName              String
+  phone                 String
+  role                  UserRole @default(SENDER)
+  isEmailVerified       Boolean  @default(false)
+  isActive              Boolean  @default(true)
+  verificationCode      String?      // 6-digit or random code
+  verificationExpires   DateTime?    // When the code expires
+  passwordResetCode     String?      // 6-digit or random code
+  passwordResetExpires  DateTime?    // When the reset code expires
+  profilePhotoId        String?
+  profilePhotoUrl       String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  
+  // Sender-specific fields
+  address         String?
+  city            String?
+  state           String?
+  zipCode         String?
+  country         String?
+  
+  // Courier-specific fields
+  courierProfile  CourierProfile?
+  
+  // Relations
+  sentPackages    Package[]   @relation("SenderPackages")
+  receivedPackages Package[]  @relation("ReceiverPackages")
+  assignedPackages Package[]  @relation("CourierPackages")
+  createdPackages Package[]   @relation("CreatedByAdmin")
+  locationUpdates LocationUpdate[]
+  deliveryAttempts DeliveryAttempt[]
+  reviews         Review[]
+  
+  
+  @@map("users")
+  @@index([email])
+  @@index([role])
+  PackageStatusHistory PackageStatusHistory[] @relation("ChangedByUser")
+}
+
+model CourierProfile {
+  id              String        @id @default(uuid())
+  userId          String        @unique
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  licenseNumber   String?
+  vehicleType     String?
+  vehicleNumber   String?
+  status          CourierStatus @default(OFFLINE)
+  currentLat      Float?
+  currentLng      Float?
+  lastLocationUpdate DateTime?
+  rating          Float?        @default(0)
+  totalDeliveries Int           @default(0)
+  isVerified      Boolean       @default(false)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  
+  @@map("courier_profiles")
+}
+
+model Package {
+  id              String        @id @default(uuid())
+  trackingId      String        @unique @default(uuid())
+  
+  // Sender information
+  senderId        String
+  sender          User          @relation("SenderPackages", fields: [senderId], references: [id])
+  senderEmail     String
+  // Receiver information (can be existing user or not)
+  receiverId      String?       // Optional: if receiver is a registered user
+  receiver        User?         @relation("ReceiverPackages", fields: [receiverId], references: [id])
+  receiverName    String
+  receiverEmail   String
+  receiverPhone   String
+  receiverAddress String
+  receiverCity    String
+  receiverState   String
+  receiverZipCode String
+  receiverCountry String
+  
+  // Created by (Admin)
+  createdById     String
+  createdBy       User          @relation("CreatedByAdmin", fields: [createdById], references: [id])
+  
+  // Package details
+  weight          Float
+  description     String
+  specialInstructions String?
+  value           Float?
+  price           Float
+
+  
+    
+  // Delivery information
+  preferredPickupDate DateTime?
+  preferredDeliveryDate DateTime?
+  actualPickupDate    DateTime?
+  actualDeliveryDate  DateTime?
+  
+  // Status and assignment
+  status          PackageStatus @default(CREATED)
+  courierId       String?
+  courier         User?         @relation("CourierPackages", fields: [courierId], references: [id])
+  
+  // Pricing
+  estimatedCost   Float?
+  actualCost      Float?
+  isPaid          Boolean       @default(false)
+  
+  // Tracking
+  currentLat      Float?
+  currentLng      Float?
+  
+  // Metadata
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  
+  // Relations
+  statusHistory   PackageStatusHistory[]
+  locationUpdates LocationUpdate[]
+  deliveryAttempts DeliveryAttempt[]
+  notifications   Notification[]
+  reviews         Review[]
+  trackinTokens TrackingToken[]
+  //indexes
+  @@map("packages")
+  @@index([trackingId])
+  @@index([status])
+  @@index([courierId])
+  @@index([senderId])
+  @@index([createdAt])
+  @@index([currentLat, currentLng])
+}
+
+model PackageStatusHistory {
+  id         String   @id @default(uuid())
+  packageId  String
+  status     String
+  changedBy  String
+  changedAt  DateTime
+  notes      String?
+  location   String?
+  changedByUser User @relation("ChangedByUser", fields: [changedBy], references: [id])
+
+  Package Package[]
+}
+
+model LocationUpdate {
+  id          String    @id @default(uuid())
+  packageId   String
+  package     Package   @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  courierId   String
+  courier     User      @relation(fields: [courierId], references: [id])
+  latitude    Float
+  longitude   Float
+  address     String?
+  notes       String? 
+  createdAt   DateTime  @default(now())
+  timestamp   DateTime
+  
+  @@map("location_updates")
+}
+
+model DeliveryAttempt {
+  id          String                @id @default(uuid())
+  packageId   String
+  package     Package               @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  courierId   String
+  courier     User                  @relation(fields: [courierId], references: [id])
+  status      DeliveryAttemptStatus
+  attemptDate DateTime              @default(now())
+  notes       String?
+  attemptNumber   String
+  // Proof of delivery
+  recipientName String?
+  recipientSignature String?     // Base64 encoded signature
+  deliveryPhoto String?          // URL to delivery photo
+  
+  createdAt   DateTime             @default(now())
+  
+  @@map("delivery_attempts")
+}
+
+model Notification {
+  id          String    @id @default(uuid())
+  packageId   String?
+  package     Package?  @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  
+  // Recipient information
+  recipientEmail String?
+  recipientPhone String?
+  recipientUserId String?
+  
+  // Notification content
+  type        String    // EMAIL, SMS, PUSH
+  subject     String?
+  message     String
+  
+  // Status
+  isSent      Boolean   @default(false)
+  sentAt      DateTime?
+  
+  // Metadata
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  @@map("notifications")
+}
+
+model Settings {
+  id          String    @id @default(uuid())
+  key         String    @unique
+  value       String
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  @@map("settings")
+}
+
+// Pricing model for different package types and distances
+model PricingRule {
+  id            String  @id @default(uuid())
+  name          String
+  description   String?
+  
+  // Weight-based pricing
+  minWeight     Float?
+  maxWeight     Float?
+  
+  // Distance-based pricing
+  minDistance   Float?
+  maxDistance   Float?
+  
+  // Pricing
+  baseCost      Float
+  costPerKm     Float   @default(0)
+  costPerKg     Float   @default(0)
+  
+  // Status
+  isActive      Boolean @default(true)
+  
+  // Metadata
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@map("pricing_rules")
+}
+
+// For storing temporary access tokens for package tracking
+model TrackingToken {
+  id          String    @id @default(uuid())
+  token       String    @unique
+  packageId   String
+  package     Package   @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  expiresAt   DateTime
+  createdAt   DateTime  @default(now())
+  
+  @@map("tracking_tokens")
+}
+
+// For storing contact us submissions
+model ContactSubmission {
+  id          String    @id @default(uuid())
+  name        String
+  email       String
+  phone       String?
+  subject     String
+  message     String
+  isRead      Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  
+  @@map("contact_submissions")
+}
+
+// For package reviews
+model Review {
+  id          String    @id @default(uuid())
+  packageId   String
+  package     Package   @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  rating      Int       // 1-5 stars
+  comment     String?
+  createdAt   DateTime  @default(now())
+  
+  @@unique([packageId, userId])
+  @@map("reviews")
+}

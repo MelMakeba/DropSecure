@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Welcome to DropSecure!</title>
+  <style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #fff8f2; color: #333; }
+    .header { background: linear-gradient(90deg, #800020 60%, #D4AF37 100%); color: #fff; padding: 24px 0; text-align: center; }
+    .logo { font-size: 2rem; font-weight: bold; letter-spacing: 2px; }
+    .content { background: #fff; border-radius: 12px; margin: 32px auto; max-width: 480px; padding: 32px; box-shadow: 0 2px 12px #80002022; }
+    .btn { background: linear-gradient(90deg, #D4AF37, #800020); color: #fff; padding: 12px 32px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 24px; }
+    .verify-box { background: #fff8f2; border: 1px solid #D4AF37; color: #800020; border-radius: 8px; padding: 18px 24px; margin: 24px 0 0 0; font-size: 1.1em; text-align: center; }
+    .footer { color: #800020; text-align: center; margin-top: 32px; font-size: 0.95em; }
+    .code { font-size: 1.5em; font-weight: bold; letter-spacing: 2px; color: #D4AF37; background: #80002010; padding: 8px 18px; border-radius: 6px; margin: 8px 0; display: inline-block; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <span class="logo">DropSecure</span>
+  </div>
+  <div class="content">
+    <h2 style="color:#800020;">Welcome, <%= name %>!</h2>
+    <p>
+      Thank you for joining <b>DropSecure</b>.<br>
+      We're excited to help you send and receive packages securely and quickly.
+    </p>
+    <div class="verify-box">
+      <div>
+        <strong>Email Verification Required</strong>
+      </div>
+      <div style="margin: 12px 0;">
+        Please verify your email address to activate your account.
+      </div>
+      <% if (verificationCode) { %>
+        <div>Your verification code:</div>
+        <div class="code"><%= verificationCode %></div>
+      <% } %>
+      <% if (verifyUrl) { %>
+        <div style="margin-top: 12px;">
+          Or click the button below to verify:
+        </div>
+        <a href="<%= verifyUrl %>" class="btn" style="margin-top: 12px;">Verify Email</a>
+      <% } %>
+    </div>
+    <a href="<%= frontendUrl || 'https://dropsecure.com' %>" class="btn">Get Started</a>
+  </div>
+  <div class="footer">
+    &copy; <%= new Date().getFullYear() %> DropSecure. All rights reserved.
+  </div>
+</body>
+</html>

@@ -1,0 +1,65 @@
+@baseUrl = http://localhost:3000
+@contentType = application/json
+@authToken = 
+@ver_Token =359949
+@reset_Token=
+
+
+####Register
+POST {{baseUrl}}/auth/register
+Content-Type: {{contentType}}
+
+{
+    "email": "mellisawanja254@gmail.com",
+    "password": "pass123",
+    "firstName": "Mel",
+    "lastName": "Kilenaa",
+    "phone": "+1234567890",
+    "role": "SENDER"
+}
+
+
+###Login
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+    "email":"melissamakeba@gmail.com",
+    "password":"admin123"
+
+}
+
+###Refresh Token
+POST {{baseUrl}}/auth/refresh
+Content-Type: {{contentType}}
+
+{
+    "refreshToken": "{{authToken}}"
+}
+
+###Verify Email
+POST {{baseUrl}}/auth/verify-email
+Content-Type: {{contentType}}
+
+{
+    "email" : "mellisawanja254@gmail.com",
+    "code": "{{ver_Token}}"
+}
+
+###Request password reset
+POST {{baseUrl}}/auth/request-password-reset
+Content-Type: {{contentType}}
+
+{
+    "email": "mary@gmail.com"
+}
+
+##Reset password
+POST {{baseUrl}}/auth/reset-password
+Content-Type: {{contentType}}
+
+{
+    "email": " mary@gmail.com",
+    "code": "{{reset_Token}}",
+    "newPassword": "NewPassword123"
+}

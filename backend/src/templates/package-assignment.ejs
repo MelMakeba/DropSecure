@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>New Package Assignment - DropSecure</title>
+  <style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #fff8f2; color: #333; }
+    .header { background: linear-gradient(90deg, #800020 60%, #D4AF37 100%); color: #fff; padding: 24px 0; text-align: center; }
+    .logo { font-size: 2rem; font-weight: bold; letter-spacing: 2px; }
+    .content { background: #fff; border-radius: 12px; margin: 32px auto; max-width: 480px; padding: 32px; box-shadow: 0 2px 12px #80002022; }
+    .btn { background: linear-gradient(90deg, #D4AF37, #800020); color: #fff; padding: 12px 32px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 24px; }
+    .info-box { background: #fff8f2; border: 1px solid #D4AF37; color: #800020; border-radius: 8px; padding: 18px 24px; margin: 24px 0 0 0; font-size: 1.1em; }
+    .footer { color: #800020; text-align: center; margin-top: 32px; font-size: 0.95em; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <span class="logo">DropSecure</span>
+  </div>
+  <div class="content">
+    <h2 style="color:#800020;">New Package Assignment</h2>
+    <p>Dear <%= courierName %>,</p>
+    <p>You have been assigned a new package for delivery.</p>
+    <div class="info-box">
+      <h3>Package Details:</h3>
+      <p><strong>Tracking Number:</strong> <%= trackingNumber %></p>
+      <p><strong>Description:</strong> <%= packageDetails %></p>
+      <h4>Pickup Information:</h4>
+      <p><strong>Address:</strong> <%= pickupAddress %></p>
+      <p><strong>Sender Phone:</strong> <%= senderPhone %></p>
+      <h4>Delivery Information:</h4>
+      <p><strong>Address:</strong> <%= deliveryAddress %></p>
+      <p><strong>Receiver Phone:</strong> <%= receiverPhone %></p>
+    </div>
+    <a href="<%= frontendUrl %>/courier/dashboard" class="btn">Open Dashboard</a>
+    <p style="margin-top:32px;">Please log into your courier dashboard to accept this assignment and update the package status.</p>
+  </div>
+  <div class="footer">
+    &copy; <%= new Date().getFullYear() %> DropSecure. All rights reserved.
+  </div>
+</body>
+
+</html></html>

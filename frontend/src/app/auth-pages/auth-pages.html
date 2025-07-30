@@ -43,21 +43,54 @@
       <!-- Register Form -->
       <form *ngSwitchCase="'register'" (ngSubmit)="onRegister()" class="flex flex-col gap-4">
         <h2 class="text-2xl font-bold text-[#800020] mb-2">Register</h2>
-        <div class="flex gap-2">
-          <input required type="text" placeholder="First Name" class="input flex-1" [(ngModel)]="user.firstName" name="firstName" />
-          <input required type="text" placeholder="Last Name" class="input flex-1" [(ngModel)]="user.lastName" name="lastName" />
+        <!-- First and Last Name side by side -->
+        <div class="flex gap-2 w-full">
+          <input 
+            required 
+            type="text" 
+            placeholder="First Name" 
+            class="input w-1/2 rounded-l-md border border-gray-300 focus:border-[#800020] focus:ring-1 focus:ring-[#800020] transition" 
+            [(ngModel)]="user.firstName" 
+            name="firstName" 
+          />
+          <input 
+            required 
+            type="text" 
+            placeholder="Last Name" 
+            class="input w-1/2 rounded-r-md border border-gray-300 focus:border-[#800020] focus:ring-1 focus:ring-[#800020] transition" 
+            [(ngModel)]="user.lastName" 
+            name="lastName" 
+          />
         </div>
-        <input required type="email" placeholder="Email" class="input" [(ngModel)]="user.email" name="email" />
-        <input required type="password" placeholder="Password" class="input" [(ngModel)]="user.password" name="password" />
-        <select required class="input" [(ngModel)]="user.role" name="role">
+        <!-- Email and Phone side by side -->
+        <div class="flex gap-2 w-full">
+          <input 
+            required 
+            type="email" 
+            placeholder="Email" 
+            class="input w-1/2 rounded-l-md border border-gray-300 focus:border-[#800020] focus:ring-1 focus:ring-[#800020] transition" 
+            [(ngModel)]="user.email" 
+            name="email" 
+          />
+          <input 
+            required 
+            type="text" 
+            [(ngModel)]="user.phone" 
+            name="phone" 
+            placeholder="Phone" 
+            class="input w-1/2 rounded-r-md border border-gray-300 focus:border-[#800020] focus:ring-1 focus:ring-[#800020] transition" 
+          />
+        </div>
+        <input required type="password" placeholder="Password" class="input border border-gray-300 focus:border-[#800020] focus:ring-1 focus:ring-[#800020] transition" [(ngModel)]="user.password" name="password" />
+        <select required class="input border border-gray-300 focus:border-[#800020] focus:ring-1 focus:ring-[#800020] transition" [(ngModel)]="user.role" name="role">
           <option *ngFor="let r of roles" [value]="r">{{ r | titlecase }}</option>
         </select>
         <!-- Sender fields -->
-        <input *ngIf="user.role === 'SENDER'" required type="text" placeholder="Address" class="input" [(ngModel)]="user.address" name="address" />
+        <input *ngIf="user.role === 'SENDER'" required type="text" placeholder="Address" class="input border border-gray-300 focus:border-[#800020] focus:ring-1 focus:ring-[#800020] transition" [(ngModel)]="user.address" name="address" />
         <!-- Courier fields -->
-        <input *ngIf="user.role === 'COURIER'" required type="text" placeholder="Vehicle Type" class="input" [(ngModel)]="user.vehicleType" name="vehicleType" />
-        <input *ngIf="user.role === 'COURIER'" required type="text" placeholder="License Number" class="input" [(ngModel)]="user.licenseNumber" name="licenseNumber" />
-        <input *ngIf="user.role === 'COURIER'" required type="text" placeholder="Zone" class="input" [(ngModel)]="user.zone" name="zone" />
+        <input *ngIf="user.role === 'COURIER'" required type="text" placeholder="Vehicle Type" class="input border border-gray-300 focus:border-[#800020] focus:ring-1 focus:ring-[#800020] transition" [(ngModel)]="user.vehicleType" name="vehicleType" />
+        <input *ngIf="user.role === 'COURIER'" required type="text" placeholder="License Number" class="input border border-gray-300 focus:border-[#800020] focus:ring-1 focus:ring-[#800020] transition" [(ngModel)]="user.licenseNumber" name="licenseNumber" />
+        <input *ngIf="user.role === 'COURIER'" required type="text" placeholder="Zone" class="input border border-gray-300 focus:border-[#800020] focus:ring-1 focus:ring-[#800020] transition" [(ngModel)]="user.zone" name="zone" />
         <button type="submit" class="btn-primary">Register</button>
         <div class="text-sm text-center mt-2">
           Already have an account? 

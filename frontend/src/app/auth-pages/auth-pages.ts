@@ -23,7 +23,8 @@ export class AuthPages {
 
   // Unified user object for forms
   user: Partial<AnyUser> = {
-    role: 'SENDER'
+    role: 'SENDER',
+    phone: '' // Add phone field
   };
   roles: UserRole[] = ['SENDER', 'COURIER', 'ADMIN'];
 
@@ -60,7 +61,7 @@ export class AuthPages {
 
   onRegister() {
     // Validate required fields based on role
-    if (!this.user.email || !this.user.password || !this.user.firstName || !this.user.lastName || !this.user.role) {
+    if (!this.user.email || !this.user.password || !this.user.firstName || !this.user.lastName || !this.user.role || !this.user.phone) {
       this.error.set('Please fill all required fields');
       return;
     }

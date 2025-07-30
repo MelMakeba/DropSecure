@@ -36,11 +36,11 @@ export class LandingPageComponent {
     const user = localStorage.getItem('dropsecure_user');
     if (user) {
       const parsed = JSON.parse(user);
-      if (parsed.role === 'admin') {
+      if (parsed.role === 'ADMIN') {
         this.router.navigate(['/admin/dashboard']);
-      } else if (parsed.role === 'courier') {
+      } else if (parsed.role === 'COURIER') {
         this.router.navigate(['/courier/dashboard']);
-      } else if (parsed.role === 'sender') {
+      } else if (parsed.role === 'SENDER') {
         this.router.navigate(['/sender/dashboard']);
       } else {
         this.router.navigate(['/']);

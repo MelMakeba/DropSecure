@@ -19,6 +19,7 @@ export interface Admin extends User {
 
 export interface Customer extends User {
   role: 'SENDER';
+  phone: string;
   address: string;
   totalPackagesSent: number;
   totalPackagesReceived: number;
@@ -39,6 +40,7 @@ export interface AnyUser {
   password: string;
   email: string;
   role: UserRole;
+  phone:string;
   firstName: string;
   lastName: string;
   createdAt: string;

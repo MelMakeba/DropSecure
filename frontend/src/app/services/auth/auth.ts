@@ -10,7 +10,7 @@ import { jwtDecode } from 'jwt-decode';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:3000';
+  private apiUrl = 'https://dropsecure.onrender.com';
 
   constructor(private http: HttpClient, private router: Router) {}
 

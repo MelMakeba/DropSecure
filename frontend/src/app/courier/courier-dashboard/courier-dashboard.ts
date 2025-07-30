@@ -26,7 +26,13 @@ export class CourierDashboard implements OnInit {
 
   get loggedInCourierName(): string {
     const user = localStorage.getItem('dropsecure_user');
-    return user ? JSON.parse(user).name : '';
+    if (!user) return '';
+    try {
+      const parsed = JSON.parse(user);
+      return `${parsed.firstName ?? ''} ${parsed.lastName ?? ''}`.trim();
+    } catch {
+      return '';
+    }
   }
 
   navItems = [

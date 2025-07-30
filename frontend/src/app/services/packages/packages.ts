@@ -131,4 +131,8 @@ export class Packages {
     return this.http.get<any>(`${this.apiUrl}/location/courier/${courierId}/current`);
   }
 
+  getAssignmentsForCourier(courierId: string) {
+    // Replace with actual API call or logic
+    return this.http.get<Package[]>(`/api/couriers/${courierId}/assignments`);
+  }
 }

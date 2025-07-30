@@ -28,7 +28,7 @@ export class Assignments implements OnInit {
     const user = localStorage.getItem('dropsecure_user');
     const courierId = user ? JSON.parse(user).id : '';
     if (courierId) {
-      this.packagesService.getAssignmentsForCourier(courierId).subscribe(pkgs => {
+      this.packagesService.getAssignmentsForCourier(courierId).subscribe((pkgs: Package[]) => {
         this.assignments = pkgs;
         this.loading = false;
       });

@@ -7,7 +7,7 @@ import { Package } from '../../../models/package.model'; // Adjust the import pa
 
 @Injectable({ providedIn: 'root' })
 export class SenderDashboardService {
-  private apiUrl = 'https://dropsecure.onrender.com/packages';
+  private apiUrl = 'http://localhost:3000/packages';
 
   constructor(private http: HttpClient) {}
 

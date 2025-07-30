@@ -8,7 +8,7 @@ import { StatusEvent } from '../../models/status-event.model';
   providedIn: 'root'
 })
 export class StatusHistory {
-  private apiUrl = 'https://dropsecure.onrender.com';
+  private apiUrl = 'http://localhost:3000';
 
   constructor(private http: HttpClient) {}
 

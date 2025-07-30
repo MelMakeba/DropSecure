@@ -8,7 +8,7 @@ import { Package } from '../../models/package.model';
   providedIn: 'root'
 })
 export class Analysis {
-  private apiUrl = 'https://dropsecure.onrender.com';
+  private apiUrl = 'http://localhost:3000';
 
   constructor(private http: HttpClient) {}
 

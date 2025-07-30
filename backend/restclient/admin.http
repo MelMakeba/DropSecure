@@ -1,4 +1,4 @@
-@baseurl = https://dropsecure.onrender.com
+@baseurl = http://localhost:3000
 @contentType = application/json
 
 @adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0MTg1NTU4NC0yYWI0LTRhZjMtOTQzMS0zMGE0NDA0OGU1YjciLCJlbWFpbCI6Im1lbGlzc2FtYWtlYmFAZ21haWwuY29tIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzUzNjk0MzE2LCJleHAiOjE3NTM3ODA3MTZ9.VTDB8AArgsnGTGyt24iskU4CRnRgPCgK3QChce690nA

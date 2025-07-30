@@ -6,11 +6,12 @@ import { DashboardCards } from './dashboard-cards/dashboard-cards';
 import { CommonModule } from '@angular/common';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { Package } from '../models/package.model';
-import { Packages, StatusEvent } from '../services/packages/packages';
+import { Packages } from '../services/packages/packages';
 import { Router } from '@angular/router';
 import { Sidebar } from '../shared/sidebar/sidebar';
 import { IonicModule } from '@ionic/angular';
-
+import { AuthService } from '../services/auth/auth';
+import { StatusEvent } from '../models/status-event.model';
 @Component({
   selector: 'app-sender',
   imports: [CommonModule, ReviewForm, PackageDetailModal, PackageList, DashboardCards, Sidebar, IonicModule], 
@@ -52,13 +53,17 @@ export class Sender implements OnInit {
 
   constructor(
     private packageService: Packages,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {} 
 
   ngOnInit() {
-    const senderId = this.loggedInSenderId;
-    this.packageService.getSentPackages(senderId).subscribe(pkgs => this.sentPackages = pkgs);
-    this.packageService.getReceivedPackages(senderId).subscribe(pkgs => this.receivedPackages = pkgs);
+    this.packageService.getUserPackages().subscribe((pkgs: Package[]) => {
+      const user = this.authService.getCurrentUser();
+      if (!user) return;
+      this.sentPackages = pkgs.filter(pkg => pkg.senderId === user.id);
+      this.receivedPackages = pkgs.filter(pkg => pkg.receiverEmail === user.email || pkg.receiverId === user.id);
+    });
   }
 
   get loggedInSenderId(): string {
@@ -74,7 +79,7 @@ export class Sender implements OnInit {
 
   get loggedInSenderName(): string {
     const user = localStorage.getItem('dropsecure_user');
-    return user ? JSON.parse(user).name : '';
+    return user ? JSON.parse(user).firstName : '';
   }
 
   logout() {
@@ -83,10 +88,10 @@ export class Sender implements OnInit {
   }
 
   navItems = [
-    { label: 'Dashboard', icon: 'home-outline', route: '/sender/dashboard', roles: ['sender'] },
-    { label: 'My Packages', icon: 'cube-outline', route: '/sender/sent-packages', fragment: 'my-packages', roles: ['sender'] },
-    { label: 'Received', icon: 'checkmark-done-outline', route: '/sender/received-packages', fragment: 'received', roles: ['sender'] },
-    { label: 'Track', icon: 'locate-outline', route: '/sender/track', roles: ['sender', 'courier', 'admin'] },
+    { label: 'Dashboard', icon: 'home-outline', route: '/sender/dashboard', roles: ['SENDER'] },
+    { label: 'My Packages', icon: 'cube-outline', route: '/sender/sent-packages', fragment: 'my-packages', roles: ['SENDER'] },
+    { label: 'Received', icon: 'checkmark-done-outline', route: '/sender/received-packages', fragment: 'received', roles: ['SENDER'] },
+    { label: 'Track', icon: 'locate-outline', route: '/sender/track', roles: ['SENDER', 'COURIER', 'ADMIN'] },
   ];
 
   

@@ -22,7 +22,7 @@ export class Assignments implements OnInit {
   selectedPackage?: Package;
 
   constructor(private packagesService: Packages,
-              private packageStatusService: StatusHistory) {}
+              private statusHistoryService: StatusHistory) {}
 
   ngOnInit() {
     const user = localStorage.getItem('dropsecure_user');
@@ -39,12 +39,12 @@ export class Assignments implements OnInit {
 
   accept(pkg: Package) {
     // Implement accept logic (API call or local update)
-    alert(`Accepted assignment for ${pkg.trackingNumber}`);
+    alert(`Accepted assignment for ${pkg.trackingId}`);
   }
 
   decline(pkg: Package) {
     // Implement decline logic (API call or local update)
-    alert(`Declined assignment for ${pkg.trackingNumber}`);
+    alert(`Declined assignment for ${pkg.trackingId}`);
   }
 
    sidebarCollapsed = false;
@@ -66,9 +66,9 @@ export class Assignments implements OnInit {
   }
 
   navItems = [
-    { label: 'Dashboard', icon: 'home-outline', route: '/courier/dashboard', roles: ['courier'] },
-    { label: 'Assignments', icon: 'mail-unread-outline', route: '/courier/assignments', roles: ['courier'] },
-    { label: 'Route Planner', icon: 'navigate-outline', route: '/courier/route-planner', roles: ['courier'] },
+    { label: 'Dashboard', icon: 'home-outline', route: '/courier/dashboard', roles: ['COURIER'] },
+    { label: 'Assignments', icon: 'mail-unread-outline', route: '/courier/assignments', roles: ['COURIER'] },
+    { label: 'Route Planner', icon: 'navigate-outline', route: '/courier/route-planner', roles: ['COURIER'] },
     // { label: 'Earnings', icon: 'cash-outline', route: '/courier/earnings', roles: ['courier'] },
     // { label: 'Track', icon: 'locate-outline', route: '/courier/track', roles: ['courier', 'admin'] },
   ];
@@ -86,10 +86,10 @@ export class Assignments implements OnInit {
   onConfirm() {
     if (this.confirmAction === 'accept' && this.pendingPackage) {
       // Accept logic here
-      alert(`Accepted assignment for ${this.pendingPackage.trackingNumber}`);
+      alert(`Accepted assignment for ${this.pendingPackage.trackingId}`);
     } else if (this.confirmAction === 'decline' && this.pendingPackage) {
       // Decline logic here
-      alert(`Declined assignment for ${this.pendingPackage.trackingNumber}`);
+      alert(`Declined assignment for ${this.pendingPackage.trackingId}`);
     }
     this.showConfirmModal = false;
     this.confirmAction = null;
@@ -104,10 +104,10 @@ export class Assignments implements OnInit {
   changeStatus(pkg: Package, newStatus: string) {
     const user = localStorage.getItem('dropsecure_user');
     const courier = user ? JSON.parse(user) : { id: '', name: '' };
-    this.packageStatusService.changeStatus(
+    this.statusHistoryService.changeStatus(
       pkg.id,
       newStatus,
-      { id: courier.id, role: 'courier', name: courier.name },
+      { id: courier.id, role: 'COURIER', name: courier.name },
       undefined,
       `Status changed to ${newStatus} by courier`
     ).subscribe(() => {

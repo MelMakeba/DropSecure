@@ -1,10 +1,12 @@
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { trigger, transition, style, animate } from '@angular/animations';
-import { Packages, StatusEvent } from '../../services/packages/packages';
+import { Packages } from '../../services/packages/packages';
 import { Package } from '../../models/package.model';
 import { PackageStatusTimeline } from '../package-status-timeline/package-status-timeline';
 import { ReviewForm } from '../review-form/review-form';
+import { StatusEvent } from '../../models/status-event.model';
+import { StatusHistory } from '../../services/StatusHistory/status-history';
 
 @Component({
   selector: 'app-package-detail-modal',
@@ -31,11 +33,13 @@ export class PackageDetailModal implements OnChanges {
   @Output() closeModal = new EventEmitter<void>();
 
 
-  constructor(private packageService: Packages) {}
+  constructor(private packageService: Packages,
+    private statusHistoryService: StatusHistory
+  ) {}
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['package'] && this.package?.id) {
-      this.packageService.getStatusHistory(this.package.id).subscribe(history => {
+      this.statusHistoryService.getStatusHistory(this.package.id).subscribe(history => {
         this.statusHistory = history;
       });
     }

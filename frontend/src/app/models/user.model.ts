@@ -1,28 +1,31 @@
-export type UserRole = 'admin' | 'customer' | 'courier';
+export type UserRole = 'ADMIN' | 'SENDER' | 'COURIER';
 
 export interface User {
   id: string;
   password: string;
   email: string;
-  name: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  isEmailVerified: boolean;
   role: UserRole;
   createdAt: string;
   isActive: boolean;
 }
 
 export interface Admin extends User {
-  role: 'admin';
+  role: 'ADMIN';
 }
 
 export interface Customer extends User {
-  role: 'customer';
+  role: 'SENDER';
   address: string;
   totalPackagesSent: number;
   totalPackagesReceived: number;
 }
 
 export interface Courier extends User {
-  role: 'courier';
+  role: 'COURIER';
   vehicleType?: string;
   licenseNumber?: string;
   zone?: string;
@@ -31,4 +34,17 @@ export interface Courier extends User {
   totalDeliveries: number;
 }
 
-export type AnyUser = Admin | Customer | Courier;
+export interface AnyUser {
+  id: string;
+  password: string;
+  email: string;
+  role: UserRole;
+  firstName: string;
+  lastName: string;
+  createdAt: string;
+  isActive: boolean;
+  address?: string;
+  vehicleType?: string;
+  licenseNumber?: string;
+  zone?: string;
+}

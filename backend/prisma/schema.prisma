@@ -101,7 +101,7 @@ model CourierProfile {
   licenseNumber   String?
   vehicleType     String?
   vehicleNumber   String?
-  status          CourierStatus @default(OFFLINE)
+  status          CourierStatus @default(AVAILABLE)
   currentLat      Float?
   currentLng      Float?
   lastLocationUpdate DateTime?
@@ -193,12 +193,13 @@ model PackageStatusHistory {
   packageId  String
   status     String
   changedBy  String
+  createdAt  DateTime
   changedAt  DateTime
   notes      String?
   location   String?
   changedByUser User @relation("ChangedByUser", fields: [changedBy], references: [id])
+  package    Package @relation(fields: [packageId], references: [id])
 
-  Package Package[]
 }
 
 model LocationUpdate {
@@ -276,29 +277,21 @@ model Settings {
 
 // Pricing model for different package types and distances
 model PricingRule {
-  id            String  @id @default(uuid())
-  name          String
-  description   String?
-  
-  // Weight-based pricing
-  minWeight     Float?
-  maxWeight     Float?
-  
-  // Distance-based pricing
-  minDistance   Float?
-  maxDistance   Float?
-  
-  // Pricing
-  baseCost      Float
-  costPerKm     Float   @default(0)
-  costPerKg     Float   @default(0)
-  
-  // Status
-  isActive      Boolean @default(true)
-  
-  // Metadata
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id                String  @id @default(uuid())
+  name              String
+  description       String?
+  minWeight         Float?
+  maxWeight         Float?
+  minDistance       Float?
+  maxDistance       Float?
+  baseCost          Float
+  costPerKg         Float
+  costPerKm         Float
+  weightMultiplier  Float    // <-- must exist
+  distanceMultiplier Float   // <-- must exist
+  isActive          Boolean
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
   
   @@map("pricing_rules")
 }

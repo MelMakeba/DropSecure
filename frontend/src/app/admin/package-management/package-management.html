@@ -7,7 +7,7 @@
   </div>
 
   <app-sidebar
-    [role]="'admin'"
+    [role]="'ADMIN'"
     [loggedInName]="loggedInAdminName"
     [navItems]="navItems"
   ></app-sidebar>
@@ -178,7 +178,7 @@
                           <ion-icon name="cube-outline" class="text-blue-600 text-lg"></ion-icon>
                         </div>
                         <div>
-                          <div class="font-bold text-gray-900 font-mono">{{ pkg.trackingNumber }}</div>
+                          <div class="font-bold text-gray-900 font-mono">{{ pkg.trackingId }}</div>
                           <div class="text-xs text-gray-500">ID: {{ pkg.id }}</div>
                         </div>
                       </div>

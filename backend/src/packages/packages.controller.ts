@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { UserRole } from '../../generated/prisma';
 /* eslint-disable no-useless-catch */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -16,6 +17,7 @@ import {
   ParseUUIDPipe,
   ValidationPipe,
   UsePipes,
+  BadRequestException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -24,6 +26,7 @@ import {
   ApiBearerAuth,
   ApiParam,
   ApiQuery,
+  ApiBody,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -72,19 +75,19 @@ export class PackageController {
     @Body() createPackageDto: CreatePackageDto,
     @Request() req: any,
   ): Promise<ApiResponseInterface> {
-    try {
-      const packageData = await this.packageService.createPackage(
-        createPackageDto,
-        req.user.id,
-      );
-
-      return this.apiResponseService.success(
-        packageData,
-        'Package created successfully',
-      );
-    } catch (error) {
-      throw error;
+    const createdById = req.user.id || req.user.sub;
+    if (!createdById) {
+      throw new BadRequestException('Authenticated user ID not found');
     }
+    const packageData = await this.packageService.createPackage(
+      createPackageDto,
+      createdById,
+    );
+
+    return this.apiResponseService.success(
+      packageData,
+      'Package created successfully',
+    );
   }
 
   @Get('get-user-packages')
@@ -218,11 +221,15 @@ export class PackageController {
     @Body() updateStatusDto: UpdatePackageStatusDto,
     @Request() req: any,
   ): Promise<ApiResponseInterface> {
+    const ChangedById = req.user.id || req.user.sub;
+    if (!ChangedById) {
+      throw new BadRequestException('Authenticated user ID not found');
+    }
     try {
       const updatedPackage = await this.packageService.updatePackageStatus(
         id,
         updateStatusDto,
-        req.user.id,
+        ChangedById,
       );
 
       return this.apiResponseService.success(
@@ -326,6 +333,69 @@ export class PackageController {
     } catch (error) {
       throw error;
     }
+  }
+
+  /**
+   * Get all packages (Admin only)
+   */
+  @Get()
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({
+    summary: 'Get all packages (Admin only)',
+    description: 'Retrieve all packages in the system. Admin access required.',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'All packages retrieved successfully',
+  })
+  async getAllPackages(
+    @Request() req: any,
+    @Query() query: PackageQueryDto,
+  ): Promise<ApiResponseInterface> {
+    // Only admins can access this endpoint (enforced by RolesGuard)
+    const result = await this.packageService.getPackagesByUser(
+      req.user.id,
+      UserRole.ADMIN,
+      query,
+    );
+    return this.apiResponseService.paginated(
+      result.packages,
+      result.page,
+      result.limit,
+      result.total,
+      'All packages retrieved successfully',
+    );
+  }
+
+  @Put(':id/assign-courier')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Assign a courier to a package (Admin only)' })
+  @ApiParam({ name: 'id', description: 'Package UUID' })
+  @ApiBody({ schema: { properties: { courierId: { type: 'string' } } } })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Courier assigned successfully',
+  })
+  async assignCourier(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body('courierId') courierId: string,
+    @Request() req: any,
+  ): Promise<ApiResponseInterface> {
+    const assignedById = req.user.id || req.user.sub;
+    if (!assignedById) {
+      throw new BadRequestException('Authenticated user ID not found');
+    }
+    const updatedPackage = await this.packageService.assignCourierToPackage(
+      id,
+      courierId,
+      assignedById,
+    );
+    return this.apiResponseService.success(
+      updatedPackage,
+      'Courier assigned successfully',
+    );
   }
 }
 

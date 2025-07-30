@@ -23,9 +23,9 @@ export class AuthPages {
 
   // Unified user object for forms
   user: Partial<AnyUser> = {
-    role: 'customer'
+    role: 'SENDER'
   };
-  roles: UserRole[] = ['customer', 'courier', 'admin'];
+  roles: UserRole[] = ['SENDER', 'COURIER', 'ADMIN'];
 
   constructor(private authService: AuthService, private router: Router) {}
 
@@ -43,7 +43,7 @@ export class AuthPages {
         localStorage.setItem('dropsecure_user', JSON.stringify(res.user));
         this.success.set(res.message);
         // Redirect based on role
-        if (res.user.role === 'admin') {
+        if (res.user.role === 'ADMIN') {
           this.router.navigate(['/admin/dashboard']);
         } else {
           this.router.navigate(['/']);
@@ -60,15 +60,15 @@ export class AuthPages {
 
   onRegister() {
     // Validate required fields based on role
-    if (!this.user.email || !this.user.password || !this.user.name || !this.user.role) {
+    if (!this.user.email || !this.user.password || !this.user.firstName || !this.user.lastName || !this.user.role) {
       this.error.set('Please fill all required fields');
       return;
     }
-    if (this.user.role === 'customer' && !this.user.address) {
+    if (this.user.role === 'SENDER' && !this.user.address) {
       this.error.set('Address is required for customers');
       return;
     }
-    if (this.user.role === 'courier' && (!this.user.vehicleType || !this.user.licenseNumber || !this.user.zone)) {
+    if (this.user.role === 'COURIER' && (!this.user.vehicleType || !this.user.licenseNumber || !this.user.zone)) {
       this.error.set('All courier fields are required');
       return;
     }

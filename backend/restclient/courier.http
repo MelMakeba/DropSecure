@@ -1,0 +1,55 @@
+@baseUrl = http://localhost:3000
+@courier_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmNjUwMWQ3Mi0wY2ZiLTQ0NDUtOTliNi0zYTNiZGY2NDBlMzMiLCJlbWFpbCI6Im1lbGlzc2Eud2FpdGl0dWhAc3RyYXRobW9yZS5lZHUiLCJyb2xlIjoiQ09VUklFUiIsImlhdCI6MTc1Mzc4MTc3MiwiZXhwIjoxNzUzODY4MTcyfQ.-SkXFXnwjyaE9JN-4h6x0VLo5wrG8FpIHAVl3P25MZE
+@admin_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0MTg1NTU4NC0yYWI0LTRhZjMtOTQzMS0zMGE0NDA0OGU1YjciLCJlbWFpbCI6Im1lbGlzc2FtYWtlYmFAZ21haWwuY29tIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzUzNzgxMjYxLCJleHAiOjE3NTM4Njc2NjF9.EBjFByZCE7dgMFCBu96NLKBiajV5QXQRA96x5ZKOpBw
+@courierId = 7305dd4d-d2b7-44a9-a80c-f11c3cbc6c32
+@packageId = 799a9df0-3478-4759-a4e2-120271ad376b
+
+
+### Get Courier Profile (Courier)
+GET {{baseUrl}}/courier/profile
+Authorization: Bearer {{courier_token}}
+
+### Get All Couriers (Admin)
+GET {{baseUrl}}/courier/admin/couriers
+Authorization: Bearer {{admin_token}}
+
+### Get Available Couriers (Admin)
+GET {{baseUrl}}/courier/admin/couriers/available
+Authorization: Bearer {{admin_token}}
+
+### Verify Courier (Admin)
+PUT {{baseUrl}}/courier/admin/courier/{{courierId}}/verify
+Authorization: Bearer {{admin_token}}
+
+### Update Courier Status (Admin)
+PUT {{baseUrl}}/courier/admin/courier/{{courierId}}/status
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "status": "AVAILABLE",
+  "currentLat": 6.5244,
+  "currentLng": 3.3792
+}
+
+### Update Courier Status (Admin) with packageId
+PUT {{baseUrl}}/courier/admin/courier/{{courierId}}/status
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "status": "AVAILABLE",
+  "currentLat": 6.5244,
+  "currentLng": 3.3792,
+  "packageId": "{{packageId}}"
+}
+
+### Update Courier Location (Courier)
+PUT {{baseUrl}}/courier/location
+Authorization: Bearer {{courier_token}}
+Content-Type: application/json
+
+{
+  "currentLat": 6.5244,
+  "currentLng": 3.3792
+}

@@ -1,8 +1,4 @@
-export enum UserRole {
-  ADMIN = 'ADMIN',
-  SENDER = 'SENDER',
-  COURIER = 'COURIER',
-}
+import { UserRole } from 'generated/prisma';
 
 export interface User {
   id: string;

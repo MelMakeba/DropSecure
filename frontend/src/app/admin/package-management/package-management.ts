@@ -1,6 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Packages, StatusEvent } from '../../services/packages/packages';
+import { Packages } from '../../services/packages/packages';
 import { RouterModule } from '@angular/router';
 import { Package } from '../../models/package.model';
 import { Sidebar } from '../../shared/sidebar/sidebar';
@@ -9,7 +9,7 @@ import { FormsModule, NgForm } from '@angular/forms';
 import { ConfirmationModal } from '../../shared/confirmation-modal/confirmation-modal';
 import { PackageDetailModal } from '../../sender/package-detail-modal/package-detail-modal';
 import { StatusHistory } from '../../services/StatusHistory/status-history'
-
+import { StatusEvent } from '../../models/status-event.model';
 @Component({
   selector: 'app-package-management',
   standalone: true,
@@ -29,28 +29,33 @@ export class PackageManagement {
   @ViewChild('createForm') createForm!: NgForm;
 
   constructor(private packagesService: Packages,
-    private packageStatusService: StatusHistory
+    private statusHistoryService: StatusHistory
   ) {
     this.loadPackages();
   }
 
-  newPackage: Package = {
-    id: '',
-    trackingNumber: '',
+  newPackage: Partial<Package> = {
+    trackingId: '',
     senderId: '',
     senderName: '',
     senderEmail: '',
     senderPhone: '',
     senderAddress: '',
+    receiverId: '',
+    receiverName: '',
     receiverEmail: '',
     receiverPhone: '',
     receiverAddress: '',
     weight: undefined,
     description: '',
-    receiverName: '',
-    createdById: '',
+    specialInstructions: '',
+    value: undefined,
+    price: undefined,
+    preferredPickupDate: '',
+    preferredDeliveryDate: '',
     status: '',
     isPaid: false,
+    createdById: '',
     createdAt: '',
     updatedAt: ''
   };
@@ -69,39 +74,17 @@ export class PackageManagement {
       if (this.editMode && this.selectedPackageId) {
         this.editPackage(this.selectedPackageId, this.newPackage);
       } else {
-        const { id, ...pkgData } = this.newPackage;
-        const pkg: Omit<Package, 'id'> = {
-          ...pkgData,
-          trackingNumber: 'PKG-' + Date.now(),
+        const pkg: Partial<Package> = {
+          ...this.newPackage,
           status: 'pending',
           isPaid: false,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
         };
-        // Type assertion to satisfy the method signature
-        this.createPackage(pkg as Package);
+        this.createPackage(pkg);
       }
       this.closeCreateModal();
-      this.newPackage = {
-        id: '',
-        trackingNumber: '',
-        senderId: '',
-        senderName: '',
-        senderEmail: '',
-        senderPhone: '',
-        senderAddress: '',
-        receiverEmail: '',
-        receiverPhone: '',
-        receiverAddress: '',
-        weight: undefined,
-        description: '',
-        receiverName: '',
-        createdById: '',
-        status: '',
-        isPaid: false,
-        createdAt: '',
-        updatedAt: ''
-      };
+      this.resetNewPackage();
       if (this.createForm) {
         this.createForm.resetForm();
       }
@@ -110,8 +93,16 @@ export class PackageManagement {
 
   loadPackages() {
     this.loading = true;
-    this.packagesService.getPackages().subscribe(packages => {
-      this.packages = packages;
+    this.packagesService.getPackages().subscribe(pkgs => {
+      this.packages = pkgs.map(pkg => ({
+        ...pkg,
+        senderName: pkg.sender
+          ? `${pkg.sender.firstName} ${pkg.sender.lastName}`
+          : pkg.senderName || '',
+        courierName: pkg.courier
+          ? `${pkg.courier.firstName} ${pkg.courier.lastName}`
+          : pkg.courierName || ''
+      }));
       this.loading = false;
     });
   }
@@ -123,14 +114,21 @@ export class PackageManagement {
   }
 
   assignToCourier(packageId: string, courierId: string, courierName: string) {
-    this.packagesService.assignPackageToCourier(packageId, courierId, courierName).subscribe(() => {
+    this.packagesService.assignPackageToCourier(packageId, courierId).subscribe(() => {
       this.loadPackages();
     });
   }
 
-  createPackage(pkg: Package) {
-    this.packagesService.createPackage(pkg).subscribe(() => {
-      this.loadPackages();
+  createPackage(pkg: Partial<Package>) {
+    this.packagesService.createPackage(pkg).subscribe({
+      next: (createdPkg) => {
+        // Optionally handle the created package (e.g., show a success message)
+        this.loadPackages(); // Refresh the list after creation
+      },
+      error: (err) => {
+        // Handle error (e.g., show an error message)
+        console.error('Failed to create package:', err);
+      }
     });
   }
 
@@ -145,22 +143,27 @@ export class PackageManagement {
     this.editMode = false;
     this.selectedPackageId = null;
     this.newPackage = {
-      id: '',
-      trackingNumber: '',
+      trackingId: '',
       senderId: '',
       senderName: '',
       senderEmail: '',
       senderPhone: '',
       senderAddress: '',
+      receiverId: '',
+      receiverName: '',
       receiverEmail: '',
       receiverPhone: '',
       receiverAddress: '',
       weight: undefined,
       description: '',
-      receiverName: '',
-      createdById: '',
+      specialInstructions: '',
+      value: undefined,
+      price: undefined,
+      preferredPickupDate: '',
+      preferredDeliveryDate: '',
       status: '',
       isPaid: false,
+      createdById: '',
       createdAt: '',
       updatedAt: ''
     };
@@ -214,8 +217,7 @@ export class PackageManagement {
       const courier = this.couriers.find(c => c.id === this.selectedCourierId);
       this.packagesService.assignPackageToCourier(
         this.packageIdToAssign,
-        this.selectedCourierId,
-        courier?.name || ''
+        this.selectedCourierId
       ).subscribe(() => {
         this.loadPackages();
         this.closeAssignModal();
@@ -234,10 +236,11 @@ export class PackageManagement {
     return user ? JSON.parse(user).name : '';
   }
 
+ 
   navItems = [
-    { label: 'Dashboard', icon: 'home-outline', route: '/admin/dashboard', roles: ['admin'] },
-    { label: 'Packages', icon: 'cube-outline', route: '/admin/packages', roles: ['admin'] },
-    { label: 'Users', icon: 'people-outline', route: '/admin/users', roles: ['admin'] },
+    { label: 'Dashboard', icon: 'home-outline', route: '/admin/dashboard', roles: ['ADMIN'] },
+    { label: 'Packages', icon: 'cube-outline', route: '/admin/packages', roles: ['ADMIN'] },
+    { label: 'Users', icon: 'people-outline', route: '/admin/users', roles: ['ADMIN'] },
     // { label: 'Couriers', icon: 'bicycle-outline', route: '/admin/couriers', roles: ['admin'] },
     // { label: 'Analytics', icon: 'stats-chart-outline', route: '/admin/analytics', roles: ['admin'] },
     // { label: 'Create Order', icon: 'add-circle-outline', route: '/admin/create-order', roles: ['admin'] }
@@ -258,7 +261,7 @@ export class PackageManagement {
   openDetailsModal(pkg: Package) {
     this.selectedPackage = pkg;
     this.showDetailsModal = true;
-    this.packagesService.getStatusHistory(pkg.id).subscribe(history => {
+    this.statusHistoryService.getStatusHistory(pkg.id).subscribe(history => {
       this.selectedPackageStatusHistory = history;
     });
   }
@@ -272,14 +275,42 @@ export class PackageManagement {
   markAsPickedUp(pkg: Package) {
     const user = localStorage.getItem('dropsecure_user');
     const admin = user ? JSON.parse(user) : { id: '', name: '' };
-    this.packageStatusService.changeStatus(
+    this.statusHistoryService.changeStatus(
       pkg.id,
       'picked_up',
-      { id: admin.id, role: 'admin', name: admin.name },
+      { id: admin.id, role: 'ADMIN', name: admin.name },
       undefined,
       'Marked as picked up by admin'
     ).subscribe(() => {
       this.loadPackages();
     });
+  }
+
+  resetNewPackage() {
+    this.newPackage = {
+      trackingId: '',
+      senderId: '',
+      senderName: '',
+      senderEmail: '',
+      senderPhone: '',
+      senderAddress: '',
+      receiverId: '',
+      receiverName: '',
+      receiverEmail: '',
+      receiverPhone: '',
+      receiverAddress: '',
+      weight: undefined,
+      description: '',
+      specialInstructions: '',
+      value: undefined,
+      price: undefined,
+      preferredPickupDate: '',
+      preferredDeliveryDate: '',
+      status: '',
+      isPaid: false,
+      createdById: '',
+      createdAt: '',
+      updatedAt: ''
+    };
   }
 }

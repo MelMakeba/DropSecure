@@ -11,6 +11,9 @@ async function main() {
       maxWeight: 5,
       baseCost: 100,
       costPerKg: 50,
+      costPerKm: 0, // Set appropriate value
+      weightMultiplier: 1, // Set appropriate value
+      distanceMultiplier: 1, // Set appropriate value
       isActive: true,
     },
   });

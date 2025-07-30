@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import { StatusEvent } from '../../services/packages/packages';
+import { StatusEvent } from '../../models/status-event.model';
 @Component({
   selector: 'app-package-status-timeline',
   imports: [CommonModule],

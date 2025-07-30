@@ -26,14 +26,17 @@ export class AdminDashboard implements OnInit {
   };
 
   get loggedInAdminName(): string {
-    const user = localStorage.getItem('dropsecure_user');
-    return user ? JSON.parse(user).name : '';
+    const userStr = localStorage.getItem('dropsecure_user');
+    if (!userStr) return '';
+    const user = JSON.parse(userStr);
+    // Use firstName and lastName if available, fallback to email
+    return `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim() || user.email || '';
   }
 
   navItems = [
-    { label: 'Dashboard', icon: 'home-outline', route: '/admin/dashboard', roles: ['admin'] },
-    { label: 'Packages', icon: 'cube-outline', route: '/admin/packages', roles: ['admin'] },
-    { label: 'Users', icon: 'people-outline', route: '/admin/users', roles: ['admin'] },
+    { label: 'Dashboard', icon: 'home-outline', route: '/admin/dashboard', roles: ['ADMIN'] },
+    { label: 'Packages', icon: 'cube-outline', route: '/admin/packages', roles: ['ADMIN'] },
+    { label: 'Users', icon: 'people-outline', route: '/admin/users', roles: ['ADMIN'] },
     // { label: 'Couriers', icon: 'bicycle-outline', route: '/admin/couriers', roles: ['admin'] },
     // { label: 'Analytics', icon: 'stats-chart-outline', route: '/admin/analytics', roles: ['admin'] },
     // { label: 'Create Order', icon: 'add-circle-outline', route: '/admin/create-order', roles: ['admin'] }

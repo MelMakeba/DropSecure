@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/require-await */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
+
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
@@ -23,6 +23,7 @@ import {
   PackageWithRelations,
 } from './interfaces/package.interfaces';
 import { nanoid } from 'nanoid';
+import { PrismaClientValidationError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class PackageService {
@@ -41,6 +42,24 @@ export class PackageService {
     createdById: string,
   ): Promise<PackageInterface> {
     try {
+      // Validate senderId and createdById
+      if (!createPackageDto.senderId) {
+        throw new BadRequestException('Sender ID is required');
+      }
+      if (!createdById) {
+        throw new BadRequestException('CreatedBy ID is required');
+      }
+
+      // Optionally validate receiverId if provided
+      if (
+        createPackageDto.receiverId === undefined &&
+        !createPackageDto.receiverName
+      ) {
+        throw new BadRequestException(
+          'Receiver ID is required if receiver is provided',
+        );
+      }
+
       // Validate sender exists (always required)
       const sender = await this.prisma.user.findUnique({
         where: { id: createPackageDto.senderId },
@@ -105,14 +124,25 @@ export class PackageService {
         createPackageDto.price,
       );
 
-      // Create package with transaction
       const packageData = await this.prisma.$transaction(async (tx) => {
         const newPackage = await tx.package.create({
           data: {
             trackingId,
-            senderId: createPackageDto.senderId,
+            // Sender relation (required)
+            sender: {
+              connect: {
+                id: createPackageDto.senderId,
+              },
+            },
             senderEmail: createPackageDto.senderEmail,
-            receiverId: createPackageDto.receiverId, // can be null
+            // Receiver relation (optional)
+            ...(createPackageDto.receiverId && {
+              receiver: {
+                connect: {
+                  id: createPackageDto.receiverId,
+                },
+              },
+            }),
             receiverName: createPackageDto.receiverName,
             receiverEmail: createPackageDto.receiverEmail,
             receiverPhone: createPackageDto.receiverPhone,
@@ -121,7 +151,13 @@ export class PackageService {
             receiverState: createPackageDto.receiverState,
             receiverZipCode: createPackageDto.receiverZipCode,
             receiverCountry: createPackageDto.receiverCountry,
-            createdById,
+            // Created by relation (required)
+            createdBy: {
+              connect: {
+                id: createdById,
+              },
+            },
+            // Package details
             weight: createPackageDto.weight,
             description: createPackageDto.description,
             specialInstructions: createPackageDto.specialInstructions,
@@ -133,7 +169,14 @@ export class PackageService {
             preferredDeliveryDate: createPackageDto.preferredDeliveryDate
               ? new Date(createPackageDto.preferredDeliveryDate)
               : null,
-            courierId: createPackageDto.courierId,
+            // Courier relation (optional)
+            ...(createPackageDto.courierId && {
+              courier: {
+                connect: {
+                  id: createPackageDto.courierId,
+                },
+              },
+            }),
             estimatedCost,
             status: PackageStatus.CREATED,
           },
@@ -147,13 +190,14 @@ export class PackageService {
             changedBy: createdById,
             changedAt: new Date(),
             notes: 'Package created',
+            createdAt: new Date(),
           },
         });
 
         // Create notification for sender
         await tx.notification.create({
           data: {
-            recipientUserId: createPackageDto.senderId, // <-- use the correct field name
+            recipientUserId: createPackageDto.senderId,
             packageId: newPackage.id,
             type: 'PACKAGE_CREATED',
             subject: 'Package Created',
@@ -180,6 +224,10 @@ export class PackageService {
       this.logger.log(`Package created successfully: ${trackingId}`);
       return packageData;
     } catch (error) {
+      if (error instanceof PrismaClientValidationError) {
+        this.logger.error(`Prisma validation error: ${error.message}`);
+        throw new BadRequestException('Invalid data: ' + error.message);
+      }
       this.logger.error(`Failed to create package: ${error.message}`);
       throw error;
     }
@@ -518,8 +566,9 @@ export class PackageService {
         data: {
           packageId,
           status: updateStatusDto.status,
-          changedBy,
+          changedBy: changedBy,
           changedAt: new Date(),
+          createdAt: new Date(),
           notes: updateStatusDto.notes,
           location: updateStatusDto.location,
         },
@@ -554,11 +603,119 @@ export class PackageService {
     });
 
     // Send status update email to sender
-    await this.sendStatusUpdateEmail(existingPackage, updateStatusDto.status);
+    const fullPackage = await this.prisma.package.findUnique({
+      where: { id: packageId },
+      include: {
+        sender: true,
+        receiver: true,
+        createdBy: true,
+        courier: true,
+        statusHistory: {
+          orderBy: { changedAt: 'desc' },
+          include: {
+            changedByUser: {
+              select: { id: true, firstName: true, email: true },
+            },
+          },
+        },
+        locationUpdates: {
+          orderBy: { timestamp: 'desc' },
+          include: {
+            courier: {
+              select: { id: true, firstName: true, email: true },
+            },
+          },
+        },
+        deliveryAttempts: {
+          orderBy: { attemptDate: 'desc' },
+          include: {
+            courier: {
+              select: { id: true, firstName: true, email: true },
+            },
+          },
+        },
+      },
+    });
+    if (fullPackage) {
+      await this.sendStatusUpdateEmail(
+        fullPackage as unknown as PackageWithRelations,
+        updateStatusDto.status,
+      );
+    }
 
     this.logger.log(
       `Package ${existingPackage.trackingId} status updated to ${updateStatusDto.status}`,
     );
+    return updatedPackage;
+  }
+
+  /**
+   * Assign a courier to a package
+   */
+  async assignCourierToPackage(
+    packageId: string,
+    courierId: string,
+    assignedBy: string,
+  ): Promise<PackageInterface> {
+    // Validate package exists
+    const pkg = await this.prisma.package.findUnique({
+      where: { id: packageId },
+    });
+    if (!pkg) throw new NotFoundException('Package not found');
+
+    // Validate courier exists and is a COURIER
+    const courier = await this.prisma.user.findUnique({
+      where: { id: courierId },
+      select: { id: true, role: true, email: true, firstName: true },
+    });
+    if (!courier || courier.role !== UserRole.COURIER) {
+      throw new BadRequestException('Courier not found or invalid role');
+    }
+
+    // Update package with courier and status
+    const updatedPackage = await this.prisma.package.update({
+      where: { id: packageId },
+      data: {
+        courier: { connect: { id: courierId } },
+        status: PackageStatus.COURIER_ASSIGNED,
+        updatedAt: new Date(),
+      },
+    });
+
+    // Add status history
+    await this.prisma.packageStatusHistory.create({
+      data: {
+        packageId,
+        status: PackageStatus.COURIER_ASSIGNED,
+        changedBy: assignedBy,
+        changedAt: new Date(),
+        notes: 'Courier assigned to package',
+        createdAt: new Date(),
+      },
+    });
+
+    // Notify courier (optional)
+    await this.prisma.notification.create({
+      data: {
+        recipientUserId: courierId,
+        packageId,
+        type: 'COURIER_ASSIGNED',
+        subject: 'New Package Assignment',
+        message: `You have been assigned a new package (${pkg.trackingId})`,
+      },
+    });
+
+    // Optionally send email to courier
+    await this.emailService.sendPackageAssignmentEmail(courier.email, {
+      courierName: courier.firstName,
+      trackingNumber: pkg.trackingId,
+      packageDetails: pkg.description,
+      pickupAddress: pkg.receiverAddress,
+      deliveryAddress: pkg.receiverAddress,
+      receiverPhone: pkg.receiverPhone,
+      senderPhone: '',
+    });
+
     return updatedPackage;
   }
 
@@ -742,7 +899,7 @@ export class PackageService {
   }
 
   private async sendStatusUpdateEmail(
-    packageData: any,
+    packageData: PackageWithRelations,
     newStatus: PackageStatus,
   ): Promise<void> {
     try {
@@ -758,27 +915,59 @@ export class PackageService {
         [PackageStatus.RETURNED]: 'has been returned',
       };
       const message = statusMessages[newStatus];
-      // Send email based on status
-      if (newStatus === PackageStatus.PICKED_UP) {
-        await this.emailService.sendPickupConfirmation(
-          packageData.sender.email,
+
+      // Send to sender
+      if (packageData.sender?.email) {
+        const senderName = packageData.sender.name; // Use 'name' property
+        if (newStatus === PackageStatus.PICKED_UP) {
+          await this.emailService.sendPickupConfirmation(
+            packageData.sender.email,
+            {
+              name: senderName,
+              trackingNumber: packageData.trackingId,
+              pickupTime: new Date().toISOString(),
+              courierName: 'DropSecure Courier',
+            },
+          );
+        } else if (newStatus === PackageStatus.DELIVERED) {
+          await this.emailService.sendDeliveryNotification(
+            packageData.sender.email,
+            {
+              name: senderName,
+              trackingNumber: packageData.trackingId,
+              deliveryTime: new Date().toISOString(),
+            },
+          );
+        } else {
+          // Use an existing generic status update method, or implement one
+          await this.emailService.sendPackageStatusUpdate(
+            packageData.sender.email,
+            {
+              name: packageData.sender.name,
+              trackingNumber: packageData.trackingId,
+              oldStatus: packageData.status,
+              newStatus,
+              statusMessage: message,
+            },
+          );
+        }
+      }
+
+      // Send to receiver (if available)
+      if (packageData.receiver?.email) {
+        const receiverName = packageData.receiver.name; // Use 'name' property
+        await this.emailService.sendPackageStatusUpdate(
+          packageData.receiver.email,
           {
-            name: packageData.sender.name,
+            name: receiverName,
             trackingNumber: packageData.trackingId,
-            pickupTime: new Date().toISOString(),
-            courierName: 'DropSecure Courier',
-          },
-        );
-      } else if (newStatus === PackageStatus.DELIVERED) {
-        await this.emailService.sendDeliveryNotification(
-          packageData.sender.email,
-          {
-            name: packageData.sender.name,
-            trackingNumber: packageData.trackingId,
-            deliveryTime: new Date().toISOString(),
+            oldStatus: packageData.status,
+            newStatus,
+            statusMessage: message,
           },
         );
       }
+
       this.logger.log(`Package ${packageData.trackingId} ${message}`);
     } catch (error) {
       this.logger.error(`Failed to send status update email: ${error.message}`);

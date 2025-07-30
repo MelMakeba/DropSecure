@@ -1,0 +1,28 @@
+@baseUrl = http://localhost:3000
+@contentType = application/json
+@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0MTg1NTU4NC0yYWI0LTRhZjMtOTQzMS0zMGE0NDA0OGU1YjciLCJlbWFpbCI6Im1lbGlzc2FtYWtlYmFAZ21haWwuY29tIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzUzNjk0MzE2LCJleHAiOjE3NTM3ODA3MTZ9.VTDB8AArgsnGTGyt24iskU4CRnRgPCgK3QChce690nA
+@senderToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlOWFmMzU5Yi0wOTViLTRlNzItYTdhMC02OTZjMGQ1YmU0NTciLCJlbWFpbCI6Im1lbGxpc2F3YW5qYTI1NEBnbWFpbC5jb20iLCJyb2xlIjoiU0VOREVSIiwiaWF0IjoxNzUzNzcxNDc2LCJleHAiOjE3NTM4NTc4NzZ9._8mZD47aI3LuVyoziALLWTISz1zNhDLeaVcahTRgye8
+@courierToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1YjQwNDY1YS0wY2E1LTRjNzgtOGJkZC1kYTc3MjcxZmNmNDYiLCJlbWFpbCI6Im1lbGsuaWxlbmEuYUBnbWFpbC5jb20iLCJyb2xlIjoiQ09VUklFUiIsImlhdCI6MTc1Mzc3MjAzMCwiZXhwIjoxNzUzODU4NDMwfQ.mzxtdMfBAQrQJD_Oac-getAdSnc1yHmG_Hf8FpRmd_A
+@packageId = 799a9df0-3478-4759-a4e2-120271ad376b
+@trackingId = DSMDO66CNBHC2V-Q
+@courierId = 5b40465a-0ca5-4c78-8bdd-da77271fcf46
+
+### Courier updates location
+POST {{baseUrl}}/location/update
+Authorization: Bearer {{courierToken}}
+Content-Type: application/json
+
+{
+  "courierId": "{{courierId}}",
+  "packageId": "{{packageId}}",
+  "latitude": 6.5244,
+  "longitude": 3.3792
+}
+
+### Get package location history
+GET {{baseUrl}}/location/package/{{packageId}}
+Authorization: Bearer {{adminToken}}
+
+### Get current courier location
+GET {{baseUrl}}/location/courier/{{courierId}}/current
+Authorization: Bearer {{adminToken}}

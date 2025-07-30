@@ -98,7 +98,7 @@ export class RoutePlanner implements AfterViewInit {
       this.packageStatusService.changeStatus(
         pkgId,
         'in_transit', // or keep current status
-        { id: courier.id, role: 'courier', name: courier.name },
+        { id: courier.id, role: 'COURIER', name: courier.name },
         location,
         `Location updated by courier`
       ).subscribe(() => {

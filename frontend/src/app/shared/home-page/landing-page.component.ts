@@ -40,7 +40,7 @@ export class LandingPageComponent {
         this.router.navigate(['/admin/dashboard']);
       } else if (parsed.role === 'courier') {
         this.router.navigate(['/courier/dashboard']);
-      } else if (parsed.role === 'customer') {
+      } else if (parsed.role === 'sender') {
         this.router.navigate(['/sender/dashboard']);
       } else {
         this.router.navigate(['/']);

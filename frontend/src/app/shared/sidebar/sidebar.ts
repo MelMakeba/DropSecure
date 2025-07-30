@@ -2,6 +2,8 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA, Input } from '@angular/core';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../services/auth/auth'; // Import AuthService
+import { UserRole } from '../../models/user.model';
 
 
 export interface SidebarNavItem {
@@ -40,14 +42,18 @@ export interface SidebarNavItem {
   ]
 })
 export class Sidebar {
-  @Input() role: 'sender' | 'courier' | 'admin' = 'sender';
-  @Input() loggedInName = '';
   @Input() navItems: SidebarNavItem[] = [];
+  @Input() role!: UserRole;
+  @Input() loggedInName!: string;
 
   sidebarOpen = true;
   sidebarCollapsed = false;
 
-  constructor(private router: Router) {}
+  user: any;
+
+  constructor(private router: Router, private authService: AuthService) {
+    this.user = this.authService.getCurrentUser();
+  }
    
   toggleSidebar() {
     this.sidebarOpen = !this.sidebarOpen;
@@ -72,23 +78,15 @@ export class Sidebar {
   }
 
   get loggedInSenderId(): string {
-    const user = localStorage.getItem('dropsecure_user');
-    if (!user) return '';
-    try {
-      const parsed = JSON.parse(user);
-      return parsed?.id ?? '';
-    } catch {
-      return '';
-    }
-  }
-
-  get loggedInSenderName(): string {
-    const user = localStorage.getItem('dropsecure_user');
-    return user ? JSON.parse(user).name : '';
+    return this.user?.id ?? '';
   }
 
   logout() {
-    localStorage.removeItem('dropsecure_user');
-    window.location.href = '/';
+    this.authService.logout();
+  }
+
+  get sidebarHeight(): string {
+    // 60rem for admin and courier, default (auto) for sender
+    return (this.role === 'ADMIN' || this.role === 'COURIER') ? '50rem' : 'auto';
   }
 }

@@ -1,47 +1,72 @@
 import { Sender } from './../sender/sender';
+
 export interface Package {
   id: string;
   trackingId?: string;
-  trackingNumber?: string;
 
   senderId: string;
-  senderName: string; 
+  senderEmail?: string;
+  senderName?: string;
   senderPhone?: string;
   senderAddress?: string;
-  senderEmail?: string;
-  receiverEmail?: string;
+
+  // Nested sender object from backend
+  sender?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    role: string;
+  };
+
   receiverId?: string;
-  receiverName: string; 
+  receiverName: string;
+  receiverEmail?: string;
   receiverPhone?: string;
   receiverAddress?: string;
+  receiverCity?: string;
+  receiverState?: string;
+  receiverZipCode?: string;
+  receiverCountry?: string;
+
   courierId?: string;
   courierName?: string;
 
-  createdById: string;
+  // Nested courier object from backend
+  courier?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+  };
+
+  createdById?: string;
 
   weight?: number;
   description: string;
   specialInstructions?: string;
   value?: number;
+  price?: number;
 
-  preferredPickupDate?: string; 
+  preferredPickupDate?: string;
   preferredDeliveryDate?: string;
   actualPickupDate?: string;
   actualDeliveryDate?: string;
-  estimatedDelivery?: string; // or Date if you prefer
+  estimatedDelivery?: string;
 
-  status: string; 
+  status: string;
 
   estimatedCost?: number;
   actualCost?: number;
-  isPaid: boolean;
+  isPaid?: boolean;
 
   currentLat?: number;
   currentLng?: number;
 
   createdAt: string;
   updatedAt: string;
-  sentAt?: string; 
+  sentAt?: string;
 
   statusHistory?: any[];
   locationUpdates?: any[];

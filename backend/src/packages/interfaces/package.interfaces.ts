@@ -96,6 +96,7 @@ export interface PackageStatusHistoryInterface {
 export interface LocationUpdateInterface {
   id: string;
   packageId: string;
+  currentLocation: string;
   latitude: number;
   longitude: number;
   address?: string | null;

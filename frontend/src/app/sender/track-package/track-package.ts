@@ -2,9 +2,10 @@ import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule, UpperCasePipe, DatePipe } from '@angular/common';
 import * as L from 'leaflet';
 import { Package } from '../../models/package.model';
-import { StatusEvent, Packages } from '../../services/packages/packages';
+import {  Packages } from '../../services/packages/packages';
 import { FormsModule } from '@angular/forms';
 import { Sidebar } from '../../shared/sidebar/sidebar';
+import { StatusEvent } from '../../models/status-event.model';
 
 
 @Component({
@@ -98,10 +99,11 @@ export class TrackPackage implements OnInit, AfterViewInit, OnDestroy {
   }
 
 
-   navItems = [
-    { label: 'Dashboard', icon: 'home-outline', route: '/sender/dashboard', roles: ['sender'] },
-    { label: 'My Packages', icon: 'cube-outline', route: '/sender/sent-packages', fragment: 'my-packages', roles: ['sender'] },
-    { label: 'Received', icon: 'checkmark-done-outline', route: '/sender/received-packages', fragment: 'received', roles: ['sender'] },
-    { label: 'Track', icon: 'locate-outline', route: '/sender/track', roles: ['sender', 'courier', 'admin'] },
+   
+  navItems = [
+    { label: 'Dashboard', icon: 'home-outline', route: '/sender/dashboard', roles: ['SENDER'] },
+    { label: 'My Packages', icon: 'cube-outline', route: '/sender/sent-packages', fragment: 'my-packages', roles: ['SENDER'] },
+    { label: 'Received', icon: 'checkmark-done-outline', route: '/sender/received-packages', fragment: 'received', roles: ['SENDER'] },
+    { label: 'Track', icon: 'locate-outline', route: '/sender/track', roles: ['SENDER', 'COURIER', 'ADMIN'] },
   ];
 }

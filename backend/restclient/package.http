@@ -1,13 +1,13 @@
 @baseUrl = http://localhost:3000
 @contentType = application/json
-@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0MTg1NTU4NC0yYWI0LTRhZjMtOTQzMS0zMGE0NDA0OGU1YjciLCJlbWFpbCI6Im1lbGlzc2FtYWtlYmFAZ21haWwuY29tIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzUzNjk0MzE2LCJleHAiOjE3NTM3ODA3MTZ9.VTDB8AArgsnGTGyt24iskU4CRnRgPCgK3QChce690nA
-@senderToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlOWFmMzU5Yi0wOTViLTRlNzItYTdhMC02OTZjMGQ1YmU0NTciLCJlbWFpbCI6Im1lbGxpc2F3YW5qYTI1NEBnbWFpbC5jb20iLCJyb2xlIjoiU0VOREVSIiwiaWF0IjoxNzUzNjkyODA1LCJleHAiOjE3NTM2OTM3MDV9.ZWLYAJot-_SbekODZMaco8Epvkb36_nwoygnRxgp0R4
-@courierToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1YjQwNDY1YS0wY2E1LTRjNzgtOGJkZC1kYTc3MjcxZmNmNDYiLCJlbWFpbCI6Im1lbGsuaWxlbmEuYUBnbWFpbC5jb20iLCJyb2xlIjoiQ09VUklFUiIsImlhdCI6MTc1MzY5MjY1NCwiZXhwIjoxNzUzNjkzNTU0fQ.fpX2mm9q6ui_jfyDWEhdjBkaDd2hQjA1apysoeyo4ms
-@packageId = 12345678-abcd-1234-efgh-123456789012
-@trackingId = DS4A2B3C1234
+@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0MTg1NTU4NC0yYWI0LTRhZjMtOTQzMS0zMGE0NDA0OGU1YjciLCJlbWFpbCI6Im1lbGlzc2FtYWtlYmFAZ21haWwuY29tIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzUzODQ4ODU5LCJleHAiOjE3NTM5MzUyNTl9.p5AH9PntLTpumJhkW5rPkaEfwScf4IEiI0VAp5yixW8
+@senderToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlOWFmMzU5Yi0wOTViLTRlNzItYTdhMC02OTZjMGQ1YmU0NTciLCJlbWFpbCI6Im1lbGxpc2F3YW5qYTI1NEBnbWFpbC5jb20iLCJyb2xlIjoiU0VOREVSIiwiaWF0IjoxNzUzNzcxNDc2LCJleHAiOjE3NTM4NTc4NzZ9._8mZD47aI3LuVyoziALLWTISz1zNhDLeaVcahTRgye8
+@courierToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1YjQwNDY1YS0wY2E1LTRjNzgtOGJkZC1kYTc3MjcxZmNmNDYiLCJlbWFpbCI6Im1lbGsuaWxlbmEuYUBnbWFpbC5jb20iLCJyb2xlIjoiQ09VUklFUiIsImlhdCI6MTc1Mzc3MjAzMCwiZXhwIjoxNzUzODU4NDMwfQ.mzxtdMfBAQrQJD_Oac-getAdSnc1yHmG_Hf8FpRmd_A
+@packageId = 799a9df0-3478-4759-a4e2-120271ad376b
+@trackingId = DSMDO66CNBHC2V-Q
 
 ### Create Package (Admin only)
-POST {{baseUrl}}/packages
+POST {{baseUrl}}/packages/create
 Content-Type: {{contentType}}
 Authorization: Bearer {{adminToken}}
 
@@ -15,7 +15,7 @@ Authorization: Bearer {{adminToken}}
   "senderId": "e9af359b-095b-4e72-a7a0-696c0d5be457",
   "senderEmail": "mellisawanja254@gmail.com",
   "receiverName": "Jane Doe",
-  "receiverEmail": "melissa.waitituh@strathmoree.edu",
+  "receiverEmail": "melissa.waitituh@strathmore.edu",
   "receiverPhone": "+1234567890",
   "receiverAddress": "123 Main St",
   "receiverCity": "Nairobi",
@@ -26,6 +26,7 @@ Authorization: Bearer {{adminToken}}
   "description": "Books and Documents",
   "specialInstructions": "Handle with care - fragile items",
   "value": 100,
+  "price": 150,
   "preferredPickupDate": "2025-07-30T10:00:00.000Z",
   "preferredDeliveryDate": "2025-08-02T15:00:00.000Z"
 }
@@ -54,12 +55,12 @@ Authorization: Bearer {{adminToken}}
 }
 
 ### Get User's Packages (Works for all roles)
-GET {{baseUrl}}/packages
+GET {{baseUrl}}/packages/get-user-packages
 Content-Type: {{contentType}}
 Authorization: Bearer {{senderToken}}
 
 ### Get All Packages (Admin only)
-GET {{baseUrl}}/packages/all
+GET {{baseUrl}}/packages
 Content-Type: {{contentType}}
 Authorization: Bearer {{adminToken}}
 
@@ -77,6 +78,17 @@ Authorization: Bearer {{adminToken}}
   "status": "COURIER_ASSIGNED",
   "notes": "Package assigned to courier John Doe"
 }
+
+### Update Package Status - In Transit (Courier)
+PUT {{baseUrl}}/packages/{{packageId}}/status
+Content-Type: {{contentType}}
+Authorization: Bearer {{courierToken}}
+
+{
+  "status": "PICKED_UP",
+  "notes": "Package picked up"
+}
+
 
 ### Update Package Status - In Transit (Courier)
 PUT {{baseUrl}}/packages/{{packageId}}/status
@@ -103,7 +115,7 @@ GET {{baseUrl}}/packages/track/{{trackingId}}
 Content-Type: {{contentType}}
 
 ### Assign Courier to Package (Admin only)
-PATCH {{baseUrl}}/packages/{{packageId}}/assign-courier
+PUT {{baseUrl}}/packages/{{packageId}}/assign-courier
 Content-Type: {{contentType}}
 Authorization: Bearer {{adminToken}}
 

@@ -1,7 +1,7 @@
 @baseUrl = http://localhost:3000
 @contentType = application/json
 @authToken = 
-@ver_Token =359949
+@ver_Token =644560
 @reset_Token=
 
 
@@ -10,12 +10,12 @@ POST {{baseUrl}}/auth/register
 Content-Type: {{contentType}}
 
 {
-    "email": "mellisawanja254@gmail.com",
+    "email": "melissa.waitituh@strathmore.edu",
     "password": "pass123",
     "firstName": "Mel",
     "lastName": "Kilenaa",
     "phone": "+1234567890",
-    "role": "SENDER"
+    "role": "COURIER"
 }
 
 
@@ -24,8 +24,8 @@ POST {{baseUrl}}/auth/login
 Content-Type: {{contentType}}
 
 {
-    "email":"melissamakeba@gmail.com",
-    "password":"admin123"
+    "email":"melissa.waitituh@strathmore.edu",
+    "password":"pass123"
 
 }
 
@@ -42,7 +42,7 @@ POST {{baseUrl}}/auth/verify-email
 Content-Type: {{contentType}}
 
 {
-    "email" : "mellisawanja254@gmail.com",
+    "email" : "melissa.waitituh@strathmore.edu",
     "code": "{{ver_Token}}"
 }
 
@@ -63,3 +63,4 @@ Content-Type: {{contentType}}
     "code": "{{reset_Token}}",
     "newPassword": "NewPassword123"
 }
+

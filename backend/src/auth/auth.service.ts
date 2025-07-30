@@ -32,11 +32,24 @@ export class AuthService {
     const hashed = await hash(dto.password, 10);
     const user = await this.prisma.user.create({
       data: {
-        ...dto,
+        email: dto.email,
         password: hashed,
+        firstName: dto.firstName,
+        lastName: dto.lastName,
+        phone: dto.phone,
         role: dto.role || UserRole.SENDER,
       },
     });
+
+    // If the user is a courier, create a courier profile
+    if (user.role === 'COURIER') {
+      await this.prisma.courierProfile.create({
+        data: {
+          userId: user.id,
+          // Optionally set other fields, or leave as defaults
+        },
+      });
+    }
 
     // Generate verification code
     const code = this.generateCode();

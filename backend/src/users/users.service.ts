@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateProfileDto } from './dto/update_profile.dto';
-import { User, UserRole, Prisma } from '../../generated/prisma';
+import { User, UserRole, Prisma, $Enums } from '../../generated/prisma';
 
 @Injectable()
 export class UserService {
@@ -61,5 +61,129 @@ export class UserService {
     return await this.prisma.user.findUnique({
       where: { id },
     });
+  }
+
+  async getUserById(id: string): Promise<{
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    role: UserRole;
+    address: string | null;
+    city: string | null;
+    state: string | null;
+    zipCode: string | null;
+    country: string | null;
+    isEmailVerified: boolean;
+    isActive: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+  }> {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        phone: true,
+        role: true,
+        address: true,
+        city: true,
+        state: true,
+        zipCode: true,
+        country: true,
+        isEmailVerified: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
+        // Exclude password for security
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
+  }
+
+  async getAllUsers(query: {
+    page: number;
+    limit: number;
+    role: $Enums.UserRole | undefined;
+    search: string | undefined;
+  }): Promise<{
+    users: Prisma.UserGetPayload<{
+      select: {
+        id: true;
+        firstName: true;
+        lastName: true;
+        email: true;
+        phone: true;
+        role: true;
+        address: true;
+        city: true;
+        state: true;
+        zipCode: true;
+        country: true;
+        isEmailVerified: true;
+        isActive: true;
+        createdAt: true;
+        updatedAt: true;
+      };
+    }>[]; // <-- Use this type
+    total: number;
+    page: number;
+    limit: number;
+  }> {
+    const { page, limit, role, search } = query;
+    const skip = (page - 1) * limit;
+
+    // Build where clause
+    const whereClause: Prisma.UserWhereInput = {};
+
+    if (role) {
+      whereClause.role = role;
+    }
+
+    if (search) {
+      whereClause.OR = [
+        { firstName: { contains: search, mode: 'insensitive' } },
+        { lastName: { contains: search, mode: 'insensitive' } },
+        { email: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+
+    const [users, total] = await Promise.all([
+      this.prisma.user.findMany({
+        where: whereClause,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          phone: true,
+          role: true,
+          address: true,
+          city: true,
+          state: true,
+          zipCode: true,
+          country: true,
+          isEmailVerified: true,
+          isActive: true,
+          createdAt: true,
+          updatedAt: true,
+          // Exclude password for security
+        },
+      }),
+      this.prisma.user.count({ where: whereClause }),
+    ]);
+
+    return { users, total, page, limit };
   }
 }

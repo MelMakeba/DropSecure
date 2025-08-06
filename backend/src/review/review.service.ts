@@ -5,6 +5,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { CreateReviewDto } from './dto/create-review.dto';
 
 @Injectable()
 export class ReviewService {
@@ -14,16 +15,26 @@ export class ReviewService {
   async createPackageReview(
     userId: string,
     packageId: string,
-    rating: number,
-    comment?: string,
+    dto: CreateReviewDto,
   ) {
-    // Check if package is delivered
+    // Check if package exists and user is the sender
     const pkg = await this.prisma.package.findUnique({
       where: { id: packageId },
+      include: { sender: true },
     });
-    if (!pkg || pkg.status !== 'DELIVERED') {
-      throw new BadRequestException('Only delivered packages can be reviewed');
+
+    if (!pkg) {
+      throw new NotFoundException('Package not found');
     }
+
+    if (pkg.senderId !== userId) {
+      throw new BadRequestException('You can only review packages you sent');
+    }
+
+    if (pkg.status !== 'DELIVERED') {
+      throw new BadRequestException('You can only review delivered packages');
+    }
+
     // Check if review already exists
     const existing = await this.prisma.review.findUnique({
       where: { packageId_userId: { packageId, userId } },
@@ -33,7 +44,19 @@ export class ReviewService {
 
     // Create review
     const review = await this.prisma.review.create({
-      data: { packageId, userId, rating, comment },
+      data: {
+        packageId,
+        userId,
+        ...dto,
+      },
+      include: {
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+          },
+        },
+      },
     });
 
     // Update courier profile rating
@@ -47,8 +70,16 @@ export class ReviewService {
   // 2. Get all reviews for a package
   async getPackageReviews(packageId: string) {
     return this.prisma.review.findMany({
-      where: { packageId },
-      include: { user: { select: { firstName: true, lastName: true } } },
+      where: { packageId, isPublic: true },
+      include: {
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
     });
   }
 

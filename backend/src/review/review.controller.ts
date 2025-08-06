@@ -1,68 +1,128 @@
 import {
   Controller,
-  Post,
   Get,
-  Put,
-  Param,
+  Post,
   Body,
-  Request,
+  Param,
   UseGuards,
+  Request,
+  HttpStatus,
+  ValidationPipe,
+  UsePipes,
+  ParseUUIDPipe,
 } from '@nestjs/common';
-import { ReviewService } from './review.service';
-import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import {
-  ReviewRequestBody,
-  UpdateReviewRequestBody,
-  AuthenticatedRequest,
-} from './interfaces/review-request.interface';
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/guards/jwt.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { UserRole } from '../../generated/prisma';
+import { ReviewService } from './review.service';
+import { ApiResponseService } from '../shared/api-response.service';
+import { CreateReviewDto } from './dto/create-review.dto';
+import { ApiResponse as ApiResponseInterface } from '../shared/interfaces/api-response.interface';
 
+@ApiTags('Reviews')
 @Controller('reviews')
-export class ReviewController {
-  constructor(private readonly reviewService: ReviewService) {}
+export class ReviewsController {
+  constructor(
+    private readonly reviewsService: ReviewService,
+    private readonly apiResponseService: ApiResponseService,
+  ) {}
 
-  // POST /reviews/package/:packageId
-  @Post('package/:packageId')
-  @UseGuards(JwtAuthGuard)
+  @Post(':packageId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.SENDER)
+  @ApiBearerAuth()
+  @UsePipes(new ValidationPipe({ transform: true }))
+  @ApiOperation({
+    summary: 'Create a review for a delivered package',
+    description: 'Sender can review a package after it has been delivered',
+  })
+  @ApiParam({ name: 'packageId', description: 'Package UUID' })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Review submitted successfully',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Invalid input or package not eligible for review',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Sender access required',
+  })
   async createReview(
-    @Param('packageId') packageId: string,
-    @Body() body: ReviewRequestBody,
-    @Request() req: AuthenticatedRequest,
-  ) {
-    const userId = req.user.id;
-    return this.reviewService.createPackageReview(
-      userId,
+    @Param('packageId', ParseUUIDPipe) packageId: string,
+    @Body() createReviewDto: CreateReviewDto,
+    @Request() req: { user: { id: string } },
+  ): Promise<ApiResponseInterface> {
+    const review = await this.reviewsService.createPackageReview(
       packageId,
-      body.rating,
-      body.comment,
+      req.user.id,
+      createReviewDto,
+    );
+
+    return this.apiResponseService.success(
+      review,
+      'Review submitted successfully',
     );
   }
 
-  // GET /reviews/package/:packageId
+  @Get()
+  @ApiOperation({
+    summary: 'Get public reviews',
+    description: 'Get all public reviews for display on website',
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Page number',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Items per page',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Reviews retrieved successfully',
+  })
+  async getReviews(): Promise<ApiResponseInterface> {
+    const reviews = await this.reviewsService.getPackageReviews('');
+
+    return this.apiResponseService.success(
+      reviews,
+      'Reviews retrieved successfully',
+    );
+  }
+
   @Get('package/:packageId')
-  async getPackageReviews(@Param('packageId') packageId: string) {
-    return this.reviewService.getPackageReviews(packageId);
-  }
+  @ApiOperation({
+    summary: 'Get reviews for a specific package',
+    description: 'Get all public reviews for a specific package',
+  })
+  @ApiParam({ name: 'packageId', description: 'Package UUID' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Package reviews retrieved successfully',
+  })
+  async getPackageReviews(
+    @Param('packageId', ParseUUIDPipe) packageId: string,
+  ): Promise<ApiResponseInterface> {
+    const reviews = await this.reviewsService.getPackageReviews(packageId);
 
-  // GET /reviews/courier/:courierId
-  @Get('courier/:courierId')
-  async getCourierReviews(@Param('courierId') courierId: string) {
-    return this.reviewService.getCourierReviews(courierId);
-  }
-
-  // PUT /reviews/:reviewId
-  @Put(':reviewId')
-  // @UseGuards(JwtAuthGuard)
-  async updateReview(
-    @Param('reviewId') reviewId: string,
-    @Body() body: UpdateReviewRequestBody,
-    @Request() req: AuthenticatedRequest,
-  ) {
-    const userId = req.user.id; // Uncomment if using auth
-    return this.reviewService.updateReview(
-      reviewId,
-      userId,
-      body.rating,
-      body.comment,
+    return this.apiResponseService.success(
+      reviews,
+      'Package reviews retrieved successfully',
     );
   }
 }

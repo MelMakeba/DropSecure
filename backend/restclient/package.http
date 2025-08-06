@@ -1,262 +1,129 @@
 @baseUrl = http://localhost:3000
-@contentType = application/json
-@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0MTg1NTU4NC0yYWI0LTRhZjMtOTQzMS0zMGE0NDA0OGU1YjciLCJlbWFpbCI6Im1lbGlzc2FtYWtlYmFAZ21haWwuY29tIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzUzODQ4ODU5LCJleHAiOjE3NTM5MzUyNTl9.p5AH9PntLTpumJhkW5rPkaEfwScf4IEiI0VAp5yixW8
-@senderToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlOWFmMzU5Yi0wOTViLTRlNzItYTdhMC02OTZjMGQ1YmU0NTciLCJlbWFpbCI6Im1lbGxpc2F3YW5qYTI1NEBnbWFpbC5jb20iLCJyb2xlIjoiU0VOREVSIiwiaWF0IjoxNzUzNzcxNDc2LCJleHAiOjE3NTM4NTc4NzZ9._8mZD47aI3LuVyoziALLWTISz1zNhDLeaVcahTRgye8
-@courierToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1YjQwNDY1YS0wY2E1LTRjNzgtOGJkZC1kYTc3MjcxZmNmNDYiLCJlbWFpbCI6Im1lbGsuaWxlbmEuYUBnbWFpbC5jb20iLCJyb2xlIjoiQ09VUklFUiIsImlhdCI6MTc1Mzc3MjAzMCwiZXhwIjoxNzUzODU4NDMwfQ.mzxtdMfBAQrQJD_Oac-getAdSnc1yHmG_Hf8FpRmd_A
-@packageId = 799a9df0-3478-4759-a4e2-120271ad376b
-@trackingId = DSMDO66CNBHC2V-Q
+@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0MTg1NTU4NC0yYWI0LTRhZjMtOTQzMS0zMGE0NDA0OGU1YjciLCJlbWFpbCI6Im1lbGlzc2FtYWtlYmFAZ21haWwuY29tIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzU0Mzc1MzMwLCJleHAiOjE3NTQ0NjE3MzB9.g2vq7fO7dusT7YM8Kz_0sge2TdTu4ANLnCc-bD1SaTQ
+@senderToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlOWFmMzU5Yi0wOTViLTRlNzItYTdhMC02OTZjMGQ1YmU0NTciLCJlbWFpbCI6Im1lbGxpc2F3YW5qYTI1NEBnbWFpbC5jb20iLCJyb2xlIjoiU0VOREVSIiwiaWF0IjoxNzU0Mzc1MzY3LCJleHAiOjE3NTQ0NjE3Njd9.0PMH0gzKukqojBahcLZ_dblF1JdcxlrTiECm6WSWY30
+@courierToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmNjUwMWQ3Mi0wY2ZiLTQ0NDUtOTliNi0zYTNiZGY2NDBlMzMiLCJlbWFpbCI6Im1lbGlzc2Eud2FpdGl0dWhAc3RyYXRobW9yZS5lZHUiLCJyb2xlIjoiQ09VUklFUiIsImlhdCI6MTc1NDM3NTQyOSwiZXhwIjoxNzU0NDYxODI5fQ.2_QmHyzYT2FJGP32iw9mPC3fxwe7u3Efvl7mC6n2K5I
+@packageId = 186fef05-b350-408b-987d-b3c4034edf6e
+@trackingId = {{createPackage.response.body.data.trackingId}}
 
-### Create Package (Admin only)
-POST {{baseUrl}}/packages/create
-Content-Type: {{contentType}}
-Authorization: Bearer {{adminToken}}
+### Admin Login for Package Tests
+# @name adminLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
 
 {
-  "senderId": "e9af359b-095b-4e72-a7a0-696c0d5be457",
+  "email": "melissamakeba@gmail.com",
+  "password": "admin123"
+}
+
+### Sender Login for Package Tests
+# @name senderLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "mellisawanja254@gmail.com",
+  "password": "pass123"
+}
+
+### Courier Login for Package Tests
+# @name courierLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "melissa.waitituh@strathmore.edu",
+  "password": "pass123"
+}
+
+### Create Package (Admin Only)
+# @name createPackage
+POST {{baseUrl}}/packages/create
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
   "senderEmail": "mellisawanja254@gmail.com",
-  "receiverName": "Jane Doe",
-  "receiverEmail": "melissa.waitituh@strathmore.edu",
-  "receiverPhone": "+1234567890",
-  "receiverAddress": "123 Main St",
-  "receiverCity": "Nairobi",
-  "receiverState": "Nairobi",
-  "receiverZipCode": "00100",
-  "receiverCountry": "Kenya",
-  "weight": 2.5,
-  "description": "Books and Documents",
-  "specialInstructions": "Handle with care - fragile items",
+  "receiverName": "Mel Receiver",
+  "receiverEmail": "melk.ilena.a@gmail.com",
+  "receiverPhone": "+1234567893",
+  "receiverAddress": "789 Delivery St",
+  "receiverCity": "Manhattan",
+  "receiverState": "NY",
+  "receiverZipCode": "10001",
+  "receiverCountry": "USA",
+  "description": "Important documents",
+  "weight": 0.5,
+  "dimensions": "30x20x5 cm",
   "value": 100,
-  "price": 150,
-  "preferredPickupDate": "2025-07-30T10:00:00.000Z",
-  "preferredDeliveryDate": "2025-08-02T15:00:00.000Z"
+  "price":200,
+  "priority": "STANDARD",
+  "pickupAddress": "123 Main St",
+  "pickupCity": "New York",
+  "pickupState": "NY",
+  "pickupZipCode": "10002",
+  "pickupCountry": "USA",
+  "estimatedDeliveryDate": "2025-08-10T10:00:00Z"
 }
 
-### Create Package with Custom Price (Admin only)
-POST {{baseUrl}}/packages/create
-Content-Type: {{contentType}}
+### Get All Packages (Admin Only)
+GET {{baseUrl}}/packages
 Authorization: Bearer {{adminToken}}
 
-{
-  "senderId": "e9af359b-095b-4e72-a7a0-696c0d5be457",
-  "senderEmail": "mellisawanja254@gmail.com",
-  "receiverName": "John Smith",
-  "receiverEmail": "john.smith@example.com",
-  "receiverPhone": "+254712345678",
-  "receiverAddress": "456 Oak Avenue",
-  "receiverCity": "Mombasa",
-  "receiverState": "Mombasa",
-  "receiverZipCode": "80100",
-  "receiverCountry": "Kenya",
-  "weight": 5.0,
-  "description": "Electronics - Laptop",
-  "specialInstructions": "Signature required on delivery",
-  "value": 800,
-  "price": 750
-}
+### Get Packages with Pagination and Filters
+GET {{baseUrl}}/packages?page=1&limit=10&status=CREATED&search=documents
+Authorization: Bearer {{adminToken}}
 
-### Get User's Packages (Works for all roles)
-GET {{baseUrl}}/packages/get-user-packages
-Content-Type: {{contentType}}
+### Get Package by ID
+GET {{baseUrl}}/packages/{{packageId}}
+Authorization: Bearer {{adminToken}}
+
+### Get User Packages (Sender)
+GET {{baseUrl}}/packages/get-user-packages?page=1&limit=5
 Authorization: Bearer {{senderToken}}
 
-### Get All Packages (Admin only)
-GET {{baseUrl}}/packages
-Content-Type: {{contentType}}
+### Get Received Packages
+GET {{baseUrl}}/packages/received?page=1&limit=5
+Authorization: Bearer {{senderToken}}
+
+### Track Package by Tracking ID (Sender)
+GET {{baseUrl}}/packages/track/{{trackingId}}
+Authorization: Bearer {{senderToken}}
+
+### Calculate Package Cost
+GET {{baseUrl}}/packages/calculate-cost/0.5/10?priority=STANDARD
 Authorization: Bearer {{adminToken}}
 
-### Get Package by ID (detailed view)
-GET {{baseUrl}}/packages/{{packageId}}
-Content-Type: {{contentType}}
+### Assign Courier to Package (Admin Only)
+PUT {{baseUrl}}/packages/{{packageId}}/assign-courier
 Authorization: Bearer {{adminToken}}
-
-### Update Package Status (Admin or Courier)
-PUT {{baseUrl}}/packages/{{packageId}}/status
-Content-Type: {{contentType}}
-Authorization: Bearer {{adminToken}}
+Content-Type: application/json
 
 {
-  "status": "COURIER_ASSIGNED",
-  "notes": "Package assigned to courier John Doe"
+  "courierId": "{{courierLogin.response.body.data.user.id}}"
 }
 
-### Update Package Status - In Transit (Courier)
+### Update Package Status (Admin/Courier)
 PUT {{baseUrl}}/packages/{{packageId}}/status
-Content-Type: {{contentType}}
 Authorization: Bearer {{courierToken}}
+Content-Type: application/json
 
 {
   "status": "PICKED_UP",
-  "notes": "Package picked up"
+  "notes": "Package picked up successfully",
+  "location": "Pickup location confirmed"
 }
 
-
-### Update Package Status - In Transit (Courier)
-PUT {{baseUrl}}/packages/{{packageId}}/status
-Content-Type: {{contentType}}
+### Update Package Location (Courier)
+PUT {{baseUrl}}/packages/{{packageId}}/location
 Authorization: Bearer {{courierToken}}
+Content-Type: application/json
 
 {
-  "status": "IN_TRANSIT",
-  "notes": "Package picked up and in transit"
+  "latitude": 40.7128,
+  "longitude": -74.0060,
+  "address": "Times Square, NYC"
 }
 
-### Update Package Status - Delivered
-PUT {{baseUrl}}/packages/{{packageId}}/status
-Content-Type: {{contentType}}
-Authorization: Bearer {{courierToken}}
-
-{
-  "status": "DELIVERED",
-  "notes": "Package delivered successfully to recipient"
-}
-
-### Public Track Package by Tracking ID (No auth required)
-GET {{baseUrl}}/packages/track/{{trackingId}}
-Content-Type: {{contentType}}
-
-### Assign Courier to Package (Admin only)
-PUT {{baseUrl}}/packages/{{packageId}}/assign-courier
-Content-Type: {{contentType}}
+### Cancel Package (Admin/Sender)
+PUT {{baseUrl}}/packages/{{packageId}}/cancel
 Authorization: Bearer {{adminToken}}
-
-{
-  "courierId": "5b40465a-0ca5-4c78-8bdd-da77271fcf46"
-}
-
-### Update Package Location (Courier only)
-POST {{baseUrl}}/packages/{{packageId}}/location
-Content-Type: {{contentType}}
-Authorization: Bearer {{courierToken}}
-
-{
-  "latitude": -1.2921,
-  "longitude": 36.8219,
-  "address": "Nairobi CBD, Kenya"
-}
-
-### Update Package Location with More Details
-POST {{baseUrl}}/packages/{{packageId}}/location
-Content-Type: {{contentType}}
-Authorization: Bearer {{courierToken}}
-
-{
-  "latitude": -4.0435,
-  "longitude": 39.6682,
-  "address": "Mombasa Road, Mombasa, Kenya"
-}
-
-### Get Package Location
-GET {{baseUrl}}/packages/{{packageId}}/location
-Content-Type: {{contentType}}
-Authorization: Bearer {{senderToken}}
-
-### Create Delivery Attempt - Successful (Courier only)
-POST {{baseUrl}}/packages/{{packageId}}/delivery-attempt
-Content-Type: {{contentType}}
-Authorization: Bearer {{courierToken}}
-
-{
-  "status": "SUCCESSFUL",
-  "notes": "Package delivered to recipient Jane Doe at 2:30 PM"
-}
-
-### Create Delivery Attempt - Failed (Courier only)
-POST {{baseUrl}}/packages/{{packageId}}/delivery-attempt
-Content-Type: {{contentType}}
-Authorization: Bearer {{courierToken}}
-
-{
-  "status": "RECIPIENT_NOT_AVAILABLE",
-  "notes": "Recipient not available. Left notice for re-delivery"
-}
-
-### Create Delivery Attempt - Address Not Found
-POST {{baseUrl}}/packages/{{packageId}}/delivery-attempt
-Content-Type: {{contentType}}
-Authorization: Bearer {{courierToken}}
-
-{
-  "status": "ADDRESS_NOT_FOUND",
-  "notes": "Could not locate the delivery address. Need to contact recipient"
-}
-
-###############################################
-# Test Different Package Scenarios
-###############################################
-
-### Heavy Package (will use weight-based pricing)
-POST {{baseUrl}}/packages
-Content-Type: {{contentType}}
-Authorization: Bearer {{adminToken}}
-
-{
-  "senderId": "e9af359b-095b-4e72-a7a0-696c0d5be457",
-  "senderEmail": "mellisawanja254@gmail.com",
-  "receiverName": "Heavy Items Store",
-  "receiverEmail": "heavy@example.com",
-  "receiverPhone": "+254700000000",
-  "receiverAddress": "Industrial Area",
-  "receiverCity": "Nairobi",
-  "receiverState": "Nairobi",
-  "receiverZipCode": "00100",
-  "receiverCountry": "Kenya",
-  "weight": 15.5,
-  "description": "Heavy machinery parts",
-  "specialInstructions": "Requires forklift for unloading"
-}
-
-### Light Package (minimal pricing)
-POST {{baseUrl}}/packages
-Content-Type: {{contentType}}
-Authorization: Bearer {{adminToken}}
-
-{
-  "senderId": "e9af359b-095b-4e72-a7a0-696c0d5be457",
-  "senderEmail": "mellisawanja254@gmail.com",
-  "receiverName": "Document Recipient",
-  "receiverEmail": "docs@example.com",
-  "receiverPhone": "+254711111111",
-  "receiverAddress": "Office Complex",
-  "receiverCity": "Kisumu",
-  "receiverState": "Kisumu",
-  "receiverZipCode": "40100",
-  "receiverCountry": "Kenya",
-  "weight": 0.5,
-  "description": "Important documents",
-  "specialInstructions": "Confidential - hand to recipient only"
-}
-
-###############################################
-# Error Testing
-###############################################
-
-### Try to create package as non-admin (should fail)
-POST {{baseUrl}}/packages
-Content-Type: {{contentType}}
-Authorization: Bearer {{senderToken}}
-
-{
-  "senderId": "e9af359b-095b-4e72-a7a0-696c0d5be457",
-  "senderEmail": "mellisawanja254@gmail.com",
-  "receiverName": "Test User",
-  "receiverEmail": "test@example.com",
-  "receiverPhone": "+254700000000",
-  "receiverAddress": "Test Address",
-  "receiverCity": "Nairobi",
-  "receiverState": "Nairobi",
-  "receiverZipCode": "00100",
-  "receiverCountry": "Kenya",
-  "weight": 1.0,
-  "description": "Test package"
-}
-
-### Try to update location as non-courier (should fail)
-POST {{baseUrl}}/packages/{{packageId}}/location
-Content-Type: {{contentType}}
-Authorization: Bearer {{senderToken}}
-
-{
-  "latitude": -1.2921,
-  "longitude": 36.8219,
-  "address": "Unauthorized location update"
-}

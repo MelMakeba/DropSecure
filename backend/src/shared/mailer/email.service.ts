@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
@@ -34,6 +35,7 @@ export interface PackageCreatedContext {
   price: number;
   estimatedDelivery?: string;
   specialInstructions?: string;
+  description?: string; // Add description field
 }
 
 export interface PickupContext {
@@ -163,7 +165,9 @@ export class EmailService {
       to,
       subject: 'DropSecure - Your Package Has Been Created',
       template: 'package-created',
-      context,
+      context: context.description
+        ? { ...context, description: context.description }
+        : { ...context },
     };
     return this.sendEmail(emailOptions);
   }
@@ -291,6 +295,110 @@ export class EmailService {
         status: 'error',
         details: error.message,
       };
+    }
+  }
+
+  async sendContactFormNotification(contactData: any): Promise<void> {
+    try {
+      const templatePath = path.join(
+        process.cwd(),
+        'src/templates/contact-form-notification.ejs',
+      );
+      const template = await fs.promises.readFile(templatePath, 'utf-8');
+
+      const html = ejs.render(template, {
+        name: contactData.name,
+        email: contactData.email,
+        phone: contactData.phone || 'Not provided',
+        subject: contactData.subject,
+        message: contactData.message,
+        submittedAt: new Date().toLocaleString(),
+      });
+
+      const mailOptions = {
+        from: this.configService.get('EMAIL_FROM'),
+        to: this.configService.get('ADMIN_EMAIL') || 'admin@dropsecure.com',
+        subject: `New Contact Form Submission: ${contactData.subject}`,
+        html,
+      };
+
+      await this.transporter.sendMail(mailOptions);
+      console.log('Contact form notification email sent to admin');
+    } catch (error) {
+      console.error('Error sending contact form notification email:', error);
+      throw new Error('Failed to send contact form notification email');
+    }
+  }
+
+  async sendContactFormConfirmation(
+    email: string,
+    name: string,
+  ): Promise<void> {
+    try {
+      const templatePath = path.join(
+        process.cwd(),
+        'src/templates/contact-form-user-confirmation.ejs',
+      );
+      const template = await fs.promises.readFile(templatePath, 'utf-8');
+
+      const html = ejs.render(template, {
+        name,
+        supportEmail:
+          this.configService.get('SUPPORT_EMAIL') || 'support@dropsecure.com',
+      });
+
+      const mailOptions = {
+        from: this.configService.get('EMAIL_FROM'),
+        to: email,
+        subject: 'Thank you for contacting DropSecure',
+        html,
+      };
+
+      await this.transporter.sendMail(mailOptions);
+      console.log('Contact form confirmation email sent to user');
+    } catch (error) {
+      console.error('Error sending contact form confirmation email:', error);
+      throw new Error('Failed to send contact form confirmation email');
+    }
+  }
+
+  async sendPackageIncomingNotification(
+    email: string,
+    data: any,
+  ): Promise<void> {
+    try {
+      const templatePath = path.join(
+        process.cwd(),
+        'src/templates/package-incoming-notification.ejs',
+      );
+      const template = await fs.promises.readFile(templatePath, 'utf-8');
+
+      const html = ejs.render(template, {
+        receiverName: data.receiverName,
+        trackingNumber: data.trackingNumber,
+        senderName: data.senderName,
+        packageDescription: data.packageDescription,
+        estimatedDeliveryDate:
+          data.estimatedDeliveryDate &&
+          new Date(data.estimatedDeliveryDate).toLocaleDateString(),
+        trackingUrl: `${this.configService.get('FRONTEND_URL')}/track/${data.trackingNumber}`,
+      });
+
+      const mailOptions = {
+        from: this.configService.get('EMAIL_FROM'),
+        to: email,
+        subject: `Package Coming Your Way - Tracking: ${data.trackingNumber}`,
+        html,
+      };
+
+      await this.transporter.sendMail(mailOptions);
+      console.log('Package incoming notification email sent');
+    } catch (error) {
+      console.error(
+        'Error sending package incoming notification email:',
+        error,
+      );
+      throw new Error('Failed to send package incoming notification email');
     }
   }
 }

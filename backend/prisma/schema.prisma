@@ -92,6 +92,8 @@ model User {
   @@index([email])
   @@index([role])
   PackageStatusHistory PackageStatusHistory[] @relation("ChangedByUser")
+  LocationUpdate LocationUpdate[] @relation("CourierLocationUpdates")
+  StatusHistory StatusHistory[] @relation("StatusUpdates")
 }
 
 model CourierProfile {
@@ -172,11 +174,10 @@ model Package {
   updatedAt       DateTime      @updatedAt
   
   // Relations
-  statusHistory   PackageStatusHistory[]
-  locationUpdates LocationUpdate[]
-  deliveryAttempts DeliveryAttempt[]
-  notifications   Notification[]
   reviews         Review[]
+  locationUpdates LocationUpdate[]
+  statusHistory   StatusHistory[]
+  notifications   Notification[]
   trackinTokens TrackingToken[]
   //indexes
   @@map("packages")
@@ -186,6 +187,8 @@ model Package {
   @@index([senderId])
   @@index([createdAt])
   @@index([currentLat, currentLng])
+  PackageStatusHistory PackageStatusHistory[]
+  deliveryAttempts DeliveryAttempt[]
 }
 
 model PackageStatusHistory {
@@ -206,16 +209,16 @@ model LocationUpdate {
   id          String    @id @default(uuid())
   packageId   String
   package     Package   @relation(fields: [packageId], references: [id], onDelete: Cascade)
-  courierId   String
-  courier     User      @relation(fields: [courierId], references: [id])
+  courierId   String?
+  courier     User?      @relation("CourierLocationUpdates", fields: [courierId], references: [id])
   latitude    Float
   longitude   Float
   address     String?
-  notes       String? 
-  createdAt   DateTime  @default(now())
-  timestamp   DateTime
-  
+  timestamp   DateTime  @default(now())
+  notes       String?
+
   @@map("location_updates")
+  User User[]
 }
 
 model DeliveryAttempt {
@@ -310,29 +313,48 @@ model TrackingToken {
 
 // For storing contact us submissions
 model ContactSubmission {
-  id          String    @id @default(uuid())
-  name        String
-  email       String
-  phone       String?
-  subject     String
-  message     String
-  isRead      Boolean   @default(false)
-  createdAt   DateTime  @default(now())
-  
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@map("contact_submissions")
 }
 
 // For package reviews
 model Review {
-  id          String    @id @default(uuid())
-  packageId   String
-  package     Package   @relation(fields: [packageId], references: [id], onDelete: Cascade)
-  userId      String
-  user        User      @relation(fields: [userId], references: [id])
-  rating      Int       // 1-5 stars
-  comment     String?
-  createdAt   DateTime  @default(now())
-  
+  id        String   @id @default(cuid())
+  packageId String
+  userId    String
+  rating    Int      @db.SmallInt // 1-5 stars
+  comment   String?
+  isPublic  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  package Package @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@unique([packageId, userId])
   @@map("reviews")
+}
+
+model StatusHistory {
+  id          String        @id @default(cuid())
+  packageId   String
+  status      PackageStatus
+  notes       String?
+  updatedBy   String?
+  timestamp   DateTime      @default(now())
+  location    String?
+
+  package   Package @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  updatedByUser User? @relation("StatusUpdates", fields: [updatedBy], references: [id])
+
+  @@map("status_history")
 }

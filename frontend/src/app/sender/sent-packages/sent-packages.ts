@@ -45,7 +45,7 @@ export class SentPackages implements OnInit {
     receivedPackages: Package[] = [];
     statusHistory: StatusEvent[] = [];
     showPackageModal = false;
-    selectedPackage?: Package; // Use the Package model, optional property
+    selectedPackage?: Package; 
   
 
   constructor(private packagesService: Packages) {}
@@ -53,17 +53,12 @@ export class SentPackages implements OnInit {
   ngOnInit() {
     const userStr = localStorage.getItem('dropsecure_user');
     const user = userStr ? JSON.parse(userStr) : null;
-    if (user) {
-      this.packagesService.getUserPackages().subscribe(pkgs => {
-        // Filter for packages where the current user is the sender
-        this.sentPackages = pkgs.filter(pkg =>
-          pkg.senderId === user.id || pkg.senderEmail === user.email
-        );
-        this.loading = false;
-      });
-    } else {
+    this.packagesService.getUserPackages().subscribe(pkgs => {
+      this.sentPackages = pkgs;
       this.loading = false;
-    }
+    }, () => {
+      this.loading = false;
+    });
   }
 
  get loggedInSenderId(): string {

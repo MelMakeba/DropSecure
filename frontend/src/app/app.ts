@@ -1,5 +1,5 @@
 import { Component, signal } from '@angular/core';
-import { RouterOutlet} from '@angular/router';
+import { RouterOutlet, Router } from '@angular/router';
 import { HeaderComponent } from './shared/header/header.component';
 import { Footer } from './shared/footer/footer';
 import { AuthService } from './services/auth/auth';
@@ -20,5 +20,9 @@ export class App {
     return user?.role === 'ADMIN' || user?.role === 'COURIER';
   }
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, public router: Router) {}
+
+  get isTrackPackagesPage(): boolean {
+    return this.router.url.startsWith('/sender/track-packages');
+  }
 }

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { map, catchError, tap } from 'rxjs/operators';
 import { Observable, of, throwError } from 'rxjs';
 import { AnyUser, UserRole } from '../../models/user.model';
@@ -40,16 +40,16 @@ export class AuthService {
   }
 
   register(userData: Partial<AnyUser> & { role: UserRole }): Observable<{success: boolean; user?: AnyUser; message: string}> {
-    return this.http.post<{ user: AnyUser }>(
+    return this.http.post<{ message: string; data: AnyUser }>(
       `${this.apiUrl}/auth/register`,
       userData
     ).pipe(
       map(res => {
-        if (res && res.user) {
+        if (res && res.data) {
           return {
             success: true,
-            user: res.user,
-            message: 'Registration successful'
+            user: res.data,
+            message: res.message || 'Registration successful'
           };
         }
         return { success: false, message: 'Invalid response from server' };
@@ -69,7 +69,7 @@ export class AuthService {
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('dropsecure_user');
-    this.router.navigate(['/login']);
+    this.router.navigate(['/']);
   }
 
   // Optionally, get current user info from backend
@@ -91,6 +91,40 @@ export class AuthService {
   isLoggedIn(): boolean {
     return !!localStorage.getItem('dropsecure_user') && !!localStorage.getItem('token');
   }
+
+  verifyEmail(email: string, code: string): Observable<{ success: boolean; message: string }> {
+    return this.http.post<{ message: string }>(
+      `${this.apiUrl}/auth/verify-email`,
+      { email, code },
+      { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) }
+    ).pipe(
+      map(res => ({
+        success: true,
+        message: res.message || 'Email verified successfully'
+      })),
+      catchError((error: HttpErrorResponse) => {
+        const msg = error.error?.message || 'Verification failed';
+        return of({ success: false, message: msg });
+      })
+    );
+  }
+
+  resendVerification(email: string): Observable<{ success: boolean; message: string }> {
+    return this.http.post<{ message: string }>(
+      `${this.apiUrl}/auth/verify-email`,
+      { email },
+      { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) }
+    ).pipe(
+      map(res => ({
+        success: true,
+        message: res.message || 'Verification email resent successfully'
+      })),
+      catchError((error: HttpErrorResponse) => {
+        const msg = error.error?.message || 'Resend verification failed';
+        return of({ success: false, message: msg });
+      })
+    );
+  }
 }
 
 export interface JwtPayload {
@@ -99,3 +133,4 @@ export interface JwtPayload {
   role: string;
   // add other fields if needed
 }
+

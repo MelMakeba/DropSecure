@@ -13,7 +13,7 @@ import { AnyUser, UserRole } from '../models/user.model';
   styleUrls: ['./auth-pages.css']
 })
 export class AuthPages {
-  @Input() mode: 'login' | 'register' | 'forgot' = 'login';
+  @Input() mode: 'login' | 'register' | 'forgot' | 'verify' = 'login';
   @Input() show = false;
   @Output() close = new EventEmitter<void>();
 
@@ -27,7 +27,7 @@ export class AuthPages {
     phone: '' // Add phone field
   };
   roles: UserRole[] = ['SENDER', 'COURIER', 'ADMIN'];
-
+  verificationCode : string[] = Array(6).fill(''); // For verification code input
   constructor(private authService: AuthService, private router: Router) {}
 
   onLogin() {
@@ -73,14 +73,19 @@ export class AuthPages {
       this.error.set('All courier fields are required');
       return;
     }
+    
     this.loading.set(true);
     this.error.set('');
     this.success.set('');
+    
     this.authService.register(this.user as Partial<AnyUser> & { role: UserRole }).subscribe(res => {
       this.loading.set(false);
       if (res.success) {
         this.success.set(res.message);
-        setTimeout(() => this.close.emit(), 1000);
+        // Switch to verification mode instead of closing
+        this.mode = 'verify';
+        // Store the email for verification
+        localStorage.setItem('verification_email', this.user.email as string);
       } else {
         this.error.set(res.message);
       }
@@ -88,6 +93,79 @@ export class AuthPages {
       this.loading.set(false);
       this.error.set('Network error');
     });
+  }
+  
+  // Add verification methods
+  onVerify() {
+    const code = this.verificationCode.join('');
+    if (code.length !== 6) {
+      this.error.set('Please enter a 6-digit code');
+      return;
+    }
+    
+    const email = localStorage.getItem('verification_email');
+    if (!email) {
+      this.error.set('Session expired. Please try registering again.');
+      return;
+    }
+    
+    this.loading.set(true);
+    this.error.set('');
+    this.success.set('');
+    
+    this.authService.verifyEmail(email, code).subscribe(res => {
+      this.loading.set(false);
+      if (res.success) {
+        this.success.set('Account verified successfully!');
+        localStorage.removeItem('verification_email');
+        setTimeout(() => {
+          this.close.emit();
+          this.router.navigate(['/login']);
+        }, 1000);
+      } else {
+        this.error.set(res.message || 'Verification failed');
+      }
+    }, err => {
+      this.loading.set(false);
+      this.error.set('Network error');
+    });
+  }
+  
+  resendCode() {
+    const email = localStorage.getItem('verification_email');
+    if (!email) {
+      this.error.set('Session expired. Please try registering again.');
+      return;
+    }
+    
+    this.loading.set(true);
+    this.error.set('');
+    
+    this.authService.resendVerification(email).subscribe(res => {
+      this.loading.set(false);
+      if (res.success) {
+        this.success.set('New verification code sent!');
+      } else {
+        this.error.set(res.message || 'Failed to resend code');
+      }
+    }, err => {
+      this.loading.set(false);
+      this.error.set('Network error');
+    });
+  }
+  
+  // Add input handling for the verification code
+  onCodeInput(event: any, index: number) {
+    const input = event.target;
+    const value = input.value;
+    
+    // Auto-focus next input
+    if (value && index < 5) {
+      const nextInput = document.querySelector(`input[name="code-${index + 1}"]`) as HTMLInputElement;
+      if (nextInput) {
+        nextInput.focus();
+      }
+    }
   }
 
   onForgot() {

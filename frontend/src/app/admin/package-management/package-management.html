@@ -309,29 +309,36 @@
 
 <!-- Create Package Modal -->
 <div *ngIf="showCreateModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-<div class="bg-white rounded-xl shadow-lg p-8 w-full max-w-lg relative">
-  <button (click)="closeCreateModal()" class="absolute top-3 right-3 text-gray-400 hover:text-[#800020] text-2xl">&times;</button>
-  <h2 class="text-xl font-bold text-[#800020] mb-4">
-    {{ editMode ? 'Edit Package' : 'Create New Package' }}
-  </h2>
-  <form #createForm="ngForm" (ngSubmit)="submitCreatePackage(createForm)">
-    <div class="grid grid-cols-1 gap-4">
-      <input class="border rounded p-2" name="senderName" [(ngModel)]="newPackage.senderName" placeholder="Sender Name" required>
-      <input class="border rounded p-2" name="senderEmail" [(ngModel)]="newPackage.senderEmail" placeholder="Sender Email" required>
-      <input class="border rounded p-2" name="senderPhone" [(ngModel)]="newPackage.senderPhone" placeholder="Sender Phone" required>
-      <input class="border rounded p-2" name="pickupAddress" [(ngModel)]="newPackage.senderAddress" placeholder="Pickup Address" required>
-      <input class="border rounded p-2" name="senderName" [(ngModel)]="newPackage.receiverName" placeholder="Receiver Name" required>
-      <input class="border rounded p-2" name="receiverEmail" [(ngModel)]="newPackage.receiverEmail" placeholder="Receiver Email" required>
-      <input class="border rounded p-2" name="receiverPhone" [(ngModel)]="newPackage.receiverPhone" placeholder="Receiver Phone" required>
-      <input class="border rounded p-2" name="deliveryAddress" [(ngModel)]="newPackage.receiverAddress" placeholder="Delivery Address" required>
-      <input class="border rounded p-2" type="number" name="weight" [(ngModel)]="newPackage.weight" placeholder="Package Weight (kg)" required>
-      <textarea class="border rounded p-2" name="description" [(ngModel)]="newPackage.description" placeholder="Package Description" required></textarea>
-    </div>
-    <button type="submit" [disabled]="createForm.invalid" class="mt-4 w-full bg-[#800020] text-white py-2 rounded font-semibold hover:bg-[#a8324a] transition">
-      {{ editMode ? 'Update Package' : 'Create Package' }}
-    </button>
-  </form>
-</div>
+  <div class="bg-white rounded-xl shadow-lg p-8 w-full max-w-lg relative max-h-[90vh] overflow-y-auto">
+    <button (click)="closeCreateModal()" class="absolute top-3 right-3 text-gray-400 hover:text-[#800020] text-2xl">&times;</button>
+    <h2 class="text-xl font-bold text-[#800020] mb-4">
+      {{ editMode ? 'Edit Package' : 'Create New Package' }}
+    </h2>
+    <form #createForm="ngForm" (ngSubmit)="submitCreatePackage(createForm)">
+      <div class="grid grid-cols-1 gap-4">
+        <input class="border rounded p-2" name="senderId" [(ngModel)]="newPackage.senderId" placeholder="Sender ID" required>
+        <input class="border rounded p-2" name="senderEmail" [(ngModel)]="newPackage.senderEmail" placeholder="Sender Email" required>
+        <input class="border rounded p-2" name="receiverName" [(ngModel)]="newPackage.receiverName" placeholder="Receiver Name" required>
+        <input class="border rounded p-2" name="receiverEmail" [(ngModel)]="newPackage.receiverEmail" placeholder="Receiver Email" required>
+        <input class="border rounded p-2" name="receiverPhone" [(ngModel)]="newPackage.receiverPhone" placeholder="Receiver Phone" required>
+        <input class="border rounded p-2" name="receiverAddress" [(ngModel)]="newPackage.receiverAddress" placeholder="Receiver Address" required>
+        <input class="border rounded p-2" name="receiverCity" [(ngModel)]="newPackage.receiverCity" placeholder="Receiver City" required>
+        <input class="border rounded p-2" name="receiverState" [(ngModel)]="newPackage.receiverState" placeholder="Receiver State" required>
+        <input class="border rounded p-2" name="receiverZipCode" [(ngModel)]="newPackage.receiverZipCode" placeholder="Receiver Zip Code" required>
+        <input class="border rounded p-2" name="receiverCountry" [(ngModel)]="newPackage.receiverCountry" placeholder="Receiver Country" required>
+        <input class="border rounded p-2" type="number" name="weight" [(ngModel)]="newPackage.weight" placeholder="Package Weight (kg)" required>
+        <textarea class="border rounded p-2" name="description" [(ngModel)]="newPackage.description" placeholder="Package Description" required></textarea>
+        <input class="border rounded p-2" name="specialInstructions" [(ngModel)]="newPackage.specialInstructions" placeholder="Special Instructions">
+        <input class="border rounded p-2" type="number" name="value" [(ngModel)]="newPackage.value" placeholder="Package Value">
+        <input class="border rounded p-2" type="number" name="price" [(ngModel)]="newPackage.price" placeholder="Custom Price">
+        <input class="border rounded p-2" type="date" name="preferredPickupDate" [(ngModel)]="newPackage.preferredPickupDate" placeholder="Preferred Pickup Date">
+        <input class="border rounded p-2" type="date" name="preferredDeliveryDate" [(ngModel)]="newPackage.preferredDeliveryDate" placeholder="Preferred Delivery Date">
+      </div>
+      <button type="submit" [disabled]="createForm.invalid" class="mt-4 w-full bg-[#800020] text-white py-2 rounded font-semibold hover:bg-[#a8324a] transition">
+        {{ editMode ? 'Update Package' : 'Create Package' }}
+      </button>
+    </form>
+  </div>
 </div>
 
 <!-- Assign Courier Modal -->

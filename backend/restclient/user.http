@@ -1,0 +1,79 @@
+### Variables
+@baseUrl = http://localhost:3000/api
+@adminToken = {{adminLogin.response.body.data.accessToken}}
+@userToken = {{userLogin.response.body.data.accessToken}}
+@userId = {{createUser.response.body.data.id}}
+
+### Admin Login for User Tests
+# @name adminLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@dropsecure.com",
+  "password": "admin123456"
+}
+
+### User Login for Profile Tests
+# @name userLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "sender@example.com",
+  "password": "sender123456"
+}
+
+### Get All Users (Admin Only)
+GET {{baseUrl}}/users
+Authorization: Bearer {{adminToken}}
+
+### Get Users with Filters
+GET {{baseUrl}}/users?page=1&limit=10&role=SENDER&search=john
+Authorization: Bearer {{adminToken}}
+
+### Get Users by Role (Admin Only)
+GET {{baseUrl}}/users/role/COURIER
+Authorization: Bearer {{adminToken}}
+
+### Get Current User Profile
+GET {{baseUrl}}/users/profile
+Authorization: Bearer {{userToken}}
+
+### Update User Profile
+PUT {{baseUrl}}/users/profile
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "firstName": "John Updated",
+  "phone": "+1234567899",
+  "address": "456 Updated Street"
+}
+
+### Create New User (Admin Only)
+# @name createUser
+POST {{baseUrl}}/users/create
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "firstName": "Test",
+  "lastName": "User",
+  "email": "testuser@example.com",
+  "password": "testpass123",
+  "role": "SENDER",
+  "phone": "+1234567894",
+  "address": "123 Test St",
+  "city": "Test City",
+  "state": "TS",
+  "country": "USA"
+}
+
+### Get User by ID (Admin Only)
+GET {{baseUrl}}/users/{{userId}}
+Authorization: Bearer {{adminToken}}
+
+### Delete User (Admin Only)
+DELETE {{baseUrl}}/users/{{userId}}
+Authorization: Bearer {{adminToken}}

@@ -113,6 +113,36 @@
         <div *ngIf="error()" class="text-red-600 text-center">{{ error() }}</div>
         <div *ngIf="success()" class="text-green-600 text-center">{{ success() }}</div>
       </form>
+      <!-- Add this inside the ngSwitch container, after the other forms -->
+<!-- Verification Form -->
+<form *ngSwitchCase="'verify'" (ngSubmit)="onVerify()" class="flex flex-col gap-4">
+  <h2 class="text-2xl font-bold text-[#800020] mb-2">Verify Your Account</h2>
+  <p class="text-sm text-gray-600 mb-4">We've sent a 6-digit code to your email. Please enter it below.</p>
+  
+  <div class="flex justify-center gap-2">
+    <input 
+      *ngFor="let i of [0,1,2,3,4,5]; let idx = index"
+      type="text"
+      maxlength="1"
+      [(ngModel)]="verificationCode[idx]"
+      name="code-{{idx}}"
+      (input)="onCodeInput($event, idx)"
+      (keydown.backspace)="onCodeBackspace($event, idx)"
+      class="w-12 h-12 text-center text-2xl border border-gray-300 rounded-md focus:border-[#800020] focus:ring-1 focus:ring-[#800020] transition"
+    />
+  </div>
+  
+  <button type="submit" class="btn-primary mt-4" [disabled]="loading()">Verify Account</button>
+  
+  <div class="text-sm text-center mt-2">
+    Didn't receive a code? 
+    <span class="text-[#800020] hover:underline cursor-pointer" (click)="resendCode()">Resend</span>
+  </div>
+  
+  <div *ngIf="loading()" class="text-[#800020] text-center">Loading...</div>
+  <div *ngIf="error()" class="text-red-600 text-center">{{ error() }}</div>
+  <div *ngIf="success()" class="text-green-600 text-center">{{ success() }}</div>
+</form>
     </ng-container>
   </div>
 </div>

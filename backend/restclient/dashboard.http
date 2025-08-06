@@ -1,0 +1,47 @@
+### Variables
+@baseUrl = http://localhost:3000
+@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0MTg1NTU4NC0yYWI0LTRhZjMtOTQzMS0zMGE0NDA0OGU1YjciLCJlbWFpbCI6Im1lbGlzc2FtYWtlYmFAZ21haWwuY29tIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzU0Mzc1MzMwLCJleHAiOjE3NTQ0NjE3MzB9.g2vq7fO7dusT7YM8Kz_0sge2TdTu4ANLnCc-bD1SaTQ
+@senderToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlOWFmMzU5Yi0wOTViLTRlNzItYTdhMC02OTZjMGQ1YmU0NTciLCJlbWFpbCI6Im1lbGxpc2F3YW5qYTI1NEBnbWFpbC5jb20iLCJyb2xlIjoiU0VOREVSIiwiaWF0IjoxNzU0Mzc1MzY3LCJleHAiOjE3NTQ0NjE3Njd9.0PMH0gzKukqojBahcLZ_dblF1JdcxlrTiECm6WSWY30
+@courierToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmNjUwMWQ3Mi0wY2ZiLTQ0NDUtOTliNi0zYTNiZGY2NDBlMzMiLCJlbWFpbCI6Im1lbGlzc2Eud2FpdGl0dWhAc3RyYXRobW9yZS5lZHUiLCJyb2xlIjoiQ09VUklFUiIsImlhdCI6MTc1NDM3NTQyOSwiZXhwIjoxNzU0NDYxODI5fQ.2_QmHyzYT2FJGP32iw9mPC3fxwe7u3Efvl7mC6n2K5I
+
+### Admin Login for Dashboard Tests
+# @name adminLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@dropsecure.com",
+  "password": "admin123456"
+}
+
+### Sender Login for Dashboard Tests
+# @name senderLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "sender@example.com",
+  "password": "sender123456"
+}
+
+### Courier Login for Dashboard Tests
+# @name courierLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "courier@example.com",
+  "password": "courier123456"
+}
+
+### Get Admin Dashboard Stats
+GET {{baseUrl}}/dashboard/admin/stats
+Authorization: Bearer {{adminToken}}
+
+### Get Sender Dashboard Stats
+GET {{baseUrl}}/dashboard/sender/stats
+Authorization: Bearer {{senderToken}}
+
+### Get Courier Dashboard Stats
+GET {{baseUrl}}/dashboard/courier/stats
+Authorization: Bearer {{courierToken}}

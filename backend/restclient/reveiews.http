@@ -1,0 +1,54 @@
+### Variables
+@baseUrl = http://localhost:3000
+@senderToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlOWFmMzU5Yi0wOTViLTRlNzItYTdhMC02OTZjMGQ1YmU0NTciLCJlbWFpbCI6Im1lbGxpc2F3YW5qYTI1NEBnbWFpbC5jb20iLCJyb2xlIjoiU0VOREVSIiwiaWF0IjoxNzU0Mzc1MzY3LCJleHAiOjE3NTQ0NjE3Njd9.0PMH0gzKukqojBahcLZ_dblF1JdcxlrTiECm6WSWY30
+
+@packageId = 186fef05-b350-408b-987d-b3c4034edf6e
+
+### Sender Login for Review Tests
+# @name senderLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "sender@example.com",
+  "password": "sender123456"
+}
+
+### Create Package for Review Testing
+# @name createPackage
+POST {{baseUrl}}/packages/create
+Authorization: Bearer {{senderToken}}
+Content-Type: application/json
+
+{
+  "senderEmail": "sender@example.com",
+  "receiverName": "Review Receiver",
+  "receiverEmail": "review@example.com",
+  "receiverPhone": "+1234567896",
+  "receiverAddress": "Review Address",
+  "receiverCity": "Review City",
+  "receiverState": "RC",
+  "receiverCountry": "USA",
+  "description": "Package for review testing",
+  "weight": 1.0,
+  "priority": "STANDARD"
+}
+
+### Create Review for Package (Sender Only - After Delivery)
+POST {{baseUrl}}/reviews/{{packageId}}
+Authorization: Bearer {{senderToken}}
+Content-Type: application/json
+
+{
+  "rating": 5,
+  "comment": "Excellent service! Package delivered on time and in perfect condition.",
+  "serviceRating": 5,
+  "deliverySpeed": 5,
+  "courierRating": 5
+}
+
+### Get Public Reviews
+GET {{baseUrl}}/reviews?page=1&limit=10
+
+### Get Reviews for Specific Package
+GET {{baseUrl}}/reviews/package/{{packageId}}

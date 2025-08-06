@@ -23,7 +23,6 @@ import {
   PackageWithRelations,
 } from './interfaces/package.interfaces';
 import { nanoid } from 'nanoid';
-import { PrismaClientValidationError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class PackageService {
@@ -35,202 +34,68 @@ export class PackageService {
   ) {}
 
   /**
-   * Create a new package (Admin only)
+   * Create a package by admin (with sender lookup by email)
    */
-  async createPackage(
-    createPackageDto: CreatePackageDto,
-    createdById: string,
-  ): Promise<PackageInterface> {
-    try {
-      // Validate senderId and createdById
-      if (!createPackageDto.senderId) {
-        throw new BadRequestException('Sender ID is required');
-      }
-      if (!createdById) {
-        throw new BadRequestException('CreatedBy ID is required');
-      }
+  async createPackageByAdmin(dto: CreatePackageDto, adminId: string) {
+    // Look up sender by email
+    const sender = await this.prisma.user.findUnique({
+      where: { email: dto.senderEmail },
+    });
 
-      // Optionally validate receiverId if provided
-      if (
-        createPackageDto.receiverId === undefined &&
-        !createPackageDto.receiverName
-      ) {
-        throw new BadRequestException(
-          'Receiver ID is required if receiver is provided',
-        );
-      }
-
-      // Validate sender exists (always required)
-      const sender = await this.prisma.user.findUnique({
-        where: { id: createPackageDto.senderId },
-        select: {
-          id: true,
-          firstName: true,
-          lastName: true,
-          email: true,
-          role: true,
-        },
-      });
-
-      if (!sender) {
-        throw new NotFoundException('Sender not found');
-      }
-
-      // Validate receiver if receiverId is provided (optional)
-      let receiver: {
-        id: string;
-        firstName: string;
-        lastName: string;
-        email: string;
-        role: UserRole;
-      } | null = null;
-      if (createPackageDto.receiverId) {
-        receiver = await this.prisma.user.findUnique({
-          where: { id: createPackageDto.receiverId },
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            email: true,
-            role: true,
-          },
-        });
-
-        if (!receiver) {
-          throw new NotFoundException('Receiver not found');
-        }
-      }
-
-      // Validate courier if courierId is provided
-      if (createPackageDto.courierId) {
-        const courier = await this.prisma.user.findFirst({
-          where: {
-            id: createPackageDto.courierId,
-            role: UserRole.COURIER,
-          },
-        });
-
-        if (!courier) {
-          throw new NotFoundException('Courier not found or invalid role');
-        }
-      }
-
-      // Generate unique tracking ID
-      const trackingId = this.generateTrackingId();
-
-      // Calculate estimated cost (placeholder logic)
-      const estimatedCost = this.calculateEstimatedCost(
-        createPackageDto.weight,
-        createPackageDto.price,
+    if (!sender) {
+      throw new NotFoundException(
+        `Sender not found with email: ${dto.senderEmail}`,
       );
-
-      const packageData = await this.prisma.$transaction(async (tx) => {
-        const newPackage = await tx.package.create({
-          data: {
-            trackingId,
-            // Sender relation (required)
-            sender: {
-              connect: {
-                id: createPackageDto.senderId,
-              },
-            },
-            senderEmail: createPackageDto.senderEmail,
-            // Receiver relation (optional)
-            ...(createPackageDto.receiverId && {
-              receiver: {
-                connect: {
-                  id: createPackageDto.receiverId,
-                },
-              },
-            }),
-            receiverName: createPackageDto.receiverName,
-            receiverEmail: createPackageDto.receiverEmail,
-            receiverPhone: createPackageDto.receiverPhone,
-            receiverAddress: createPackageDto.receiverAddress,
-            receiverCity: createPackageDto.receiverCity,
-            receiverState: createPackageDto.receiverState,
-            receiverZipCode: createPackageDto.receiverZipCode,
-            receiverCountry: createPackageDto.receiverCountry,
-            // Created by relation (required)
-            createdBy: {
-              connect: {
-                id: createdById,
-              },
-            },
-            // Package details
-            weight: createPackageDto.weight,
-            description: createPackageDto.description,
-            specialInstructions: createPackageDto.specialInstructions,
-            value: createPackageDto.value,
-            price: createPackageDto.price,
-            preferredPickupDate: createPackageDto.preferredPickupDate
-              ? new Date(createPackageDto.preferredPickupDate)
-              : null,
-            preferredDeliveryDate: createPackageDto.preferredDeliveryDate
-              ? new Date(createPackageDto.preferredDeliveryDate)
-              : null,
-            // Courier relation (optional)
-            ...(createPackageDto.courierId && {
-              courier: {
-                connect: {
-                  id: createPackageDto.courierId,
-                },
-              },
-            }),
-            estimatedCost,
-            status: PackageStatus.CREATED,
-          },
-        });
-
-        // Create initial status history
-        await tx.packageStatusHistory.create({
-          data: {
-            packageId: newPackage.id,
-            status: PackageStatus.CREATED,
-            changedBy: createdById,
-            changedAt: new Date(),
-            notes: 'Package created',
-            createdAt: new Date(),
-          },
-        });
-
-        // Create notification for sender
-        await tx.notification.create({
-          data: {
-            recipientUserId: createPackageDto.senderId,
-            packageId: newPackage.id,
-            type: 'PACKAGE_CREATED',
-            subject: 'Package Created',
-            message: `Your package with tracking ID ${trackingId} has been created`,
-          },
-        });
-
-        return newPackage;
-      });
-
-      // Send package creation email to sender
-      await this.emailService.sendPackageCreatedEmail(
-        createPackageDto.senderEmail,
-        {
-          name: sender.firstName,
-          trackingNumber: trackingId,
-          packageDetails: `${createPackageDto.description} (${createPackageDto.weight}kg)`,
-          receiverName: createPackageDto.receiverName,
-          price: createPackageDto.price,
-          specialInstructions: createPackageDto.specialInstructions,
-        },
-      );
-
-      this.logger.log(`Package created successfully: ${trackingId}`);
-      return packageData;
-    } catch (error) {
-      if (error instanceof PrismaClientValidationError) {
-        this.logger.error(`Prisma validation error: ${error.message}`);
-        throw new BadRequestException('Invalid data: ' + error.message);
-      }
-      this.logger.error(`Failed to create package: ${error.message}`);
-      throw error;
     }
+
+    if (sender.role !== 'SENDER') {
+      throw new BadRequestException('Selected user is not a sender');
+    }
+
+    // Generate tracking ID
+    const trackingId = this.generateTrackingId();
+
+    // Calculate estimated cost
+    const estimatedCost = await this.calculatePackageCost(dto.weight, 0);
+
+    const packageData = await this.prisma.package.create({
+      data: {
+        ...dto,
+        senderId: sender.id,
+        trackingId,
+        estimatedCost,
+        price: dto.price || estimatedCost,
+        createdById: adminId,
+        status: 'CREATED',
+        preferredPickupDate: dto.preferredPickupDate
+          ? new Date(dto.preferredPickupDate)
+          : null,
+        preferredDeliveryDate: dto.preferredDeliveryDate
+          ? new Date(dto.preferredDeliveryDate)
+          : null,
+      },
+      include: {
+        sender: true,
+        statusHistory: true,
+      },
+    });
+
+    // Create initial status history
+    await this.prisma.packageStatusHistory.create({
+      data: {
+        packageId: packageData.id,
+        status: 'CREATED',
+        notes: 'Package created by admin',
+        changedBy: adminId,
+        changedAt: new Date(),
+        createdAt: new Date(),
+      },
+    });
+
+    // Send notifications
+    await this.sendPackageCreationNotifications(packageData);
+
+    return packageData;
   }
 
   /**
@@ -260,21 +125,12 @@ export class PackageService {
     // Build where clause based on user role
     const whereClause: Prisma.PackageWhereInput = {};
 
-    switch (userRole) {
-      case UserRole.ADMIN:
-        // Admin can see all packages
-        break;
-      case UserRole.SENDER:
-        whereClause.senderId = userId;
-        break;
-      case UserRole.COURIER:
-        whereClause.courierId = userId;
-        break;
-      default:
-        // If you want to allow a user to see packages where they are the receiver:
-        whereClause.receiverId = userId;
-        break;
+    if (userRole === UserRole.SENDER) {
+      whereClause.senderId = userId;
+    } else if (userRole === UserRole.COURIER) {
+      whereClause.courierId = userId;
     }
+    // Admin: no filter
 
     // Add additional filters
     if (status) {
@@ -386,9 +242,9 @@ export class PackageService {
           },
         },
         statusHistory: {
-          orderBy: { changedAt: 'desc' },
+          orderBy: { timestamp: 'desc' },
           include: {
-            changedByUser: {
+            updatedByUser: {
               select: { id: true, firstName: true, email: true },
             },
           },
@@ -462,14 +318,14 @@ export class PackageService {
           select: { id: true, firstName: true, email: false, phone: false },
         },
         statusHistory: {
-          orderBy: { changedAt: 'desc' },
+          orderBy: { timestamp: 'desc' },
           select: {
             id: true,
             status: true,
-            changedAt: true,
+            timestamp: true,
             notes: true,
             location: true,
-            changedByUser: {
+            updatedByUser: {
               select: { firstName: true, lastName: true },
             },
           },
@@ -567,7 +423,7 @@ export class PackageService {
           packageId,
           status: updateStatusDto.status,
           changedBy: changedBy,
-          changedAt: new Date(),
+          changedAt: new Date(), // <-- Keep this if it's a field you create
           createdAt: new Date(),
           notes: updateStatusDto.notes,
           location: updateStatusDto.location,
@@ -611,9 +467,9 @@ export class PackageService {
         createdBy: true,
         courier: true,
         statusHistory: {
-          orderBy: { changedAt: 'desc' },
+          orderBy: { timestamp: 'desc' },
           include: {
-            changedByUser: {
+            updatedByUser: {
               select: { id: true, firstName: true, email: true },
             },
           },
@@ -812,6 +668,128 @@ export class PackageService {
     this.logger.log(`Location updated for package ${packageExists.trackingId}`);
   }
 
+  /**
+   * Get received packages by user
+   */
+  async getReceivedPackages(
+    userEmail: string,
+    query: PackageQueryDto,
+  ): Promise<{
+    packages: PackageInterface[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
+    const { page = 1, limit = 10, status, search } = query;
+    const skip = (page - 1) * limit;
+
+    // Build where clause for packages where user is receiver
+    const whereClause: Prisma.PackageWhereInput = {
+      receiverEmail: userEmail,
+    };
+
+    if (status) {
+      whereClause.status = status;
+    }
+
+    if (search) {
+      whereClause.OR = [
+        { trackingId: { contains: search, mode: 'insensitive' } },
+        { description: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+
+    const [packages, total] = await Promise.all([
+      this.prisma.package.findMany({
+        where: whereClause,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          sender: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+            },
+          },
+          courier: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              phone: true,
+            },
+          },
+        },
+      }),
+      this.prisma.package.count({ where: whereClause }),
+    ]);
+
+    return { packages, total, page, limit };
+  }
+
+  /**
+   * Cancel a package
+   */
+  async cancelPackage(
+    packageId: string,
+    userId: string,
+    userRole: UserRole,
+  ): Promise<PackageInterface> {
+    const pkg = await this.prisma.package.findUnique({
+      where: { id: packageId },
+      include: { sender: true },
+    });
+
+    if (!pkg) {
+      throw new NotFoundException('Package not found');
+    }
+
+    if (userRole !== UserRole.ADMIN && pkg.senderId !== userId) {
+      throw new ForbiddenException('Not authorized to cancel this package');
+    }
+
+    const cancellableStatuses = [
+      PackageStatus.CREATED,
+      PackageStatus.COURIER_ASSIGNED,
+    ];
+
+    if (
+      !cancellableStatuses.includes(
+        pkg.status as (typeof cancellableStatuses)[number],
+      )
+    ) {
+      throw new BadRequestException(
+        `Cannot cancel package with status: ${pkg.status}`,
+      );
+    }
+
+    // Update package status
+    const cancelledPackage = await this.prisma.package.update({
+      where: { id: packageId },
+      data: {
+        status: PackageStatus.CANCELLED,
+        updatedAt: new Date(),
+      },
+    });
+
+    // Add status history
+    await this.prisma.packageStatusHistory.create({
+      data: {
+        packageId,
+        status: PackageStatus.CANCELLED,
+        changedBy: userId,
+        changedAt: new Date(),
+        createdAt: new Date(),
+        notes: 'Package cancelled by user',
+      },
+    });
+
+    return cancelledPackage;
+  }
+
   // Private helper methods
 
   private generateTrackingId(): string {
@@ -971,6 +949,38 @@ export class PackageService {
       this.logger.log(`Package ${packageData.trackingId} ${message}`);
     } catch (error) {
       this.logger.error(`Failed to send status update email: ${error.message}`);
+    }
+  }
+
+  private async sendPackageCreationNotifications(packageData: any) {
+    try {
+      // Email to sender
+      await this.emailService.sendPackageCreatedEmail(
+        String(packageData.sender.email),
+        {
+          name: `${packageData.sender.firstName} ${packageData.sender.lastName}`,
+          trackingNumber: packageData.trackingId,
+          receiverName: packageData.receiverName,
+          estimatedDelivery: packageData.preferredDeliveryDate,
+          packageDetails: '',
+          price: 0,
+        },
+      );
+
+      // Email to receiver
+      await this.emailService.sendPackageIncomingNotification(
+        String(packageData.receiverEmail),
+        {
+          receiverName: packageData.receiverName,
+          trackingNumber: packageData.trackingId,
+          senderName: `${packageData.sender.firstName} ${packageData.sender.lastName}`,
+          estimatedDeliveryDate: packageData.preferredDeliveryDate,
+          packageDescription: packageData.description,
+        },
+      );
+    } catch (error) {
+      console.error('Failed to send package creation notifications:', error);
+      // Don't throw error as package creation was successful
     }
   }
 }

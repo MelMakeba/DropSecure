@@ -17,18 +17,9 @@ import { PackageStatus } from '../../../generated/prisma';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreatePackageDto {
-  @ApiProperty({ description: 'Sender user ID' })
-  @IsString()
-  senderId: string;
-
   @ApiProperty({ description: 'Sender email address' })
   @IsEmail()
   senderEmail: string;
-
-  @ApiPropertyOptional({ description: 'Receiver user ID (if registered user)' })
-  @IsOptional()
-  @IsString()
-  receiverId?: string;
 
   @ApiProperty({
     description: 'Receiver full name',

@@ -79,7 +79,7 @@ export class PackageController {
     if (!createdById) {
       throw new BadRequestException('Authenticated user ID not found');
     }
-    const packageData = await this.packageService.createPackage(
+    const packageData = await this.packageService.createPackageByAdmin(
       createPackageDto,
       createdById,
     );
@@ -95,7 +95,8 @@ export class PackageController {
   @UsePipes(new ValidationPipe({ transform: true }))
   @ApiOperation({
     summary: 'Get user packages',
-    description: 'Get packages based on user role and permissions',
+    description:
+      'Get packages belonging ONLY to the logged-in user, based on their role.',
   })
   @ApiQuery({
     name: 'page',
@@ -133,27 +134,19 @@ export class PackageController {
     status: HttpStatus.OK,
     description: 'Packages retrieved successfully',
   })
-  async getPackages(
-    @Query() query: PackageQueryDto,
-    @Request() req: any,
-  ): Promise<ApiResponseInterface> {
-    try {
-      const result = await this.packageService.getPackagesByUser(
-        req.user.id,
-        req.user.role,
-        query,
-      );
-
-      return this.apiResponseService.paginated(
-        result.packages,
-        result.page,
-        result.limit,
-        result.total,
-        'Packages retrieved successfully',
-      );
-    } catch (error) {
-      throw error;
-    }
+  async getUserPackages(@Request() req, @Query() query: PackageQueryDto) {
+    const userId = req.user.id;
+    const userRole = req.user.role;
+    // This will ensure only the logged-in user's parcels are returned
+    const result = await this.packageService.getPackagesByUser(
+      userId,
+      userRole,
+      query,
+    );
+    return this.apiResponseService.success(
+      result.packages,
+      'Packages retrieved successfully',
+    );
   }
 
   @Get(':id')
@@ -395,6 +388,150 @@ export class PackageController {
     return this.apiResponseService.success(
       updatedPackage,
       'Courier assigned successfully',
+    );
+  }
+
+  @Get('track/:trackingId')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.SENDER)
+  @ApiOperation({
+    summary: 'Sender tracks package by tracking ID',
+    description: 'Authenticated sender can track their package by tracking ID',
+  })
+  @ApiParam({ name: 'trackingId', description: 'Package tracking ID' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Package tracking information retrieved successfully',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Package not found',
+  })
+  async trackPackageBySender(
+    @Param('trackingId') trackingId: string,
+    @Request() req: any,
+  ): Promise<ApiResponseInterface> {
+    try {
+      const packageData =
+        await this.packageService.getPackageByTrackingId(trackingId);
+
+      // Ensure the sender is the owner of the package
+      if (!packageData || packageData.senderId !== req.user.id) {
+        return this.apiResponseService.error(
+          'Not authorized to view this package',
+          'FORBIDDEN',
+          [HttpStatus.FORBIDDEN], // wrap in array
+        );
+      }
+
+      // Remove sensitive information for sender access
+      const publicPackageData = {
+        id: packageData.id,
+        trackingId: packageData.trackingId,
+        status: packageData.status,
+        weight: packageData.weight,
+        description: packageData.description,
+        receiverName: packageData.receiverName,
+        receiverCity: packageData.receiverCity,
+        receiverState: packageData.receiverState,
+        receiverCountry: packageData.receiverCountry,
+        preferredDeliveryDate: packageData.preferredDeliveryDate,
+        actualPickupDate: packageData.actualPickupDate,
+        actualDeliveryDate: packageData.actualDeliveryDate,
+        createdAt: packageData.createdAt,
+        updatedAt: packageData.updatedAt,
+        statusHistory: packageData.statusHistory,
+        locationUpdates: packageData.locationUpdates,
+        deliveryAttempts: packageData.deliveryAttempts,
+      };
+
+      return this.apiResponseService.success(
+        publicPackageData,
+        'Package tracking information retrieved successfully',
+      );
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Get('received')
+  @UseGuards(RolesGuard)
+  @UsePipes(new ValidationPipe({ transform: true }))
+  @ApiOperation({
+    summary: 'Get received packages',
+    description: 'Get packages where the logged-in user is the receiver',
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Page number',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Items per page',
+  })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    enum: [
+      'CREATED',
+      'CONFIRMED',
+      'PICKED_UP',
+      'IN_TRANSIT',
+      'OUT_FOR_DELIVERY',
+      'DELIVERED',
+      'FAILED',
+      'CANCELLED',
+    ],
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Received packages retrieved successfully',
+  })
+  async getReceivedPackages(
+    @Request() req: any,
+    @Query() query: PackageQueryDto,
+  ): Promise<ApiResponseInterface> {
+    const userEmail = req.user.email;
+    const result = await this.packageService.getReceivedPackages(
+      userEmail,
+      query,
+    );
+
+    return this.apiResponseService.success(
+      result.packages,
+      'Received packages retrieved successfully',
+    );
+  }
+
+  @Put(':id/cancel')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SENDER)
+  @ApiOperation({
+    summary: 'Cancel a package',
+    description: 'Cancel a package (Admin or Sender only)',
+  })
+  @ApiParam({ name: 'id', description: 'Package UUID' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Package cancelled successfully',
+  })
+  async cancelPackage(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Request() req: any,
+  ): Promise<ApiResponseInterface> {
+    const cancelledPackage = await this.packageService.cancelPackage(
+      id,
+      req.user.id,
+      req.user.role,
+    );
+
+    return this.apiResponseService.success(
+      cancelledPackage,
+      'Package cancelled successfully',
     );
   }
 }

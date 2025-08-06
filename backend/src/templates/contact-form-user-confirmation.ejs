@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thank You for Contacting DropSecure</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #fff8f2;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #800020 0%, #D4AF37 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            letter-spacing: 3px;
+            margin-bottom: 15px;
+        }
+        .content {
+            padding: 40px 30px;
+            line-height: 1.6;
+        }
+        .greeting {
+            font-size: 24px;
+            color: #800020;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        .thank-you-box {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-left: 5px solid #800020;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .icon {
+            font-size: 48px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .highlight {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #D4AF37;
+        }
+        .footer {
+            background: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            color: #6c757d;
+        }
+        .contact-info {
+            background: white;
+            border: 2px solid #e9ecef;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .contact-info h4 {
+            color: #800020;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">DropSecure</div>
+            <p>Secure Delivery Solutions</p>
+        </div>
+        
+        <div class="content">
+            <div class="icon">✅</div>
+            
+            <div class="greeting">Hello <%= name %>!</div>
+            
+            <div class="thank-you-box">
+                <h3 style="color: #800020; margin-top: 0;">Thank you for contacting DropSecure!</h3>
+                <p>We have successfully received your message and our team will review it shortly.</p>
+            </div>
+            
+            <p>We appreciate you taking the time to reach out to us. Your inquiry is important to us, and we're committed to providing you with the best possible service.</p>
+            
+            <div class="highlight">
+                <strong>What happens next?</strong><br>
+                • Our customer service team will review your message<br>
+                • You can expect a response within 24 hours<br>
+                • For urgent matters, please call our support line
+            </div>
+            
+            <p>In the meantime, feel free to explore our services or track your existing packages through our platform.</p>
+            
+            <div class="contact-info">
+                <h4>Need Immediate Assistance?</h4>
+                <p><strong>Email:</strong> <%= supportEmail %></p>
+                <p><strong>Phone:</strong> +1 (555) 123-4567</p>
+                <p><strong>Hours:</strong> Monday - Friday, 8:00 AM - 6:00 PM EST</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>DropSecure Courier Services</strong></p>
+            <p>Delivering your packages safely and securely</p>
+            <p style="font-size: 12px; margin-top: 15px;">
+                This is an automated response. Please do not reply to this email.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

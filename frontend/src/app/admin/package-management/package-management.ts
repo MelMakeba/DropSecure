@@ -35,17 +35,16 @@ export class PackageManagement {
   }
 
   newPackage: Partial<Package> = {
-    trackingId: '',
     senderId: '',
-    senderName: '',
     senderEmail: '',
-    senderPhone: '',
-    senderAddress: '',
-    receiverId: '',
     receiverName: '',
     receiverEmail: '',
     receiverPhone: '',
     receiverAddress: '',
+    receiverCity: '',
+    receiverState: '',
+    receiverZipCode: '',
+    receiverCountry: '',
     weight: undefined,
     description: '',
     specialInstructions: '',
@@ -53,11 +52,6 @@ export class PackageManagement {
     price: undefined,
     preferredPickupDate: '',
     preferredDeliveryDate: '',
-    status: '',
-    isPaid: false,
-    createdById: '',
-    createdAt: '',
-    updatedAt: ''
   };
 
   editMode = false;
@@ -143,17 +137,16 @@ export class PackageManagement {
     this.editMode = false;
     this.selectedPackageId = null;
     this.newPackage = {
-      trackingId: '',
       senderId: '',
-      senderName: '',
       senderEmail: '',
-      senderPhone: '',
-      senderAddress: '',
-      receiverId: '',
       receiverName: '',
       receiverEmail: '',
       receiverPhone: '',
       receiverAddress: '',
+      receiverCity: '',
+      receiverState: '',
+      receiverZipCode: '',
+      receiverCountry: '',
       weight: undefined,
       description: '',
       specialInstructions: '',
@@ -161,11 +154,6 @@ export class PackageManagement {
       price: undefined,
       preferredPickupDate: '',
       preferredDeliveryDate: '',
-      status: '',
-      isPaid: false,
-      createdById: '',
-      createdAt: '',
-      updatedAt: ''
     };
   }
 
@@ -288,17 +276,16 @@ export class PackageManagement {
 
   resetNewPackage() {
     this.newPackage = {
-      trackingId: '',
       senderId: '',
-      senderName: '',
       senderEmail: '',
-      senderPhone: '',
-      senderAddress: '',
-      receiverId: '',
       receiverName: '',
       receiverEmail: '',
       receiverPhone: '',
       receiverAddress: '',
+      receiverCity: '',
+      receiverState: '',
+      receiverZipCode: '',
+      receiverCountry: '',
       weight: undefined,
       description: '',
       specialInstructions: '',
@@ -306,11 +293,6 @@ export class PackageManagement {
       price: undefined,
       preferredPickupDate: '',
       preferredDeliveryDate: '',
-      status: '',
-      isPaid: false,
-      createdById: '',
-      createdAt: '',
-      updatedAt: ''
     };
   }
 }

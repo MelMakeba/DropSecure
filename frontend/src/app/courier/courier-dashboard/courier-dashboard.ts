@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Sidebar } from '../../shared/sidebar/sidebar';
 import { IonicModule } from '@ionic/angular';
+import { Packages} from '../../services/packages/packages'; // Adjust the import according to your project structure
+import { Package } from '../../models/package.model'; // Adjust the import according to your project structure
 
 @Component({
   selector: 'app-courier-dashboard',
@@ -12,6 +14,9 @@ import { IonicModule } from '@ionic/angular';
 })
 export class CourierDashboard implements OnInit {
   sidebarCollapsed = false;
+  courierPackages: Package[] = [];
+
+  constructor(private packagesService: Packages) {} // Inject the PackagesService
 
   get loggedInCourierId(): string {
     const user = localStorage.getItem('dropsecure_user');
@@ -43,5 +48,14 @@ export class CourierDashboard implements OnInit {
     // { label: 'Track', icon: 'locate-outline', route: '/courier/track', roles: ['courier', 'admin'] },
   ];
 
-  ngOnInit() {}
+  ngOnInit() {
+    const userStr = localStorage.getItem('dropsecure_user');
+    const user = userStr ? JSON.parse(userStr) : null;
+    if (user) {
+      this.packagesService.getUserPackages().subscribe(pkgs => {
+        // Filter for packages assigned to this courier
+        this.courierPackages = pkgs.filter(pkg => pkg.courierId === user.id);
+      });
+    }
+  }
 }

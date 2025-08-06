@@ -37,8 +37,12 @@ export class Packages {
   }
 
   // Get packages for the current user (all roles)
+  // Ensures only the logged-in user's packages are returned by backend filtering
   getUserPackages(): Observable<Package[]> {
-    return this.http.get<Package[]>(`${this.apiUrl}/packages/get-user-packages`, this.getAuthHeaders());
+    return this.http.get<any>(`${this.apiUrl}/packages/get-user-packages`, this.getAuthHeaders())
+      .pipe(
+        map(res => res.data as Package[])
+      );
   }
 
   // Get package by ID
@@ -46,9 +50,12 @@ export class Packages {
     return this.http.get<Package>(`${this.apiUrl}/packages/${packageId}`, this.getAuthHeaders());
   }
 
-  // Get package by tracking number (public)
-  getPackageByTrackingNumber(trackingNumber: string): Observable<Package> {
-    return this.http.get<Package>(`${this.apiUrl}/packages/track/${trackingNumber}`, this.getAuthHeaders());
+  // Get package by tracking number (sender only, not public)
+  getPackageByTrackingNumber(trackingId: string): Observable<Package> {
+    return this.http.get<any>(`${this.apiUrl}/packages/track/${trackingId}`, this.getAuthHeaders())
+      .pipe(
+        map(res => res.data as Package)
+      );
   }
 
   // Create a new package (admin only)

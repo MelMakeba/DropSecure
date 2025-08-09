@@ -1,7 +1,7 @@
 @baseUrl = http://localhost:3000
 @contentType = application/json
 @authToken = 
-@ver_Token =382408
+@ver_Token =224703
 @reset_Token=
 
 
@@ -10,12 +10,12 @@ POST {{baseUrl}}/auth/register
 Content-Type: {{contentType}}
 
 {
-    "email": "melissa.waitituh@strathmore.edu",
+    "email": "mellisawanja254@gmail.com",
     "password": "pass123",
     "firstName": "Mel",
     "lastName": "Kilenaa",
     "phone": "+1234567890",
-    "role": "COURIER"
+    "role": "SENDER"
 }
 
 

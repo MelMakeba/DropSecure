@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/require-await */
-
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
@@ -620,7 +622,9 @@ export class PackageService {
 
       return Math.round(cost * 100) / 100; // Round to 2 decimal places
     } catch (error) {
-      this.logger.error(`Failed to calculate package cost: ${error.message}`);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error occurred';
+      this.logger.error(`Failed to calculate package cost: ${errorMessage}`);
       return this.calculateEstimatedCost(weight, 10);
     }
   }
@@ -751,16 +755,12 @@ export class PackageService {
       throw new ForbiddenException('Not authorized to cancel this package');
     }
 
-    const cancellableStatuses = [
+    const cancellableStatuses: PackageStatus[] = [
       PackageStatus.CREATED,
       PackageStatus.COURIER_ASSIGNED,
     ];
 
-    if (
-      !cancellableStatuses.includes(
-        pkg.status as (typeof cancellableStatuses)[number],
-      )
-    ) {
+    if (!cancellableStatuses.includes(pkg.status)) {
       throw new BadRequestException(
         `Cannot cancel package with status: ${pkg.status}`,
       );
@@ -788,6 +788,82 @@ export class PackageService {
     });
 
     return cancelledPackage;
+  }
+
+  /**
+   * Get courier assignments
+   */
+  async getCourierAssignments(courierId: string) {
+    return this.prisma.package.findMany({
+      where: {
+        courierId,
+        status: {
+          in: [
+            PackageStatus.COURIER_ASSIGNED,
+            PackageStatus.PICKED_UP,
+            PackageStatus.OUT_FOR_DELIVERY,
+          ],
+        },
+      },
+      include: {
+        sender: {
+          select: {
+            firstName: true,
+            lastName: true,
+            email: true,
+            phone: true,
+          },
+        },
+        receiver: {
+          select: {
+            firstName: true,
+            lastName: true,
+            email: true,
+            phone: true,
+            address: true,
+          },
+        },
+        statusHistory: {
+          orderBy: { timestamp: 'desc' },
+          take: 5,
+        },
+        locationUpdates: {
+          orderBy: { timestamp: 'desc' },
+          take: 1,
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  /**
+   * Mark package as picked up by courier
+   */
+  async markAsPickedUp(packageId: string, courierId: string, notes?: string) {
+    const updatedPackage = await this.prisma.package.update({
+      where: {
+        id: packageId,
+        courierId, // Ensure courier owns this package
+        status: PackageStatus.COURIER_ASSIGNED,
+      },
+      data: {
+        status: PackageStatus.PICKED_UP,
+        updatedAt: new Date(),
+      },
+    });
+
+    // Create status history
+    await this.prisma.statusHistory.create({
+      data: {
+        packageId,
+        status: PackageStatus.PICKED_UP,
+        timestamp: new Date(),
+        updatedBy: courierId,
+        notes: notes || 'Package picked up by courier',
+      },
+    });
+
+    return updatedPackage;
   }
 
   // Private helper methods
@@ -896,7 +972,9 @@ export class PackageService {
 
       // Send to sender
       if (packageData.sender?.email) {
-        const senderName = packageData.sender.name; // Use 'name' property
+        // Fix: Use 'name' property since 'firstName' and 'lastName' do not exist
+        const senderName = packageData.sender.name;
+
         if (newStatus === PackageStatus.PICKED_UP) {
           await this.emailService.sendPickupConfirmation(
             packageData.sender.email,
@@ -917,11 +995,10 @@ export class PackageService {
             },
           );
         } else {
-          // Use an existing generic status update method, or implement one
           await this.emailService.sendPackageStatusUpdate(
             packageData.sender.email,
             {
-              name: packageData.sender.name,
+              name: senderName,
               trackingNumber: packageData.trackingId,
               oldStatus: packageData.status,
               newStatus,
@@ -933,7 +1010,9 @@ export class PackageService {
 
       // Send to receiver (if available)
       if (packageData.receiver?.email) {
-        const receiverName = packageData.receiver.name; // Use 'name' property
+        // Fix: Use 'name' property instead of non-existent 'firstName' and 'lastName'
+        const receiverName = packageData.receiver.name;
+
         await this.emailService.sendPackageStatusUpdate(
           packageData.receiver.email,
           {
@@ -948,11 +1027,15 @@ export class PackageService {
 
       this.logger.log(`Package ${packageData.trackingId} ${message}`);
     } catch (error) {
-      this.logger.error(`Failed to send status update email: ${error.message}`);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error occurred';
+      this.logger.error(`Failed to send status update email: ${errorMessage}`);
     }
   }
 
-  private async sendPackageCreationNotifications(packageData: any) {
+  private async sendPackageCreationNotifications(
+    packageData: any,
+  ): Promise<void> {
     try {
       // Email to sender
       await this.emailService.sendPackageCreatedEmail(
@@ -962,8 +1045,8 @@ export class PackageService {
           trackingNumber: packageData.trackingId,
           receiverName: packageData.receiverName,
           estimatedDelivery: packageData.preferredDeliveryDate,
-          packageDetails: '',
-          price: 0,
+          packageDetails: packageData.description || '',
+          price: packageData.price || 0,
         },
       );
 
@@ -979,7 +1062,11 @@ export class PackageService {
         },
       );
     } catch (error) {
-      console.error('Failed to send package creation notifications:', error);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error occurred';
+      this.logger.error(
+        `Failed to send package creation notifications: ${errorMessage}`,
+      );
       // Don't throw error as package creation was successful
     }
   }

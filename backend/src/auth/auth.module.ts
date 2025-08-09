@@ -1,14 +1,16 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { EmailService } from 'src/shared/mailer/email.service';
-import { ApiResponseService } from 'src/shared/api-response.service';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { EmailService } from '../shared/mailer/email.service';
+import { ApiResponseService } from '../shared/api-response.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { JwtModule } from '@nestjs/jwt';
-import { UsersModule } from 'src/users/users.module';
+import { UsersModule } from '../users/users.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { JwtAuthGuard } from './guards/jwt.guard';
+import { RolesGuard } from './guards/roles.guard';
 
 @Module({
   imports: [
@@ -41,8 +43,17 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     ApiResponseService,
     PrismaService,
     JwtStrategy,
+    JwtAuthGuard,
+    RolesGuard,
   ],
   controllers: [AuthController],
-  exports: [AuthService],
+  exports: [
+    AuthService,
+    JwtStrategy,
+    JwtAuthGuard,
+    RolesGuard,
+    PassportModule,
+    JwtModule,
+  ],
 })
 export class AuthModule {}

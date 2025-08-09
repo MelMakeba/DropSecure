@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   Controller,
   Get,
   Put,
+  Patch,
   Body,
   Param,
   UseGuards,
@@ -23,6 +25,7 @@ import {
 } from './interfaces/courier.interfaces';
 import { ApiResponseService } from '../shared/api-response.service';
 import { ApiResponse } from '../shared/interfaces/api-response.interface';
+import { PackageService } from 'src/packages/packages.service';
 
 // Define a type for the request user if you have one, otherwise define minimally here:
 interface AuthenticatedRequest extends Request {
@@ -39,6 +42,7 @@ export class CourierController {
   constructor(
     private readonly courierService: CourierService,
     private readonly apiResponseService: ApiResponseService,
+    private readonly packagesService: PackageService,
   ) {}
 
   @Get('profile')
@@ -131,5 +135,35 @@ export class CourierController {
       updateLocationRequest,
     );
     return this.apiResponseService.success(null, 'Courier location updated');
+  }
+
+  @Get('assignments')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.COURIER)
+  async getAssignments(
+    @Request() req: AuthenticatedRequest,
+  ): Promise<ApiResponse<any>> {
+    return this.apiResponseService.success(
+      await this.packagesService.getCourierAssignments(req.user.id),
+      'Courier assignments retrieved successfully',
+    );
+  }
+
+  @Patch('packages/:packageId/pickup')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.COURIER)
+  async markAsPickedUp(
+    @Param('packageId') packageId: string,
+    @Body() body: { notes?: string },
+    @Request() req: AuthenticatedRequest,
+  ): Promise<ApiResponse<any>> {
+    return this.apiResponseService.success(
+      await this.packagesService.markAsPickedUp(
+        packageId,
+        req.user.id,
+        body.notes,
+      ),
+      'Package marked as picked up',
+    );
   }
 }

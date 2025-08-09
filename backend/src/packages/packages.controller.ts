@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { UserRole } from '../../generated/prisma';
 /* eslint-disable no-useless-catch */

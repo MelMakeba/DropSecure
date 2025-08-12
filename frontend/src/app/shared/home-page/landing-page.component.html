@@ -1,124 +1,282 @@
-<!-- Hero Section - Enhanced with subtle animation and better gradient -->
-<div class="relative flex flex-col items-center justify-center py-24 bg-gradient-to-br from-[#800020] via-[#A00030] to-[#D4AF37] text-white overflow-hidden">
-  <!-- Animated background elements -->
-  <div class="absolute -top-20 -right-20 w-64 h-64 bg-[#D4AF37] rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-  <div class="absolute -bottom-20 -left-20 w-72 h-72 bg-[#800020] rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+<!-- Hero Section - Enhanced with more professional design -->
+<div class="relative flex flex-col items-center justify-center py-32 bg-gradient-to-br from-[#800020] via-[#A00030] to-[#D4AF37] text-white overflow-hidden">
+  <!-- Professional background pattern -->
+  <div class="absolute inset-0 opacity-10">
+    <svg class="w-full h-full" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
+          <path d="M 10 0 L 0 0 0 10" fill="none" stroke="white" stroke-width="0.5"/>
+        </pattern>
+      </defs>
+      <rect width="100" height="100" fill="url(#grid)"/>
+    </svg>
+  </div>
   
-  <div class="relative z-10 text-center px-4">
-    <h1 class="text-5xl md:text-6xl font-bold font-poppins mb-6 animate-fade-in bg-clip-text text-transparent bg-gradient-to-r from-[#D4AF37] to-white">
-      DropSecure Courier
-    </h1>
-    <p class="text-xl md:text-2xl font-inter mb-10 max-w-2xl mx-auto leading-relaxed">
-      Fast, secure, and reliable courier service for your important packages. Experience the future of delivery today.
+  <!-- Floating elements for visual interest -->
+  <div class="absolute top-20 left-10 w-20 h-20 bg-white/10 rounded-full animate-pulse"></div>
+  <div class="absolute bottom-20 right-10 w-16 h-16 bg-[#D4AF37]/20 rounded-full animate-bounce"></div>
+  <div class="absolute top-1/3 right-1/4 w-12 h-12 bg-white/5 rounded-full animate-ping"></div>
+  
+  <div class="relative z-10 text-center px-6 max-w-6xl mx-auto">
+    <!-- Professional heading with better typography -->
+    <div class="mb-8">
+      <h1 class="text-6xl md:text-7xl font-black font-poppins mb-4 leading-tight">
+        <span class="block text-white">DropSecure</span>
+        <span class="block text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-5xl md:text-6xl">
+          Courier Service
+        </span>
+      </h1>
+      <div class="w-32 h-1 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] mx-auto mb-6"></div>
+    </div>
+    
+    <p class="text-xl md:text-2xl font-inter mb-12 max-w-3xl mx-auto leading-relaxed font-light">
+      Professional courier solutions for businesses and individuals. 
+      <span class="font-semibold text-[#D4AF37]">Fast, secure, and reliable delivery</span> 
+      with real-time tracking and 24/7 support.
     </p>
     
-    <!-- Show ONLY when NOT logged in -->
-    <div class="flex flex-col sm:flex-row gap-4 justify-center" *ngIf="!isLoggedIn()">
+    <!-- Enhanced CTA buttons -->
+    <div class="flex flex-col sm:flex-row gap-6 justify-center mb-16" *ngIf="!isLoggedIn()">
       <button 
-        class="relative overflow-hidden bg-[#D4AF37] text-[#800020] px-8 py-4 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group"
+        class="group relative overflow-hidden bg-[#D4AF37] text-[#800020] px-10 py-5 rounded-xl font-bold text-lg shadow-2xl hover:shadow-3xl transition-all duration-300 hover:-translate-y-1 min-w-[200px]"
         (click)="openAuth('register')">
-        <span class="relative z-10">Get Started</span>
-        <span class="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"></span>
+        <span class="relative z-10 flex items-center justify-center gap-3">
+          <ion-icon name="rocket-outline" class="text-xl"></ion-icon>
+          Get Started
+        </span>
+        <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
       </button>
       <button 
-        class="relative overflow-hidden bg-transparent text-white px-8 py-4 rounded-lg font-semibold border-2 border-[#D4AF37] hover:bg-[#D4AF37] hover:bg-opacity-10 transition-all duration-300 hover:-translate-y-1 group"
+        class="group relative overflow-hidden bg-transparent text-white px-10 py-5 rounded-xl font-bold text-lg border-2 border-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#800020] transition-all duration-300 hover:-translate-y-1 min-w-[200px]"
         (click)="openAuth('login')">
-        <span class="relative z-10">Login</span>
-        <span class="absolute inset-0 bg-white opacity-0 group-hover:opacity-5 transition-opacity duration-300"></span>
+        <span class="relative z-10 flex items-center justify-center gap-3">
+          <ion-icon name="log-in-outline" class="text-xl"></ion-icon>
+          Sign In
+        </span>
       </button>
     </div>
 
-    <!-- Show ONLY when logged in -->
-    <div class="flex flex-col sm:flex-row gap-4 justify-center" *ngIf="isLoggedIn()">
+    <!-- Dashboard button for logged in users -->
+    <div class="flex justify-center" *ngIf="isLoggedIn()">
       <button 
-        class="relative overflow-hidden bg-[#D4AF37] text-[#800020] px-8 py-4 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group"
+        class="group relative overflow-hidden bg-[#D4AF37] text-[#800020] px-12 py-6 rounded-xl font-bold text-xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:-translate-y-1"
         (click)="goToDashboard()">
-        <span class="relative z-10">Go to Dashboard</span>
-        <span class="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"></span>
+        <span class="relative z-10 flex items-center justify-center gap-3">
+          <ion-icon name="speedometer-outline" class="text-2xl"></ion-icon>
+          Go to Dashboard
+        </span>
       </button>
     </div>
-  </div>
-</div>
 
-<!-- Service Overview Cards - Enhanced with hover effects and better icons -->
-<div class="container mx-auto px-6 py-16">
-  <div class="text-center mb-16">
-    <h2 class="text-3xl md:text-4xl font-bold text-[#800020] mb-4">Our Services</h2>
-    <p class="text-lg text-gray-600 max-w-2xl mx-auto">Delivering excellence with every package</p>
-  </div>
-  
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-10 px-4">
-    <!-- Card 1 -->
-    <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300 group transform hover:-translate-y-2">
-      <div class="p-8 flex flex-col items-center">
-        <div class="bg-[#800020] bg-opacity-10 p-4 rounded-full mb-6 text-[#800020] group-hover:bg-[#D4AF37] group-hover:bg-opacity-20 transition-colors">
-          <ion-icon name="flash-outline" class="text-4xl"></ion-icon>
-        </div>
-        <h3 class="text-2xl font-bold text-gray-800 mb-3">Fast Delivery</h3>
-        <p class="text-gray-600 text-center leading-relaxed">
-          Get your packages delivered quickly with our optimized routes and real-time tracking.
-        </p>
+    <!-- Trust indicators -->
+    <div class="flex flex-wrap justify-center items-center gap-8 mt-16 opacity-80">
+      <div class="flex items-center gap-2 text-sm">
+        <ion-icon name="shield-checkmark" class="text-[#D4AF37] text-xl"></ion-icon>
+        <span>Secure & Insured</span>
       </div>
-    </div>
-    
-    <!-- Card 2 -->
-    <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300 group transform hover:-translate-y-2">
-      <div class="p-8 flex flex-col items-center">
-        <div class="bg-[#800020] bg-opacity-10 p-4 rounded-full mb-6 text-[#800020] group-hover:bg-[#D4AF37] group-hover:bg-opacity-20 transition-colors">
-          <ion-icon name="shield-checkmark-outline" class="text-4xl"></ion-icon>
-        </div>
-        <h3 class="text-2xl font-bold text-gray-800 mb-3">Secure Handling</h3>
-        <p class="text-gray-600 text-center leading-relaxed">
-          Your items are safe with us. We use tamper-proof packaging and trusted couriers.
-        </p>
+      <div class="flex items-center gap-2 text-sm">
+        <ion-icon name="time" class="text-[#D4AF37] text-xl"></ion-icon>
+        <span>Same Day Delivery</span>
       </div>
-    </div>
-    
-    <!-- Card 3 -->
-    <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300 group transform hover:-translate-y-2">
-      <div class="p-8 flex flex-col items-center">
-        <div class="bg-[#800020] bg-opacity-10 p-4 rounded-full mb-6 text-[#800020] group-hover:bg-[#D4AF37] group-hover:bg-opacity-20 transition-colors">
-          <ion-icon name="headset-outline" class="text-4xl"></ion-icon>
-        </div>
-        <h3 class="text-2xl font-bold text-gray-800 mb-3">24/7 Support</h3>
-        <p class="text-gray-600 text-center leading-relaxed">
-          Our support team is available around the clock to assist you with any queries.
-        </p>
+      <div class="flex items-center gap-2 text-sm">
+        <ion-icon name="location" class="text-[#D4AF37] text-xl"></ion-icon>
+        <span>Real-time Tracking</span>
+      </div>
+      <div class="flex items-center gap-2 text-sm">
+        <ion-icon name="headset" class="text-[#D4AF37] text-xl"></ion-icon>
+        <span>24/7 Support</span>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Package Tracking Widget - Enhanced with visual appeal -->
-<div class="relative py-16 bg-gradient-to-r from-[#F3F4F6] to-[#f9fafb]">
-  <div class="absolute inset-0 opacity-5 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9IiM4MDAwMjAiIG9wYWNpdHk9IjAuMSI+PC9yZWN0Pjwvc3ZnPg==')]"></div>
-  
+<!-- Statistics Section - New professional addition -->
+<div class="bg-white py-20">
   <div class="container mx-auto px-6">
-    <div class="max-w-3xl mx-auto bg-white rounded-xl shadow-lg p-8 md:p-10 text-center">
-      <h2 class="text-3xl font-bold text-[#800020] mb-6">Track Your Package</h2>
-      <p class="text-gray-600 mb-8">Enter your tracking number to get real-time updates on your delivery</p>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+      <div class="group">
+        <div class="text-4xl md:text-5xl font-black text-[#800020] mb-2 group-hover:text-[#D4AF37] transition-colors">
+          10K+
+        </div>
+        <div class="text-gray-600 font-medium">Packages Delivered</div>
+      </div>
+      <div class="group">
+        <div class="text-4xl md:text-5xl font-black text-[#800020] mb-2 group-hover:text-[#D4AF37] transition-colors">
+          99.9%
+        </div>
+        <div class="text-gray-600 font-medium">Success Rate</div>
+      </div>
+      <div class="group">
+        <div class="text-4xl md:text-5xl font-black text-[#800020] mb-2 group-hover:text-[#D4AF37] transition-colors">
+          50+
+        </div>
+        <div class="text-gray-600 font-medium">Cities Covered</div>
+      </div>
+      <div class="group">
+        <div class="text-4xl md:text-5xl font-black text-[#800020] mb-2 group-hover:text-[#D4AF37] transition-colors">
+          24/7
+        </div>
+        <div class="text-gray-600 font-medium">Support Available</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Enhanced Service Cards -->
+<div class="bg-gradient-to-b from-gray-50 to-white py-20">
+  <div class="container mx-auto px-6">
+    <div class="text-center mb-16">
+      <h2 class="text-4xl md:text-5xl font-bold text-[#800020] mb-6">
+        Why Choose DropSecure?
+      </h2>
+      <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+        We combine cutting-edge technology with personalized service to deliver exceptional results for every package.
+      </p>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+      <!-- Service Card 1 -->
+      <div class="group bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3">
+        <div class="relative p-8 h-full">
+          <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#800020] to-[#D4AF37]"></div>
+          <div class="flex flex-col items-center text-center h-full">
+            <div class="w-20 h-20 bg-gradient-to-br from-[#800020] to-[#A00030] rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+              <ion-icon name="flash" class="text-white text-3xl"></ion-icon>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">Lightning Fast</h3>
+            <p class="text-gray-600 leading-relaxed flex-grow">
+              Same-day and express delivery options with optimized routing algorithms for maximum efficiency.
+            </p>
+            <div class="mt-6 flex items-center text-[#800020] font-semibold">
+              <span>Learn More</span>
+              <ion-icon name="arrow-forward" class="ml-2 group-hover:translate-x-1 transition-transform"></ion-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Service Card 2 -->
+      <div class="group bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3">
+        <div class="relative p-8 h-full">
+          <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#800020] to-[#D4AF37]"></div>
+          <div class="flex flex-col items-center text-center h-full">
+            <div class="w-20 h-20 bg-gradient-to-br from-[#D4AF37] to-[#FFD700] rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+              <ion-icon name="shield-checkmark" class="text-white text-3xl"></ion-icon>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">Fully Secure</h3>
+            <p class="text-gray-600 leading-relaxed flex-grow">
+              End-to-end encryption, tamper-proof packaging, and comprehensive insurance coverage for peace of mind.
+            </p>
+            <div class="mt-6 flex items-center text-[#800020] font-semibold">
+              <span>Learn More</span>
+              <ion-icon name="arrow-forward" class="ml-2 group-hover:translate-x-1 transition-transform"></ion-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Service Card 3 -->
+      <div class="group bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3">
+        <div class="relative p-8 h-full">
+          <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#800020] to-[#D4AF37]"></div>
+          <div class="flex flex-col items-center text-center h-full">
+            <div class="w-20 h-20 bg-gradient-to-br from-[#800020] to-[#D4AF37] rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+              <ion-icon name="location" class="text-white text-3xl"></ion-icon>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">Real-time Tracking</h3>
+            <p class="text-gray-600 leading-relaxed flex-grow">
+              Monitor your package journey with live GPS tracking, delivery notifications, and detailed status updates.
+            </p>
+            <div class="mt-6 flex items-center text-[#800020] font-semibold">
+              <span>Learn More</span>
+              <ion-icon name="arrow-forward" class="ml-2 group-hover:translate-x-1 transition-transform"></ion-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Enhanced Package Tracking Section -->
+<div class="relative py-24 bg-gradient-to-br from-[#800020] to-[#A00030] text-white">
+  <div class="absolute inset-0 opacity-10">
+    <!-- Fixed the problematic div - simplified the background pattern -->
+    <div class="absolute inset-0" style="background-image: url('data:image/svg+xml;utf8,<svg width=&quot;60&quot; height=&quot;60&quot; viewBox=&quot;0 0 60 60&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;><g fill=&quot;none&quot; fill-rule=&quot;evenodd&quot;><g fill=&quot;%23ffffff&quot; fill-opacity=&quot;0.1&quot;><path d=&quot;M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z&quot;/></g></g></svg>')"></div>
+  </div>
+  
+  <div class="container mx-auto px-6 relative z-10">
+    <div class="max-w-4xl mx-auto text-center">
+      <h2 class="text-4xl md:text-5xl font-bold mb-6">Track Your Package</h2>
+      <p class="text-xl mb-12 opacity-90">
+        Enter your tracking number below for real-time updates on your delivery
+      </p>
       
-      <form class="flex flex-col sm:flex-row gap-4 w-full">
+      <form class="flex flex-col md:flex-row gap-4 max-w-2xl mx-auto mb-8">
         <div class="relative flex-1">
-          <ion-icon name="search-outline" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl"></ion-icon>
+          <ion-icon name="search" class="absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl"></ion-icon>
           <input 
             type="text" 
-            placeholder="Enter Tracking Number" 
-            class="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#800020] focus:border-transparent transition-all" />
+            placeholder="Enter Tracking Number (e.g., DS-2024-001)" 
+            class="w-full pl-16 pr-6 py-5 rounded-xl border-0 text-gray-800 text-lg font-medium focus:outline-none focus:ring-4 focus:ring-[#D4AF37]/50 transition-all shadow-lg" />
         </div>
         <button 
           type="submit" 
-          class="bg-gradient-to-r from-[#800020] to-[#A00030] text-white px-8 py-3 rounded-lg font-semibold shadow-md hover:shadow-lg hover:opacity-90 transition-all flex items-center justify-center gap-2">
-          <ion-icon name="location-outline" class="text-xl"></ion-icon>
-          Track Package
+          class="bg-[#D4AF37] text-[#800020] px-10 py-5 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:bg-[#FFD700] transition-all duration-300 hover:-translate-y-1 flex items-center justify-center gap-3 min-w-[160px]">
+          <ion-icon name="location" class="text-xl"></ion-icon>
+          Track Now
         </button>
       </form>
       
-      <div class="mt-8 flex justify-center">
-        <div class="flex items-center text-sm text-gray-500">
-          <ion-icon name="information-circle-outline" class="mr-2"></ion-icon>
-          Don't have a tracking number? <a href="#" class="text-[#800020] font-medium ml-1">Contact support</a>
+      <div class="flex justify-center">
+        <div class="flex items-center text-sm opacity-75">
+          <ion-icon name="information-circle" class="mr-2"></ion-icon>
+          Need help? <a href="/contact" class="text-[#D4AF37] font-semibold ml-1 hover:underline">Contact our support team</a>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- How It Works Section -->
+<div class="bg-gray-50 py-20">
+  <div class="container mx-auto px-6">
+    <div class="text-center mb-16">
+      <h2 class="text-4xl md:text-5xl font-bold text-[#800020] mb-6">How It Works</h2>
+      <p class="text-xl text-gray-600 max-w-2xl mx-auto">Simple, efficient, and reliable delivery process</p>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div class="text-center group">
+        <div class="w-24 h-24 bg-[#800020] rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+          <ion-icon name="create" class="text-white text-3xl"></ion-icon>
+        </div>
+        <h3 class="text-xl font-bold text-gray-800 mb-3">1. Book Online</h3>
+        <p class="text-gray-600">Create your delivery request through our user-friendly platform</p>
+      </div>
+      
+      <div class="text-center group">
+        <div class="w-24 h-24 bg-[#A00030] rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+          <ion-icon name="person" class="text-white text-3xl"></ion-icon>
+        </div>
+        <h3 class="text-xl font-bold text-gray-800 mb-3">2. Courier Pickup</h3>
+        <p class="text-gray-600">Our professional courier collects your package from the specified location</p>
+      </div>
+      
+      <div class="text-center group">
+        <div class="w-24 h-24 bg-[#D4AF37] rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+          <ion-icon name="car" class="text-white text-3xl"></ion-icon>
+        </div>
+        <h3 class="text-xl font-bold text-gray-800 mb-3">3. Safe Transport</h3>
+        <p class="text-gray-600">Track your package in real-time as it travels to its destination</p>
+      </div>
+      
+      <div class="text-center group">
+        <div class="w-24 h-24 bg-[#800020] rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+          <ion-icon name="checkmark-circle" class="text-white text-3xl"></ion-icon>
+        </div>
+        <h3 class="text-xl font-bold text-gray-800 mb-3">4. Delivered</h3>
+        <p class="text-gray-600">Secure delivery with proof of receipt and instant notifications</p>
       </div>
     </div>
   </div>

@@ -11,6 +11,7 @@ import { Assignments} from './courier/assignments/assignments';
 import { RoutePlanner } from './courier/route-planner/route-planner';
 import { AdminDashboard } from './admin/admin-dashboard/admin-dashboard';
 import { PackageManagement } from './admin/package-management/package-management';
+import { UserManagement } from './admin/user-management/user-management';
 
 export const routes: Routes = [
   { path: '', component: LandingPageComponent },
@@ -24,6 +25,7 @@ export const routes: Routes = [
   {path: 'courier/assignments', component: Assignments},
   {path: 'courier/route-planner', component:RoutePlanner},
   {path: 'admin/dashboard', component: AdminDashboard},
-  {path: 'admin/packages', component:PackageManagement}
+  {path: 'admin/packages', component:PackageManagement},
+  {path: 'admin/users', component:UserManagement},
   // ...other routes will be added here step by step
 ];

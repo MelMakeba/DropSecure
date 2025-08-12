@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   Controller,
   Post,
@@ -23,24 +22,12 @@ import { LocationService } from './location.service';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { UserRole, PackageStatus } from '../../generated/prisma';
+import { UserRole } from '../../generated/prisma';
 import { AuthenticatedRequest } from '../auth/interfaces/authenticated-request.interface';
 import { ApiResponseService } from '../shared/api-response.service';
 import { ApiResponse as ApiResponseInterface } from '../shared/interfaces/api-response.interface';
-
-// Create DTOs for type safety
-export class UpdateLocationDto {
-  packageId: string;
-  latitude: number;
-  longitude: number;
-  address?: string;
-  notes?: string;
-}
-
-export class UpdatePackageStatusDto {
-  status: PackageStatus;
-  notes?: string;
-}
+import { UpdatePackageStatusDto } from './../packages/dto/package.dto';
+import { UpdatePackageLocationDto } from './../packages/dto/package.dto';
 
 @ApiTags('Location')
 @Controller('location')
@@ -65,12 +52,13 @@ export class LocationController {
     description: 'Location updated successfully',
   })
   async updateLocation(
-    @Body() body: UpdateLocationDto,
+    @Body() body: UpdatePackageLocationDto,
     @Request() req: AuthenticatedRequest,
   ): Promise<ApiResponseInterface> {
     const locationUpdate = await this.locationService.updateCourierLocation({
       courierId: req.user.id,
       ...body,
+      packageId: '',
     });
 
     return this.apiResponseService.success(

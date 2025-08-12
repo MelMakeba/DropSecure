@@ -1,9 +1,9 @@
-@baseUrl = http://localhost:3000
-@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0MTg1NTU4NC0yYWI0LTRhZjMtOTQzMS0zMGE0NDA0OGU1YjciLCJlbWFpbCI6Im1lbGlzc2FtYWtlYmFAZ21haWwuY29tIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzU0Mzc1MzMwLCJleHAiOjE3NTQ0NjE3MzB9.g2vq7fO7dusT7YM8Kz_0sge2TdTu4ANLnCc-bD1SaTQ
-@senderToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlOWFmMzU5Yi0wOTViLTRlNzItYTdhMC02OTZjMGQ1YmU0NTciLCJlbWFpbCI6Im1lbGxpc2F3YW5qYTI1NEBnbWFpbC5jb20iLCJyb2xlIjoiU0VOREVSIiwiaWF0IjoxNzU0Mzc1MzY3LCJleHAiOjE3NTQ0NjE3Njd9.0PMH0gzKukqojBahcLZ_dblF1JdcxlrTiECm6WSWY30
-@courierToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmNjUwMWQ3Mi0wY2ZiLTQ0NDUtOTliNi0zYTNiZGY2NDBlMzMiLCJlbWFpbCI6Im1lbGlzc2Eud2FpdGl0dWhAc3RyYXRobW9yZS5lZHUiLCJyb2xlIjoiQ09VUklFUiIsImlhdCI6MTc1NDM3NTQyOSwiZXhwIjoxNzU0NDYxODI5fQ.2_QmHyzYT2FJGP32iw9mPC3fxwe7u3Efvl7mC6n2K5I
-@packageId = 186fef05-b350-408b-987d-b3c4034edf6e
-@trackingId = {{createPackage.response.body.data.trackingId}}
+@baseUrl = https://dropsecure.onrender.com
+@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0MTg1NTU4NC0yYWI0LTRhZjMtOTQzMS0zMGE0NDA0OGU1YjciLCJlbWFpbCI6Im1lbGlzc2FtYWtlYmFAZ21haWwuY29tIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzU0OTg1NjM2LCJleHAiOjE3NTUwNzIwMzZ9.K0zQCVXkziAewNVGldPjXeWgvLzbwMXQ_CSJ6BbtIY4
+@senderToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlOWFmMzU5Yi0wOTViLTRlNzItYTdhMC02OTZjMGQ1YmU0NTciLCJlbWFpbCI6Im1lbGxpc2F3YW5qYTI1NEBnbWFpbC5jb20iLCJyb2xlIjoiU0VOREVSIiwiaWF0IjoxNzU0OTkxODA0LCJleHAiOjE3NTUwNzgyMDR9.W7Ed5rE_NvMskvKsY3GBnwva0x_yMkuCLleOKXKCPKI
+@courierToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1YjQwNDY1YS0wY2E1LTRjNzgtOGJkZC1kYTc3MjcxZmNmNDYiLCJlbWFpbCI6Im1lbGsuaWxlbmEuYUBnbWFpbC5jb20iLCJyb2xlIjoiQ09VUklFUiIsImlhdCI6MTc1NDk4NzM2OSwiZXhwIjoxNzU1MDczNzY5fQ.Tsbo5bj_N4Csi73FpeVvEyaJnO8sYL2edzIqqXXg-SQ
+@packageId =99eca28f-42df-405d-9277-a833672dff13
+@trackingId = DSME89H8VA3X4QHL
 
 ### Admin Login for Package Tests
 # @name adminLogin
@@ -31,7 +31,7 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "melissa.waitituh@strathmore.edu",
+  "email": "melk.ilena.a@gmail.com",
   "password": "pass123"
 }
 
@@ -44,7 +44,7 @@ Content-Type: application/json
 {
   "senderEmail": "mellisawanja254@gmail.com",
   "receiverName": "Mel Receiver",
-  "receiverEmail": "melk.ilena.a@gmail.com",
+  "receiverEmail": "mel@gmail.com",
   "receiverPhone": "+1234567893",
   "receiverAddress": "789 Delivery St",
   "receiverCity": "Manhattan",
@@ -99,7 +99,7 @@ Authorization: Bearer {{adminToken}}
 Content-Type: application/json
 
 {
-  "courierId": "{{courierLogin.response.body.data.user.id}}"
+  "courierId": "5b40465a-0ca5-4c78-8bdd-da77271fcf46"
 }
 
 ### Update Package Status (Admin/Courier)
@@ -108,9 +108,9 @@ Authorization: Bearer {{courierToken}}
 Content-Type: application/json
 
 {
-  "status": "PICKED_UP",
-  "notes": "Package picked up successfully",
-  "location": "Pickup location confirmed"
+  "status": "DELIVERED",
+  "notes": "Package has been delivered successfully",
+  "location": "Pickup location stopped"
 }
 
 ### Update Package Location (Courier)
@@ -126,4 +126,22 @@ Content-Type: application/json
 
 ### Cancel Package (Admin/Sender)
 PUT {{baseUrl}}/packages/{{packageId}}/cancel
+Authorization: Bearer {{adminToken}}
+
+####
+# Update package details
+PUT {{baseUrl}}/packages/{{packageId}}
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+
+{
+  "receiverName": "New Receiver Name",
+  "receiverAddress": "New Address",
+  "weight": 2.5,
+  "updateNotes": "Updated receiver information"
+}
+####
+# Get update history
+GET {{baseUrl}}/packages/{{packageId}}/update-history
 Authorization: Bearer {{adminToken}}

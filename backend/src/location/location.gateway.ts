@@ -18,7 +18,7 @@ import { OnEvent } from '@nestjs/event-emitter';
 
 @WebSocketGateway({
   cors: {
-    origin: ['http://localhost:4200', 'http://localhost:3000'],
+    origin: ['http://localhost:4200', 'https://dropsecure.onrender.com'],
     credentials: true,
   },
   namespace: '/location',

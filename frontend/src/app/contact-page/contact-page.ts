@@ -2,11 +2,12 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { IonicModule } from '@ionic/angular';
 
 @Component({
   selector: 'app-contact-page',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, IonicModule],
   templateUrl: './contact-page.html',
   styleUrl: './contact-page.css'
 })

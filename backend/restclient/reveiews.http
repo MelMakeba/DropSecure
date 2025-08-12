@@ -1,5 +1,5 @@
 ### Variables
-@baseUrl = http://localhost:3000
+@baseUrl = https://dropsecure.onrender.com
 @senderToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlOWFmMzU5Yi0wOTViLTRlNzItYTdhMC02OTZjMGQ1YmU0NTciLCJlbWFpbCI6Im1lbGxpc2F3YW5qYTI1NEBnbWFpbC5jb20iLCJyb2xlIjoiU0VOREVSIiwiaWF0IjoxNzU0Mzc1MzY3LCJleHAiOjE3NTQ0NjE3Njd9.0PMH0gzKukqojBahcLZ_dblF1JdcxlrTiECm6WSWY30
 
 @packageId = 186fef05-b350-408b-987d-b3c4034edf6e

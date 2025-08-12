@@ -365,7 +365,7 @@
         <select class="w-full border-2 border-[#D4AF37]/40 rounded-lg p-3 pr-10 text-[#800020] focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/30 transition"
             [(ngModel)]="selectedCourierId" name="courier" required>
           <option [ngValue]="null" disabled selected>Select a courier</option>
-          <option *ngFor="let courier of couriers" [ngValue]="courier.id">{{ courier.name }}</option>
+          <option *ngFor="let courier of couriers" [ngValue]="courier.id">{{ courier.firstName }} {{ courier.lastName }}</option>
         </select>
       </div>
     </div>
@@ -401,3 +401,29 @@ cancelText="Cancel"
 [statusHistory]="selectedPackageStatusHistory"
 (closeModal)="closeDetailsModal()">
 </app-package-detail-modal>
+
+<!-- Add to your template -->
+<!-- Filters -->
+<div class="filters">
+  <ion-searchbar [(ngModel)]="searchTerm" (ionInput)="onSearch()" placeholder="Search packages..."></ion-searchbar>
+  <ion-select [(ngModel)]="statusFilter" (ionChange)="onFilterChange()" placeholder="Filter by status">
+    <ion-select-option value="">All Statuses</ion-select-option>
+    <ion-select-option value="PENDING">Pending</ion-select-option>
+    <ion-select-option value="PICKED_UP">Picked Up</ion-select-option>
+    <ion-select-option value="DELIVERED">Delivered</ion-select-option>
+  </ion-select>
+</div>
+
+<!-- Pagination -->
+<div class="pagination" *ngIf="totalPages > 1">
+  <ion-button fill="clear" (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1">
+    Previous
+  </ion-button>
+  <span>Page {{ currentPage }} of {{ totalPages }}</span>
+  <ion-button fill="clear" (click)="onPageChange(currentPage + 1)" [disabled]="currentPage === totalPages">
+    Next
+  </ion-button>
+</div>
+
+<!-- Error Display -->
+<ion-toast [isOpen]="!!error" [message]="error" color="danger" [duration]="3000"></ion-toast>

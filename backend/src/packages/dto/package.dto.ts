@@ -259,3 +259,99 @@ export class PackageQueryDto {
   @IsDateString()
   endDate?: string;
 }
+
+export class UpdatePackageDto {
+  @ApiProperty({ description: 'Receiver name', required: false })
+  @IsOptional()
+  @IsString()
+  @Length(2, 100)
+  receiverName?: string;
+
+  @ApiProperty({ description: 'Receiver email', required: false })
+  @IsOptional()
+  @IsEmail()
+  receiverEmail?: string;
+
+  @ApiProperty({ description: 'Receiver phone', required: false })
+  @IsOptional()
+  @IsString()
+  @Length(0, 20)
+  receiverPhone?: string;
+
+  @ApiProperty({ description: 'Receiver address', required: false })
+  @IsOptional()
+  @IsString()
+  @Length(10, 500)
+  receiverAddress?: string;
+
+  @ApiProperty({ description: 'Receiver city', required: false })
+  @IsOptional()
+  @IsString()
+  @Length(0, 100)
+  receiverCity?: string;
+
+  @ApiProperty({ description: 'Receiver state', required: false })
+  @IsOptional()
+  @IsString()
+  @Length(0, 100)
+  receiverState?: string;
+
+  @ApiProperty({ description: 'Receiver zip code', required: false })
+  @IsOptional()
+  @IsString()
+  @Length(0, 20)
+  receiverZipCode?: string;
+
+  @ApiProperty({ description: 'Receiver country', required: false })
+  @IsOptional()
+  @IsString()
+  @Length(0, 100)
+  receiverCountry?: string;
+
+  @ApiProperty({ description: 'Package weight in kg', required: false })
+  @IsOptional()
+  @IsNumber()
+  @Min(0.1)
+  @Max(1000)
+  weight?: number;
+
+  @ApiProperty({ description: 'Package description', required: false })
+  @IsOptional()
+  @IsString()
+  @Length(5, 500)
+  description?: string;
+
+  @ApiProperty({ description: 'Special instructions', required: false })
+  @IsOptional()
+  @IsString()
+  @Length(0, 1000)
+  specialInstructions?: string;
+
+  @ApiProperty({ description: 'Package value', required: false })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  value?: number;
+
+  @ApiProperty({ description: 'Package price', required: false })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  price?: number;
+
+  @ApiProperty({ description: 'Preferred pickup date', required: false })
+  @IsOptional()
+  @IsDateString()
+  preferredPickupDate?: string;
+
+  @ApiProperty({ description: 'Preferred delivery date', required: false })
+  @IsOptional()
+  @IsDateString()
+  preferredDeliveryDate?: string;
+
+  @ApiProperty({ description: 'Update notes', required: false })
+  @IsOptional()
+  @IsString()
+  @Length(0, 500)
+  updateNotes?: string;
+}

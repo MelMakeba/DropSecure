@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -19,6 +16,7 @@ import {
   UpdatePackageStatusDto,
   UpdatePackageLocationDto,
   PackageQueryDto,
+  UpdatePackageDto,
 } from './dto/package.dto';
 import {
   PackageInterface,
@@ -281,85 +279,80 @@ export class PackageService {
   }
 
   /**
-   * Get package by tracking ID (public access)
+   * Get package by tracking ID (for authenticated users)
    */
   async getPackageByTrackingId(
     trackingId: string,
+    userId: string,
   ): Promise<PackageWithRelations> {
-    const packageData = await this.prisma.package.findUnique({
+    console.log('=== DEBUG TRACKING ===');
+    console.log('trackingId:', trackingId);
+    console.log('userId:', userId);
+    console.log('userId type:', typeof userId);
+    console.log('userId length:', userId.length);
+
+    // Try to find user by ID
+    const currentUser = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+      },
+    });
+
+    console.log('Found user:', currentUser);
+
+    // If not found, try to find by email and check what the actual ID is
+    if (!currentUser) {
+      const userByEmail = await this.prisma.user.findUnique({
+        where: { email: 'mellisawanja254@gmail.com' },
+        select: {
+          id: true,
+          email: true,
+          role: true,
+        },
+      });
+      console.log('User by email:', userByEmail);
+      console.log('Actual ID from DB:', userByEmail?.id);
+      console.log('JWT ID:', userId);
+      console.log('IDs match:', userByEmail?.id === userId);
+    }
+
+    if (!currentUser) {
+      throw new ForbiddenException('Invalid user');
+    }
+
+    const pkg = await this.prisma.package.findUnique({
       where: { trackingId },
       include: {
-        sender: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            email: false,
-            role: true,
-          },
-        },
-        receiver: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            email: false,
-            role: true,
-          },
-        },
-        createdBy: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            email: false,
-            role: true,
-          },
-        },
-        courier: {
-          select: { id: true, firstName: true, email: false, phone: false },
-        },
+        sender: true,
+        receiver: true,
+        courier: true,
         statusHistory: {
           orderBy: { timestamp: 'desc' },
-          select: {
-            id: true,
-            status: true,
-            timestamp: true,
-            notes: true,
-            location: true,
-            updatedByUser: {
-              select: { firstName: true, lastName: true },
-            },
-          },
         },
         locationUpdates: {
           orderBy: { timestamp: 'desc' },
-          take: 10,
-          select: {
-            id: true,
-            latitude: true,
-            longitude: true,
-            address: true,
-            timestamp: true,
-          },
-        },
-        deliveryAttempts: {
-          orderBy: { attemptDate: 'desc' },
-          select: {
-            id: true,
-            attemptNumber: true,
-            attemptDate: true,
-            notes: true,
-          },
         },
       },
     });
 
-    if (!packageData) {
+    if (!pkg) {
       throw new NotFoundException('Package not found');
     }
 
-    return packageData as unknown as PackageWithRelations;
+    const hasAccess =
+      pkg.senderId === userId || // User is the sender
+      pkg.receiverEmail === currentUser.email || // User is the receiver
+      pkg.courierId === userId || // User is the courier
+      currentUser.role === 'ADMIN'; // User is admin
+
+    if (!hasAccess) {
+      throw new ForbiddenException('Not authorized to view this package');
+    }
+
+    return pkg as unknown as PackageWithRelations;
   }
 
   /**
@@ -864,6 +857,246 @@ export class PackageService {
     });
 
     return updatedPackage;
+  }
+
+  /**
+   * Update package details (admin or sender only)
+   */
+  async updatePackageDetails(
+    packageId: string,
+    updateDto: UpdatePackageDto,
+    updatedBy: string,
+    userRole: UserRole,
+  ): Promise<PackageInterface> {
+    // Get existing package
+    const existingPackage = await this.prisma.package.findUnique({
+      where: { id: packageId },
+      include: {
+        sender: {
+          select: { id: true, firstName: true, lastName: true, email: true },
+        },
+      },
+    });
+
+    if (!existingPackage) {
+      throw new NotFoundException('Package not found');
+    }
+
+    // Check permissions
+    if (userRole !== UserRole.ADMIN && existingPackage.senderId !== updatedBy) {
+      throw new ForbiddenException('Not authorized to update this package');
+    }
+
+    // Check if package can be updated (only certain statuses allow updates)
+    const updatableStatuses: PackageStatus[] = [
+      PackageStatus.CREATED,
+      PackageStatus.COURIER_ASSIGNED,
+    ];
+
+    if (!updatableStatuses.includes(existingPackage.status)) {
+      throw new BadRequestException(
+        `Cannot update package with status: ${existingPackage.status}. Package can only be updated when status is CREATED or COURIER_ASSIGNED.`,
+      );
+    }
+
+    // Prepare update data
+    const updateData: Prisma.PackageUpdateInput = {
+      updatedAt: new Date(),
+    };
+
+    // Track what fields are being updated for history
+    const updatedFields: string[] = [];
+
+    // Update only provided fields
+    if (updateDto.receiverName !== undefined) {
+      updateData.receiverName = updateDto.receiverName;
+      updatedFields.push('receiverName');
+    }
+
+    if (updateDto.receiverEmail !== undefined) {
+      updateData.receiverEmail = updateDto.receiverEmail;
+      updatedFields.push('receiverEmail');
+    }
+
+    if (updateDto.receiverPhone !== undefined) {
+      updateData.receiverPhone = updateDto.receiverPhone;
+      updatedFields.push('receiverPhone');
+    }
+
+    if (updateDto.receiverAddress !== undefined) {
+      updateData.receiverAddress = updateDto.receiverAddress;
+      updatedFields.push('receiverAddress');
+    }
+
+    if (updateDto.receiverCity !== undefined) {
+      updateData.receiverCity = updateDto.receiverCity;
+      updatedFields.push('receiverCity');
+    }
+
+    if (updateDto.receiverState !== undefined) {
+      updateData.receiverState = updateDto.receiverState;
+      updatedFields.push('receiverState');
+    }
+
+    if (updateDto.receiverZipCode !== undefined) {
+      updateData.receiverZipCode = updateDto.receiverZipCode;
+      updatedFields.push('receiverZipCode');
+    }
+
+    if (updateDto.receiverCountry !== undefined) {
+      updateData.receiverCountry = updateDto.receiverCountry;
+      updatedFields.push('receiverCountry');
+    }
+
+    if (updateDto.weight !== undefined) {
+      updateData.weight = updateDto.weight;
+      updatedFields.push('weight');
+
+      // Recalculate cost if weight changes
+      const newCost = await this.calculatePackageCost(updateDto.weight, 0);
+      updateData.estimatedCost = newCost;
+      if (!updateDto.price) {
+        updateData.price = newCost;
+        updatedFields.push('price (auto-calculated)');
+      }
+    }
+
+    if (updateDto.description !== undefined) {
+      updateData.description = updateDto.description;
+      updatedFields.push('description');
+    }
+
+    if (updateDto.specialInstructions !== undefined) {
+      updateData.specialInstructions = updateDto.specialInstructions;
+      updatedFields.push('specialInstructions');
+    }
+
+    if (updateDto.value !== undefined) {
+      updateData.value = updateDto.value;
+      updatedFields.push('value');
+    }
+
+    if (updateDto.price !== undefined) {
+      updateData.price = updateDto.price;
+      updatedFields.push('price');
+    }
+
+    if (updateDto.preferredPickupDate !== undefined) {
+      updateData.preferredPickupDate = new Date(updateDto.preferredPickupDate);
+      updatedFields.push('preferredPickupDate');
+    }
+
+    if (updateDto.preferredDeliveryDate !== undefined) {
+      updateData.preferredDeliveryDate = new Date(
+        updateDto.preferredDeliveryDate,
+      );
+      updatedFields.push('preferredDeliveryDate');
+    }
+
+    // If no fields to update
+    if (updatedFields.length === 0) {
+      throw new BadRequestException('No valid fields provided for update');
+    }
+
+    // Perform update in transaction
+    const updatedPackage = await this.prisma.$transaction(async (tx) => {
+      // Update the package
+      const updated = await tx.package.update({
+        where: { id: packageId },
+        data: updateData,
+        include: {
+          sender: {
+            select: { id: true, firstName: true, lastName: true, email: true },
+          },
+          courier: {
+            select: { id: true, firstName: true, lastName: true, email: true },
+          },
+        },
+      });
+
+      // Create status history record for the update
+      const historyNotes =
+        updateDto.updateNotes ||
+        `Package details updated. Fields changed: ${updatedFields.join(', ')}`;
+
+      await tx.packageStatusHistory.create({
+        data: {
+          packageId,
+          status: existingPackage.status, // Keep same status
+          changedBy: updatedBy,
+          changedAt: new Date(),
+          createdAt: new Date(),
+          notes: historyNotes,
+        },
+      });
+
+      // Create notification for sender (if updated by admin)
+      if (
+        userRole === UserRole.ADMIN &&
+        existingPackage.senderId !== updatedBy
+      ) {
+        await tx.notification.create({
+          data: {
+            recipientUserId: existingPackage.senderId,
+            packageId,
+            type: 'PACKAGE_UPDATED',
+            subject: 'Package Details Updated',
+            message: `Your package ${existingPackage.trackingId} details have been updated by admin`,
+          },
+        });
+      }
+
+      return updated;
+    });
+    this.logger.log(
+      `Package ${existingPackage.trackingId} updated by ${userRole}. Fields: ${updatedFields.join(', ')}`,
+    );
+
+    return updatedPackage;
+  }
+
+  /**
+   * Get package update history
+   */
+  async getPackageUpdateHistory(
+    packageId: string,
+    userId: string,
+    userRole: UserRole,
+  ) {
+    // Check if user has access to this package
+    const packageData = await this.prisma.package.findUnique({
+      where: { id: packageId },
+      select: { id: true, senderId: true, courierId: true },
+    });
+
+    if (!packageData) {
+      throw new NotFoundException('Package not found');
+    }
+
+    // Check access permissions
+    if (
+      userRole !== UserRole.ADMIN &&
+      packageData.senderId !== userId &&
+      packageData.courierId !== userId
+    ) {
+      throw new ForbiddenException('Access denied to this package');
+    }
+
+    return this.prisma.packageStatusHistory.findMany({
+      where: { packageId },
+      include: {
+        changedByUser: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            role: true,
+          },
+        },
+      },
+      orderBy: { changedAt: 'desc' },
+    });
   }
 
   // Private helper methods

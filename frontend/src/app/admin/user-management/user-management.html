@@ -1,0 +1,528 @@
+<section class="min-h-screen bg-gradient-to-br from-[#fff8f2] via-[#f9fafb] to-[#F3F4F6] flex relative overflow-x-hidden">
+  <!-- Decorative Background Elements -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-[#800020]/10 to-transparent rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-blue-500/10 to-transparent rounded-full blur-3xl"></div>
+    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-purple-500/5 to-transparent rounded-full blur-3xl"></div>
+  </div>
+
+  <app-sidebar
+    [role]="'ADMIN'"
+    [loggedInName]="loggedInAdminName"
+    [navItems]="navItems"
+  ></app-sidebar>
+
+  <main
+    class="flex-1 ml-0 transition-all duration-300 min-h-screen relative z-10 flex flex-col"
+    [ngClass]="{
+      'md:ml-64': !sidebarCollapsed,
+      'md:ml-16': sidebarCollapsed
+    }"
+  >
+    <!-- Enhanced Header -->
+    <header class="bg-white/90 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-20 shadow-sm">
+      <div class="px-6 py-5 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-gradient-to-r from-[#800020] to-[#b91c3c] rounded-2xl flex items-center justify-center shadow-lg">
+            <ion-icon name="people-outline" class="text-white text-xl"></ion-icon>
+          </div>
+          <div>
+            <h1 class="text-3xl font-bold bg-gradient-to-r from-[#800020] to-[#b91c3c] bg-clip-text text-transparent">
+              User Management
+            </h1>
+            <p class="text-gray-600 mt-1 flex items-center gap-2">
+              <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+              Manage system users, roles, and permissions
+            </p>
+          </div>
+        </div>
+        
+        <!-- Header Actions -->
+        <div class="flex items-center gap-3">
+          <!-- Filter Dropdown -->
+          <div class="relative">
+            <select [(ngModel)]="roleFilter" (ngModelChange)="onFilterChange()" class="appearance-none bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl px-4 py-2 pr-8 text-sm font-medium text-gray-700 hover:border-[#800020] focus:outline-none focus:ring-2 focus:ring-[#800020]/20 focus:border-[#800020] transition-all duration-200">
+              <option value="">All Roles</option>
+              <option value="ADMIN">Admin</option>
+              <option value="COURIER">Courier</option>
+              <option value="SENDER">Sender</option>
+            </select>
+            <ion-icon name="chevron-down" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm pointer-events-none"></ion-icon>
+          </div>
+
+          <!-- Status Filter -->
+          <div class="relative">
+            <select [(ngModel)]="statusFilter" (ngModelChange)="onFilterChange()" class="appearance-none bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl px-4 py-2 pr-8 text-sm font-medium text-gray-700 hover:border-[#800020] focus:outline-none focus:ring-2 focus:ring-[#800020]/20 focus:border-[#800020] transition-all duration-200">
+              <option value="">All Status</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+            <ion-icon name="chevron-down" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm pointer-events-none"></ion-icon>
+          </div>
+          
+          <!-- Search -->
+          <div class="relative">
+            <ion-icon name="search-outline" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></ion-icon>
+            <input type="text" 
+                   placeholder="Search users..." 
+                   [(ngModel)]="searchTerm"
+                   (ngModelChange)="onSearch()"
+                   class="pl-9 pr-4 py-2 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:border-[#800020] focus:outline-none focus:ring-2 focus:ring-[#800020]/20 focus:border-[#800020] transition-all duration-200 w-64">
+          </div>
+          
+          <!-- Create User Button -->
+          <button (click)="openCreateModal()" class="bg-[#800020] text-white px-5 py-2 rounded-xl font-semibold shadow hover:bg-[#a8324a] transition-all duration-200">
+            + Create User
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- User Stats Cards -->
+    <div class="p-6 pb-0">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-gray-500 text-sm font-medium">Total Users</p>
+              <p class="text-2xl font-bold text-[#800020]">{{ userStats.totalUsers }}</p>
+            </div>
+            <div class="w-10 h-10 bg-[#800020] rounded-lg flex items-center justify-center">
+              <ion-icon name="people-outline" class="text-white text-lg"></ion-icon>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-gray-500 text-sm font-medium">Active Users</p>
+              <p class="text-2xl font-bold text-green-600">{{ userStats.activeUsers }}</p>
+            </div>
+            <div class="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
+              <ion-icon name="checkmark-circle-outline" class="text-white text-lg"></ion-icon>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-gray-500 text-sm font-medium">Admins</p>
+              <p class="text-2xl font-bold text-red-600">{{ userStats.admins }}</p>
+            </div>
+            <div class="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center">
+              <ion-icon name="shield-outline" class="text-white text-lg"></ion-icon>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-gray-500 text-sm font-medium">Couriers</p>
+              <p class="text-2xl font-bold text-blue-600">{{ userStats.couriers }}</p>
+            </div>
+            <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+              <ion-icon name="bicycle-outline" class="text-white text-lg"></ion-icon>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-gray-500 text-sm font-medium">Senders</p>
+              <p class="text-2xl font-bold text-purple-600">{{ userStats.senders }}</p>
+            </div>
+            <div class="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
+              <ion-icon name="send-outline" class="text-white text-lg"></ion-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 p-6 pt-0 flex flex-col">
+      <!-- Enhanced Table Container -->
+      <div class="flex-1 bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-gray-100/50 overflow-hidden">
+        <div class="p-6 border-b border-gray-100/50">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-gradient-to-r from-[#800020] to-[#b91c3c] rounded-xl flex items-center justify-center">
+                <ion-icon name="list-outline" class="text-white text-lg"></ion-icon>
+              </div>
+              <div>
+                <h3 class="text-xl font-bold text-gray-800">All Users</h3>
+                <p class="text-sm text-gray-600">Manage user accounts and permissions</p>
+              </div>
+            </div>
+            
+            <!-- Bulk Actions -->
+            <div class="flex items-center gap-2">
+              <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium">
+                Export
+              </button>
+              <button class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm font-medium">
+                Bulk Actions
+              </button>
+              <button (click)="clearFilters()" class="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors text-sm font-medium">
+                Clear Filters
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div *ngIf="loading" class="flex flex-col items-center justify-center py-16">
+          <div class="relative">
+            <div class="w-16 h-16 border-4 border-gray-200 border-t-[#800020] rounded-full animate-spin"></div>
+            <div class="absolute inset-0 w-16 h-16 border-4 border-transparent border-t-red-400 rounded-full animate-spin" style="animation-delay: 0.15s;"></div>
+          </div>
+          <p class="text-gray-600 mt-4 font-medium">Loading users...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!loading && users.length === 0" class="flex flex-col items-center justify-center py-16">
+          <div class="w-20 h-20 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full flex items-center justify-center mb-6">
+            <ion-icon name="people-outline" class="text-gray-400 text-3xl"></ion-icon>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-700 mb-2">No users found</h3>
+          <p class="text-gray-500 mb-6">Get started by creating your first user</p>
+          <button (click)="openCreateModal()" class="bg-gradient-to-r from-[#800020] to-[#b91c3c] text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105">
+            Create First User
+          </button>
+        </div>
+
+        <!-- Enhanced Table -->
+        <div class="flex-1 overflow-hidden" *ngIf="!loading && users.length > 0">
+          <div class="overflow-x-auto h-full">
+            <div class="min-w-max">
+              <table class="w-full">
+                <thead class="bg-gradient-to-r from-[#800020] to-[#b91c3c] sticky top-0 z-10">
+                  <tr>
+                    <th class="py-4 px-6 text-left text-white font-semibold text-sm tracking-wider">
+                      <div class="flex items-center gap-2">
+                        <ion-icon name="person-outline" class="text-lg"></ion-icon>
+                        User
+                      </div>
+                    </th>
+                    <th class="py-4 px-6 text-left text-white font-semibold text-sm tracking-wider">
+                      <div class="flex items-center gap-2">
+                        <ion-icon name="mail-outline" class="text-lg"></ion-icon>
+                        Email
+                      </div>
+                    </th>
+                    <th class="py-4 px-6 text-left text-white font-semibold text-sm tracking-wider">
+                      <div class="flex items-center gap-2">
+                        <ion-icon name="call-outline" class="text-lg"></ion-icon>
+                        Phone
+                      </div>
+                    </th>
+                    <th class="py-4 px-6 text-left text-white font-semibold text-sm tracking-wider">
+                      <div class="flex items-center gap-2">
+                        <ion-icon name="shield-outline" class="text-lg"></ion-icon>
+                        Role
+                      </div>
+                    </th>
+                    <th class="py-4 px-6 text-left text-white font-semibold text-sm tracking-wider">
+                      <div class="flex items-center gap-2">
+                        <ion-icon name="pulse-outline" class="text-lg"></ion-icon>
+                        Status
+                      </div>
+                    </th>
+                    <th class="py-4 px-6 text-left text-white font-semibold text-sm tracking-wider">
+                      <div class="flex items-center gap-2">
+                        <ion-icon name="calendar-outline" class="text-lg"></ion-icon>
+                        Created
+                      </div>
+                    </th>
+                    <th class="py-4 px-6 text-center text-white font-semibold text-sm tracking-wider">
+                      <div class="flex items-center justify-center gap-2">
+                        <ion-icon name="settings-outline" class="text-lg"></ion-icon>
+                        Actions
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                  <tr *ngFor="let user of users; let i = index" 
+                      class="hover:bg-gradient-to-r hover:from-gray-50 hover:to-blue-50/30 transition-all duration-200 group"
+                      [class.bg-gray-50]="i % 2 === 0">
+                  
+                    <!-- User Info -->
+                    <td class="py-4 px-6">
+                      <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
+                          <span class="text-blue-600 text-sm font-bold">{{ getUserName(user).charAt(0).toUpperCase() }}</span>
+                        </div>
+                        <div>
+                          <div class="font-bold text-gray-900">{{ getUserName(user) }}</div>
+                          <div class="text-xs text-gray-500">ID: {{ user.id }}</div>
+                        </div>
+                      </div>
+                    </td>
+  
+                    <!-- Email -->
+                    <td class="py-4 px-6">
+                      <div class="font-medium text-gray-900">{{ user.email }}</div>
+                    </td>
+
+                    <!-- Phone -->
+                    <td class="py-4 px-6">
+                      <div class="font-medium text-gray-900">{{ user.phone || 'Not provided' }}</div>
+                    </td>
+  
+                    <!-- Role -->
+                    <td class="py-4 px-6">
+                      <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold shadow-sm"
+                            [ngClass]="{
+                              'bg-gradient-to-r from-red-100 to-pink-100 text-red-800 border border-red-200': user.role === 'ADMIN',
+                              'bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border border-blue-200': user.role === 'COURIER',
+                              'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border border-green-200': user.role === 'SENDER'
+                            }">
+                        {{ user.role }}
+                      </span>
+                    </td>
+  
+                    <!-- Status -->
+                    <td class="py-4 px-6">
+                      <div class="flex items-center gap-2">
+                        <div class="w-3 h-3 rounded-full"
+                             [ngClass]="{
+                               'bg-green-400 animate-pulse': user.isActive,
+                               'bg-red-400': !user.isActive
+                             }"></div>
+                        <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold shadow-sm"
+                              [ngClass]="{
+                                'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border border-green-200': user.isActive,
+                                'bg-gradient-to-r from-red-100 to-pink-100 text-red-800 border border-red-200': !user.isActive
+                              }">
+                          {{ user.isActive ? 'Active' : 'Inactive' }}
+                        </span>
+                      </div>
+                    </td>
+  
+                    <!-- Created Date -->
+                    <td class="py-4 px-6">
+                      <div class="text-sm text-gray-600">
+                        {{ user.createdAt | date:'MMM dd, yyyy' }}
+                      </div>
+                      <div class="text-xs text-gray-400">
+                        {{ user.createdAt | date:'h:mm a' }}
+                      </div>
+                    </td>
+  
+                    <!-- Actions -->
+                    <td class="py-4 px-6">
+                      <div class="flex items-center justify-center gap-2">
+                        <button class="group flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 hover:from-blue-200 hover:to-blue-300 transition-all duration-200 transform hover:scale-105 font-semibold"
+                          (click)="openDetailsModal(user)">
+                          <ion-icon name="eye-outline" class="text-sm group-hover:scale-110 transition-transform"></ion-icon>
+                          View
+                        </button>
+                        <button class="group flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 hover:from-green-200 hover:to-emerald-200 transition-all duration-200 transform hover:scale-105 font-semibold"
+                          (click)="openEditModal(user)">
+                          <ion-icon name="create-outline" class="text-sm group-hover:scale-110 transition-transform"></ion-icon>
+                          Edit
+                        </button>
+                        <button class="group flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg"
+                          [ngClass]="{
+                            'bg-gradient-to-r from-red-100 to-red-200 text-red-800 hover:from-red-200 hover:to-red-300': user.isActive,
+                            'bg-gradient-to-r from-green-100 to-green-200 text-green-800 hover:from-green-200 hover:to-green-300': !user.isActive
+                          }"
+                          (click)="toggleUserStatus(user.id)">
+                          <ion-icon [name]="user.isActive ? 'ban-outline' : 'checkmark-circle-outline'" class="text-sm group-hover:scale-110 transition-transform"></ion-icon>
+                          {{ user.isActive ? 'Disable' : 'Enable' }}
+                        </button>
+                        <button class="group flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-gradient-to-r from-red-100 to-pink-100 text-red-800 hover:from-red-200 hover:to-pink-200 transition-all duration-200 transform hover:scale-105 font-semibold"
+                          (click)="openDeleteModal(user.id)">
+                          <ion-icon name="trash-outline" class="text-sm group-hover:scale-110 transition-transform"></ion-icon>
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <div *ngIf="totalPages > 1" class="p-6 border-t border-gray-100 bg-gray-50/50">
+          <div class="flex items-center justify-between">
+            <div class="text-sm text-gray-600">
+              Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to {{ min(currentPage * itemsPerPage, totalItems) }} of {{ totalItems }} users
+            </div>
+            <div class="flex items-center gap-2">
+              <button 
+                (click)="onPageChange(currentPage - 1)" 
+                [disabled]="currentPage === 1"
+                class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                Previous
+              </button>
+              
+              <div class="flex items-center gap-1">
+                <button 
+                  *ngFor="let page of getPaginationArray()"
+                  (click)="onPageChange(page)"
+                  [class.bg-[#800020]]="page === currentPage"
+                  [class.text-white]="page === currentPage"
+                  [class.bg-white]="page !== currentPage"
+                  [class.text-gray-500]="page !== currentPage"
+                  class="px-3 py-2 text-sm font-medium border border-gray-300 rounded-lg hover:bg-gray-50">
+                  {{ page }}
+                </button>
+              </div>
+              
+              <button 
+                (click)="onPageChange(currentPage + 1)" 
+                [disabled]="currentPage === totalPages"
+                class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                Next
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</section>
+
+<!-- Create/Edit User Modal -->
+<div *ngIf="showCreateModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+  <div class="bg-white rounded-xl shadow-lg p-8 w-full max-w-lg relative max-h-[90vh] overflow-y-auto">
+    <button (click)="closeCreateModal()" class="absolute top-3 right-3 text-gray-400 hover:text-[#800020] text-2xl">&times;</button>
+    <h2 class="text-xl font-bold text-[#800020] mb-4">
+      {{ editMode ? 'Edit User' : 'Create New User' }}
+    </h2>
+    
+    <form #createForm="ngForm" (ngSubmit)="submitCreateUser(createForm)">
+      <div class="grid grid-cols-1 gap-4">
+        <div class="grid grid-cols-2 gap-4">
+          <input class="border rounded-lg p-3 focus:border-[#800020] focus:ring-2 focus:ring-[#800020]/20" 
+                 name="firstName" 
+                 [(ngModel)]="newUser.firstName" 
+                 placeholder="First Name" 
+                 required>
+          <input class="border rounded-lg p-3 focus:border-[#800020] focus:ring-2 focus:ring-[#800020]/20" 
+                 name="lastName" 
+                 [(ngModel)]="newUser.lastName" 
+                 placeholder="Last Name" 
+                 required>
+        </div>
+        
+        <input class="border rounded-lg p-3 focus:border-[#800020] focus:ring-2 focus:ring-[#800020]/20" 
+               type="email" 
+               name="email" 
+               [(ngModel)]="newUser.email" 
+               placeholder="Email Address" 
+               required>
+        
+        <input class="border rounded-lg p-3 focus:border-[#800020] focus:ring-2 focus:ring-[#800020]/20" 
+               type="tel" 
+               name="phone" 
+               [(ngModel)]="newUser.phone" 
+               placeholder="Phone Number">
+        
+        <select class="border rounded-lg p-3 focus:border-[#800020] focus:ring-2 focus:ring-[#800020]/20" 
+                name="role" 
+                [(ngModel)]="newUser.role" 
+                required>
+          <option value="SENDER">Sender</option>
+          <option value="COURIER">Courier</option>
+          <option value="ADMIN">Admin</option>
+        </select>
+        
+        <div class="flex items-center gap-3">
+          <input type="checkbox" 
+                 id="isActive" 
+                 name="isActive" 
+                 [(ngModel)]="newUser.isActive" 
+                 class="w-4 h-4 text-[#800020] border-gray-300 rounded focus:ring-[#800020]">
+          <label for="isActive" class="text-sm font-medium text-gray-700">Active User</label>
+        </div>
+      </div>
+      
+      <div class="flex gap-3 mt-6">
+        <button type="button" 
+                (click)="closeCreateModal()" 
+                class="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium">
+          Cancel
+        </button>
+        <button type="submit" 
+                [disabled]="createForm.invalid" 
+                class="flex-1 bg-[#800020] text-white py-3 rounded-lg font-semibold hover:bg-[#a8324a] disabled:opacity-50 disabled:cursor-not-allowed transition">
+          {{ editMode ? 'Update User' : 'Create User' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- User Details Modal -->
+<div *ngIf="showDetailsModal && selectedUser" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+  <div class="bg-white rounded-xl shadow-lg p-8 w-full max-w-md relative">
+    <button (click)="closeDetailsModal()" class="absolute top-3 right-3 text-gray-400 hover:text-[#800020] text-2xl">&times;</button>
+    
+    <div class="text-center mb-6">
+      <div class="w-20 h-20 bg-gradient-to-r from-[#800020] to-[#b91c3c] rounded-full flex items-center justify-center mx-auto mb-4">
+        <span class="text-white text-2xl font-bold">{{ getUserName(selectedUser).charAt(0).toUpperCase() }}</span>
+      </div>
+      <h2 class="text-xl font-bold text-gray-800">{{ getUserName(selectedUser) }}</h2>
+      <p class="text-gray-600">{{ selectedUser.email }}</p>
+    </div>
+    
+    <div class="space-y-4">
+      <div class="flex justify-between items-center py-2 border-b border-gray-100">
+        <span class="text-gray-600">Role:</span>
+        <span class="font-semibold text-[#800020]">{{ selectedUser.role }}</span>
+      </div>
+      <div class="flex justify-between items-center py-2 border-b border-gray-100">
+        <span class="text-gray-600">Status:</span>
+        <span [class]="selectedUser.isActive ? 'text-green-600' : 'text-red-600'" class="font-semibold">
+          {{ selectedUser.isActive ? 'Active' : 'Inactive' }}
+        </span>
+      </div>
+      <div class="flex justify-between items-center py-2 border-b border-gray-100">
+        <span class="text-gray-600">Phone:</span>
+        <span class="font-semibold">{{ selectedUser.phone || 'Not provided' }}</span>
+      </div>
+      <div class="flex justify-between items-center py-2 border-b border-gray-100">
+        <span class="text-gray-600">Created:</span>
+        <span class="font-semibold">{{ selectedUser.createdAt | date:'MMM dd, yyyy' }}</span>
+      </div>
+    </div>
+    
+    <div class="flex gap-3 mt-8">
+      <button (click)="openEditModal(selectedUser)" class="flex-1 bg-[#800020] text-white py-3 rounded-lg font-semibold hover:bg-[#a8324a] transition">
+        Edit User
+      </button>
+      <button (click)="closeDetailsModal()" class="flex-1 border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition font-medium">
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<app-confirmation-modal
+  [show]="showDeleteModal"
+  title="Delete User"
+  message="Are you sure you want to delete this user? This action cannot be undone."
+  confirmText="Delete"
+  cancelText="Cancel"
+  (confirm)="confirmDeleteUser()"
+  (cancel)="closeDeleteModal()">
+</app-confirmation-modal>
+
+<!-- Error Toast -->
+<ion-toast 
+  [isOpen]="!!error" 
+  [message]="error" 
+  color="danger" 
+  [duration]="3000"
+  (didDismiss)="error = null">
+</ion-toast>

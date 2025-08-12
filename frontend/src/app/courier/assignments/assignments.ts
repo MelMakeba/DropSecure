@@ -6,7 +6,7 @@ import { PackageDetailModal } from '../../sender/package-detail-modal/package-de
 import { Sidebar } from '../../shared/sidebar/sidebar';
 import { ConfirmationModal } from '../../shared/confirmation-modal/confirmation-modal';
 import { IonicModule } from '@ionic/angular';
-import { StatusHistory } from '../../services/StatusHistory/status-history'
+import { StatusHistory } from '../../services/status-history/status-history'
 
 @Component({
   selector: 'app-assignments',

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, signal } from '@angular/core';
+import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../services/auth/auth';
@@ -13,8 +13,8 @@ import { AnyUser, UserRole } from '../models/user.model';
   styleUrls: ['./auth-pages.css']
 })
 export class AuthPages {
-  @Input() mode: 'login' | 'register' | 'forgot' | 'verify' = 'login';
   @Input() show = false;
+  @Input() mode: 'login' | 'register' | 'forgot' | 'verify' = 'login';
   @Output() close = new EventEmitter<void>();
 
   loading = signal(false);
@@ -27,7 +27,7 @@ export class AuthPages {
     phone: '' // Add phone field
   };
   roles: UserRole[] = ['SENDER', 'COURIER', 'ADMIN'];
-  verificationCode : string[] = Array(6).fill(''); // For verification code input
+  verificationCode: string[] = Array(6).fill(''); 
   constructor(private authService: AuthService, private router: Router) {}
 
   onLogin() {
@@ -159,15 +159,28 @@ export class AuthPages {
     const input = event.target;
     const value = input.value;
     
-    // Auto-focus next input
+    // Update the verification code array
+    this.verificationCode[index] = value;
+    
+    // Auto-focus next input if value is entered
     if (value && index < 5) {
-      const nextInput = document.querySelector(`input[name="code-${index + 1}"]`) as HTMLInputElement;
+      const nextInput = event.target.parentElement.children[index + 1];
       if (nextInput) {
         nextInput.focus();
       }
     }
   }
 
+  onCodeBackspace(event: any, index: number) {
+    // If backspace is pressed and current input is empty, focus previous input
+    if (event.target.value === '' && index > 0) {
+      const prevInput = event.target.parentElement.children[index - 1];
+      if (prevInput) {
+        prevInput.focus();
+      }
+    }
+  }
+  
   onForgot() {
     if (!this.user.email) {
       this.error.set('Email is required');

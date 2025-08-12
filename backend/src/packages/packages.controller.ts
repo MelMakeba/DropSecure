@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { UserRole } from '../../generated/prisma';
 /* eslint-disable no-useless-catch */
@@ -19,6 +18,7 @@ import {
   ValidationPipe,
   UsePipes,
   BadRequestException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -39,6 +39,7 @@ import {
   UpdatePackageStatusDto,
   UpdatePackageLocationDto,
   PackageQueryDto,
+  UpdatePackageDto,
 } from './dto/package.dto';
 import { ApiResponse as ApiResponseInterface } from '../shared/interfaces/api-response.interface';
 
@@ -413,11 +414,24 @@ export class PackageController {
     @Request() req: any,
   ): Promise<ApiResponseInterface> {
     try {
-      const packageData =
-        await this.packageService.getPackageByTrackingId(trackingId);
+      // Make sure we're getting the user ID correctly
+      const userId = req.user.id || req.user.sub;
+
+      console.log('Debug - req.user:', req.user); // Debug line
+      console.log('Debug - userId:', userId); // Debug line
+
+      if (!userId) {
+        throw new UnauthorizedException('User ID not found in token');
+      }
+
+      const packageData = await this.packageService.getPackageByTrackingId(
+        trackingId,
+        userId, // This should not be undefined
+      );
 
       // Ensure the sender is the owner of the package
-      if (!packageData || packageData.senderId !== req.user.id) {
+      // (Ownership check is already performed in the service)
+      if (!packageData) {
         return this.apiResponseService.error(
           'Not authorized to view this package',
           'FORBIDDEN',
@@ -535,6 +549,80 @@ export class PackageController {
       'Package cancelled successfully',
     );
   }
+
+  @Put(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SENDER)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Update package details',
+    description:
+      'Update package details. Only admin or package sender can update. Package must be in CREATED or COURIER_ASSIGNED status.',
+  })
+  @ApiParam({ name: 'id', description: 'Package UUID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Package updated successfully',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Not authorized to update this package',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Package not found',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Package cannot be updated in current status',
+  })
+  async updatePackageDetails(
+    @Param('id', ParseUUIDPipe) packageId: string,
+    @Body() updatePackageDto: UpdatePackageDto,
+    @Request() req: any,
+  ): Promise<ApiResponseInterface> {
+    const userId = req.user.id || req.user.sub;
+    const userRole = req.user.role;
+
+    const updatedPackage = await this.packageService.updatePackageDetails(
+      packageId,
+      updatePackageDto,
+      userId,
+      userRole,
+    );
+
+    return this.apiResponseService.success(
+      updatedPackage,
+      'Package details updated successfully',
+    );
+  }
+
+  @Get(':id/update-history')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Get package update history',
+    description: 'Get the update history for a package.',
+  })
+  @ApiParam({ name: 'id', description: 'Package UUID' })
+  async getPackageUpdateHistory(
+    @Param('id', ParseUUIDPipe) packageId: string,
+    @Request() req: any,
+  ): Promise<ApiResponseInterface> {
+    const userId = req.user.id || req.user.sub;
+    const userRole = req.user.role;
+
+    const history = await this.packageService.getPackageUpdateHistory(
+      packageId,
+      userId,
+      userRole,
+    );
+
+    return this.apiResponseService.success(
+      history,
+      'Package update history retrieved successfully',
+    );
+  }
 }
 
 // Public tracking controller (no authentication required)
@@ -563,10 +651,13 @@ export class PackageTrackingController {
   })
   async trackPackage(
     @Param('trackingId') trackingId: string,
+    userId: string,
   ): Promise<ApiResponseInterface> {
     try {
-      const packageData =
-        await this.packageService.getPackageByTrackingId(trackingId);
+      const packageData = await this.packageService.getPackageByTrackingId(
+        trackingId,
+        userId,
+      );
 
       // Remove sensitive information for public access
       const publicPackageData = {

@@ -1,82 +1,363 @@
-<section class="bg-gradient-to-br from-[#F3F4F6] via-[#fff8f2] to-[#f9fafb] min-h-screen flex flex-col relative overflow-hidden">
-  <!-- Decorative Blobs -->
-  <div class="absolute -top-24 -left-24 w-96 h-96 bg-[#D4AF37] rounded-full mix-blend-multiply filter blur-2xl opacity-20 animate-blob"></div>
-  <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-[#800020] rounded-full mix-blend-multiply filter blur-2xl opacity-20 animate-blob animation-delay-2000"></div>
-
-  <!-- Company Story & Mission -->
-  <div class="max-w-4xl mx-auto py-16 px-4 relative z-10">
-    <h1 class="text-5xl md:text-6xl font-bold font-poppins text-transparent bg-clip-text bg-gradient-to-r from-[#800020] via-[#A00030] to-[#D4AF37] mb-6 animate-fade-in">
-      About DropSecure
-    </h1>
-    <p class="text-xl md:text-2xl font-inter text-[#1C1C1E] mb-8 leading-relaxed animate-fade-in">
-      Founded in 2022, <span class="font-bold text-[#800020]">DropSecure</span> is committed to revolutionizing courier services with speed, security, and transparency.<br>
-      <span class="text-[#D4AF37] font-semibold">Our mission:</span> Deliver trust, one package at a time.
-    </p>
-    <div class="flex flex-col md:flex-row gap-8">
-      <div class="flex-1 bg-white/90 rounded-[16px] shadow-xl p-8 mb-4 md:mb-0 border-l-4 border-[#D4AF37] animate-fade-in-up">
-        <h2 class="text-2xl font-semibold mb-2 text-[#800020]">Our Mission</h2>
-        <p class="text-gray-700">To provide fast, secure, and reliable delivery solutions for everyone, everywhere.</p>
-      </div>
-      <div class="flex-1 bg-white/90 rounded-[16px] shadow-xl p-8 border-l-4 border-[#800020] animate-fade-in-up animation-delay-200">
-        <h2 class="text-2xl font-semibold mb-2 text-[#D4AF37]">Our Vision</h2>
-        <p class="text-gray-700">To be the most trusted courier partner, setting new standards in customer experience and innovation.</p>
+<div class="min-h-screen bg-white">
+  <!-- Hero Section -->
+  <div class="relative bg-gradient-to-br from-[#800020] via-[#A00030] to-[#D4AF37] text-white py-24">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 opacity-10">
+      <svg class="w-full h-full" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="about-grid" width="10" height="10" patternUnits="userSpaceOnUse">
+            <path d="M 10 0 L 0 0 0 10" fill="none" stroke="white" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+        <rect width="100" height="100" fill="url(#about-grid)"/>
+      </svg>
+    </div>
+    
+    <!-- Floating Elements -->
+    <div class="absolute top-16 right-16 w-24 h-24 bg-white/10 rounded-full animate-pulse"></div>
+    <div class="absolute bottom-16 left-16 w-20 h-20 bg-[#D4AF37]/20 rounded-full animate-bounce"></div>
+    
+    <div class="container mx-auto px-6 relative z-10">
+      <div class="max-w-4xl mx-auto text-center">
+        <h1 class="text-5xl md:text-6xl font-black mb-6 leading-tight">
+          About 
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] to-[#FFD700]">
+            DropSecure
+          </span>
+        </h1>
+        <div class="w-32 h-1 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] mx-auto mb-8"></div>
+        <p class="text-xl md:text-2xl leading-relaxed opacity-90 max-w-3xl mx-auto">
+          Pioneering the future of courier services with cutting-edge technology, 
+          unwavering reliability, and a commitment to excellence that spans over a decade.
+        </p>
       </div>
     </div>
   </div>
 
-  <!-- Team Profiles -->
-  <div class="max-w-6xl mx-auto py-12 px-4 relative z-10">
-    <h2 class="text-4xl font-bold text-[#800020] mb-10 text-center animate-fade-in">Meet Our Team</h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
-      <div class="bg-white rounded-[16px] shadow-xl p-8 flex flex-col items-center hover:scale-105 transition-transform duration-300 animate-fade-in-up">
-        <img src="/assets/team/alex.jpg" alt="Alex" class="w-28 h-28 rounded-full mb-4 object-cover border-4 border-[#D4AF37] shadow-lg">
-        <h3 class="text-2xl font-semibold mb-1 text-[#800020]">Alex Johnson</h3>
-        <p class="text-[#A00030] mb-2 font-medium">CEO & Founder</p>
-        <p class="text-sm text-gray-500 text-center">Visionary leader with 10+ years in logistics and tech innovation.</p>
-      </div>
-      <div class="bg-white rounded-[16px] shadow-xl p-8 flex flex-col items-center hover:scale-105 transition-transform duration-300 animate-fade-in-up animation-delay-200">
-        <img src="/assets/team/sam.jpg" alt="Sam" class="w-28 h-28 rounded-full mb-4 object-cover border-4 border-[#800020] shadow-lg">
-        <h3 class="text-2xl font-semibold mb-1 text-[#800020]">Sam Lee</h3>
-        <p class="text-[#A00030] mb-2 font-medium">COO</p>
-        <p class="text-sm text-gray-500 text-center">Expert in operations and customer experience management.</p>
-      </div>
-      <div class="bg-white rounded-[16px] shadow-xl p-8 flex flex-col items-center hover:scale-105 transition-transform duration-300 animate-fade-in-up animation-delay-400">
-        <img src="/assets/team/rita.jpg" alt="Rita" class="w-28 h-28 rounded-full mb-4 object-cover border-4 border-[#D4AF37] shadow-lg">
-        <h3 class="text-2xl font-semibold mb-1 text-[#800020]">Rita Patel</h3>
-        <p class="text-[#A00030] mb-2 font-medium">CTO</p>
-        <p class="text-sm text-gray-500 text-center">Tech enthusiast driving innovation and secure delivery solutions.</p>
+  <!-- Company Story Section -->
+  <div class="py-20 bg-white">
+    <div class="container mx-auto px-6">
+      <div class="max-w-6xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <!-- Text Content -->
+          <div class="order-2 lg:order-1">
+            <h2 class="text-4xl md:text-5xl font-bold text-[#800020] mb-8">
+              Our Story
+            </h2>
+            <div class="space-y-6 text-lg text-gray-700 leading-relaxed">
+              <p>
+                Founded in 2014, DropSecure began as a vision to revolutionize the courier industry 
+                through technology and exceptional service. What started as a small local delivery 
+                service has grown into a comprehensive logistics solution trusted by thousands.
+              </p>
+              <p>
+                Our journey has been marked by continuous innovation, from implementing real-time 
+                GPS tracking to developing our proprietary route optimization algorithms. We've 
+                consistently stayed ahead of industry trends while maintaining our core values 
+                of reliability, security, and customer satisfaction.
+              </p>
+              <p>
+                Today, DropSecure stands as a testament to what's possible when cutting-edge 
+                technology meets genuine care for customers. We're not just delivering packages; 
+                we're delivering peace of mind.
+              </p>
+            </div>
+          </div>
+          
+          <!-- Image/Visual Content -->
+          <div class="order-1 lg:order-2">
+            <div class="relative">
+              <div class="bg-gradient-to-br from-[#800020] to-[#D4AF37] rounded-3xl p-8 shadow-2xl">
+                <div class="bg-white rounded-2xl p-8 text-center">
+                  <div class="w-24 h-24 bg-gradient-to-br from-[#800020] to-[#D4AF37] rounded-full flex items-center justify-center mx-auto mb-6">
+                    <ion-icon name="rocket" class="text-white text-4xl"></ion-icon>
+                  </div>
+                  <h3 class="text-2xl font-bold text-gray-800 mb-4">10+ Years</h3>
+                  <p class="text-gray-600">of Excellence in Courier Services</p>
+                </div>
+              </div>
+              
+              <!-- Decorative Elements -->
+              <div class="absolute -top-4 -right-4 w-16 h-16 bg-[#D4AF37] rounded-full opacity-20"></div>
+              <div class="absolute -bottom-4 -left-4 w-12 h-12 bg-[#800020] rounded-full opacity-20"></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Achievements & Stats -->
-  <div class="bg-gradient-to-r from-[#800020] via-[#A00030] to-[#D4AF37] text-white py-16 relative z-10">
-    <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10 text-center">
-      <div>
-        <div class="text-5xl font-bold mb-2 animate-counter drop-shadow-lg" id="stat1">10K+</div>
-        <div class="text-lg font-medium">Packages Delivered</div>
+  <!-- Mission, Vision, Values Section -->
+  <div class="py-20 bg-gradient-to-b from-gray-50 to-white">
+    <div class="container mx-auto px-6">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-bold text-[#800020] mb-6">
+          Our Foundation
+        </h2>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+          The principles that guide every decision, every delivery, and every customer interaction
+        </p>
       </div>
-      <div>
-        <div class="text-5xl font-bold mb-2 animate-counter drop-shadow-lg" id="stat2">99.9%</div>
-        <div class="text-lg font-medium">Delivery Success</div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-6xl mx-auto">
+        <!-- Mission -->
+        <div class="group bg-white rounded-3xl shadow-xl p-8 hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+          <div class="text-center">
+            <div class="w-20 h-20 bg-gradient-to-br from-[#800020] to-[#A00030] rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+              <ion-icon name="target" class="text-white text-3xl"></ion-icon>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">Our Mission</h3>
+            <p class="text-gray-600 leading-relaxed">
+              To provide fast, secure, and reliable courier services that exceed customer 
+              expectations while leveraging technology to create seamless delivery experiences.
+            </p>
+          </div>
+        </div>
+
+        <!-- Vision -->
+        <div class="group bg-white rounded-3xl shadow-xl p-8 hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+          <div class="text-center">
+            <div class="w-20 h-20 bg-gradient-to-br from-[#D4AF37] to-[#FFD700] rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+              <ion-icon name="eye" class="text-white text-3xl"></ion-icon>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">Our Vision</h3>
+            <p class="text-gray-600 leading-relaxed">
+              To become the leading courier service provider globally, known for innovation, 
+              reliability, and exceptional customer service in every community we serve.
+            </p>
+          </div>
+        </div>
+
+        <!-- Values -->
+        <div class="group bg-white rounded-3xl shadow-xl p-8 hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+          <div class="text-center">
+            <div class="w-20 h-20 bg-gradient-to-br from-[#800020] to-[#D4AF37] rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+              <ion-icon name="heart" class="text-white text-3xl"></ion-icon>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">Our Values</h3>
+            <p class="text-gray-600 leading-relaxed">
+              Integrity, reliability, innovation, and customer-centricity form the cornerstone 
+              of everything we do. These values guide our daily operations and strategic decisions.
+            </p>
+          </div>
+        </div>
       </div>
-      <div>
-        <div class="text-5xl font-bold mb-2 animate-counter drop-shadow-lg" id="stat3">24/7</div>
-        <div class="text-lg font-medium">Support</div>
+    </div>
+  </div>
+
+  <!-- Key Features Section -->
+  <div class="py-20 bg-white">
+    <div class="container mx-auto px-6">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-bold text-[#800020] mb-6">
+          What Sets Us Apart
+        </h2>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+          Industry-leading features and capabilities that make DropSecure your trusted delivery partner
+        </p>
       </div>
-      <div>
-        <div class="text-5xl font-bold mb-2 animate-counter drop-shadow-lg" id="stat4">50+</div>
-        <div class="text-lg font-medium">Cities Covered</div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+        <!-- Feature 1 -->
+        <div class="group text-center">
+          <div class="relative mb-6">
+            <div class="w-24 h-24 bg-gradient-to-br from-[#800020] to-[#A00030] rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300 shadow-lg">
+              <ion-icon name="shield-checkmark" class="text-white text-3xl"></ion-icon>
+            </div>
+            <div class="absolute -inset-2 bg-gradient-to-r from-[#800020] to-[#D4AF37] rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+          </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-3">100% Secure</h3>
+          <p class="text-gray-600">End-to-end encryption and comprehensive insurance coverage</p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="group text-center">
+          <div class="relative mb-6">
+            <div class="w-24 h-24 bg-gradient-to-br from-[#D4AF37] to-[#FFD700] rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300 shadow-lg">
+              <ion-icon name="flash" class="text-white text-3xl"></ion-icon>
+            </div>
+            <div class="absolute -inset-2 bg-gradient-to-r from-[#800020] to-[#D4AF37] rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+          </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-3">Lightning Fast</h3>
+          <p class="text-gray-600">Same-day delivery with optimized routing algorithms</p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="group text-center">
+          <div class="relative mb-6">
+            <div class="w-24 h-24 bg-gradient-to-br from-[#800020] to-[#D4AF37] rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300 shadow-lg">
+              <ion-icon name="location" class="text-white text-3xl"></ion-icon>
+            </div>
+            <div class="absolute -inset-2 bg-gradient-to-r from-[#800020] to-[#D4AF37] rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+          </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-3">Real-time Tracking</h3>
+          <p class="text-gray-600">Live GPS tracking with instant status notifications</p>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="group text-center">
+          <div class="relative mb-6">
+            <div class="w-24 h-24 bg-gradient-to-br from-[#A00030] to-[#800020] rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300 shadow-lg">
+              <ion-icon name="people" class="text-white text-3xl"></ion-icon>
+            </div>
+            <div class="absolute -inset-2 bg-gradient-to-r from-[#800020] to-[#D4AF37] rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+          </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-3">24/7 Support</h3>
+          <p class="text-gray-600">Round-the-clock customer service and technical support</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Team Section -->
+  <div class="py-20 bg-gradient-to-b from-gray-50 to-white">
+    <div class="container mx-auto px-6">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-bold text-[#800020] mb-6">
+          Leadership Team
+        </h2>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+          Meet the visionaries and experts driving DropSecure's success
+        </p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-6xl mx-auto">
+        <!-- Team Member 1 -->
+        <div class="group bg-white rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+          <div class="relative">
+            <div class="h-64 bg-gradient-to-br from-[#800020] to-[#D4AF37] flex items-center justify-center">
+              <div class="w-32 h-32 bg-white rounded-full flex items-center justify-center">
+                <ion-icon name="person" class="text-[#800020] text-6xl"></ion-icon>
+              </div>
+            </div>
+            <div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300"></div>
+          </div>
+          <div class="p-8 text-center">
+            <h3 class="text-2xl font-bold text-gray-800 mb-2">Sarah Johnson</h3>
+            <p class="text-[#800020] font-semibold mb-4">Chief Executive Officer</p>
+            <p class="text-gray-600 leading-relaxed">
+              With over 15 years in logistics, Sarah leads DropSecure's strategic vision 
+              and operational excellence initiatives.
+            </p>
+          </div>
+        </div>
+
+        <!-- Team Member 2 -->
+        <div class="group bg-white rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+          <div class="relative">
+            <div class="h-64 bg-gradient-to-br from-[#D4AF37] to-[#FFD700] flex items-center justify-center">
+              <div class="w-32 h-32 bg-white rounded-full flex items-center justify-center">
+                <ion-icon name="person" class="text-[#D4AF37] text-6xl"></ion-icon>
+              </div>
+            </div>
+            <div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300"></div>
+          </div>
+          <div class="p-8 text-center">
+            <h3 class="text-2xl font-bold text-gray-800 mb-2">Michael Chen</h3>
+            <p class="text-[#800020] font-semibold mb-4">Chief Technology Officer</p>
+            <p class="text-gray-600 leading-relaxed">
+              Michael spearheads our technology innovations, including our real-time 
+              tracking system and route optimization algorithms.
+            </p>
+          </div>
+        </div>
+
+        <!-- Team Member 3 -->
+        <div class="group bg-white rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+          <div class="relative">
+            <div class="h-64 bg-gradient-to-br from-[#A00030] to-[#800020] flex items-center justify-center">
+              <div class="w-32 h-32 bg-white rounded-full flex items-center justify-center">
+                <ion-icon name="person" class="text-[#800020] text-6xl"></ion-icon>
+              </div>
+            </div>
+            <div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300"></div>
+          </div>
+          <div class="p-8 text-center">
+            <h3 class="text-2xl font-bold text-gray-800 mb-2">Emily Rodriguez</h3>
+            <p class="text-[#800020] font-semibold mb-4">Chief Operations Officer</p>
+            <p class="text-gray-600 leading-relaxed">
+              Emily ensures seamless daily operations and maintains our industry-leading 
+              99.9% delivery success rate.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistics Section -->
+  <div class="py-20 bg-gradient-to-br from-[#800020] to-[#A00030] text-white">
+    <div class="container mx-auto px-6">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-bold mb-6">
+          Our Impact in Numbers
+        </h2>
+        <p class="text-xl opacity-90 max-w-3xl mx-auto">
+          Real achievements that showcase our commitment to excellence
+        </p>
+      </div>
+      
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-6xl mx-auto">
+        <div class="text-center group">
+          <div class="text-4xl md:text-6xl font-black mb-4 text-[#D4AF37] group-hover:scale-110 transition-transform duration-300">
+            10K+
+          </div>
+          <div class="text-lg font-medium opacity-90">Happy Customers</div>
+        </div>
+        
+        <div class="text-center group">
+          <div class="text-4xl md:text-6xl font-black mb-4 text-[#D4AF37] group-hover:scale-110 transition-transform duration-300">
+            100K+
+          </div>
+          <div class="text-lg font-medium opacity-90">Packages Delivered</div>
+        </div>
+        
+        <div class="text-center group">
+          <div class="text-4xl md:text-6xl font-black mb-4 text-[#D4AF37] group-hover:scale-110 transition-transform duration-300">
+            50+
+          </div>
+          <div class="text-lg font-medium opacity-90">Cities Covered</div>
+        </div>
+        
+        <div class="text-center group">
+          <div class="text-4xl md:text-6xl font-black mb-4 text-[#D4AF37] group-hover:scale-110 transition-transform duration-300">
+            99.9%
+          </div>
+          <div class="text-lg font-medium opacity-90">Success Rate</div>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- Call to Action -->
-  <div class="max-w-3xl mx-auto py-12 px-4 text-center relative z-10">
-    <h3 class="text-3xl font-bold text-[#800020] mb-4 animate-fade-in">Ready to experience secure delivery?</h3>
-    <p class="text-lg mb-6 text-gray-700">Join thousands of happy customers and businesses who trust DropSecure for their deliveries.</p>
-    <a routerLink="/register" class="inline-block bg-[#D4AF37] text-[#800020] font-bold px-8 py-3 rounded-full shadow-lg hover:bg-[#800020] hover:text-white transition-colors duration-300 animate-fade-in-up">
-      Get Started
-    </a>
+  <div class="py-20 bg-white">
+    <div class="container mx-auto px-6">
+      <div class="max-w-4xl mx-auto text-center">
+        <h2 class="text-4xl md:text-5xl font-bold text-[#800020] mb-6">
+          Ready to Experience the Difference?
+        </h2>
+        <p class="text-xl text-gray-600 mb-10 leading-relaxed">
+          Join thousands of satisfied customers who trust DropSecure for their delivery needs. 
+          Experience the perfect blend of technology, reliability, and exceptional service.
+        </p>
+        
+        <div class="flex flex-col sm:flex-row gap-6 justify-center">
+          <button class="group relative overflow-hidden bg-[#800020] text-white px-10 py-5 rounded-xl font-bold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 min-w-[200px]">
+            <span class="relative z-10 flex items-center justify-center gap-3">
+              <ion-icon name="rocket-outline" class="text-xl"></ion-icon>
+              Get Started Today
+            </span>
+            <div class="absolute inset-0 bg-[#D4AF37] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          </button>
+          
+          <button class="group relative overflow-hidden bg-transparent text-[#800020] px-10 py-5 rounded-xl font-bold text-lg border-2 border-[#800020] hover:bg-[#800020] hover:text-white transition-all duration-300 hover:-translate-y-1 min-w-[200px]">
+            <span class="relative z-10 flex items-center justify-center gap-3">
+              <ion-icon name="call-outline" class="text-xl"></ion-icon>
+              Contact Us
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
-</section>
+</div>

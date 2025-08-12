@@ -6,7 +6,7 @@ import { Package } from '../../models/package.model';
 import { PackageStatusTimeline } from '../package-status-timeline/package-status-timeline';
 import { ReviewForm } from '../review-form/review-form';
 import { StatusEvent } from '../../models/status-event.model';
-import { StatusHistory } from '../../services/StatusHistory/status-history';
+import { StatusHistory } from '../../services/status-history/status-history';
 
 @Component({
   selector: 'app-package-detail-modal',

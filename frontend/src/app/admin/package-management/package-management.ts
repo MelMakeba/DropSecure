@@ -1,6 +1,5 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Packages } from '../../services/packages/packages';
 import { RouterModule } from '@angular/router';
 import { Package } from '../../models/package.model';
 import { Sidebar } from '../../shared/sidebar/sidebar';
@@ -8,8 +7,10 @@ import { IonicModule } from '@ionic/angular';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ConfirmationModal } from '../../shared/confirmation-modal/confirmation-modal';
 import { PackageDetailModal } from '../../sender/package-detail-modal/package-detail-modal';
-import { StatusHistory } from '../../services/StatusHistory/status-history'
 import { StatusEvent } from '../../models/status-event.model';
+import { AdminDashboardService, User } from '../../services/dashboards/admin/admin-dashboard';
+import { Subscription } from 'rxjs';
+
 @Component({
   selector: 'app-package-management',
   standalone: true,
@@ -17,9 +18,10 @@ import { StatusEvent } from '../../models/status-event.model';
   templateUrl: './package-management.html',
   styleUrls: ['./package-management.css']
 })
-export class PackageManagement {
+export class PackageManagement implements OnInit, OnDestroy {
   packages: Package[] = [];
   loading = false;
+  error: string | null = null;
   sidebarCollapsed = false;
   showCreateModal = false;
   showDeleteModal = false;
@@ -28,14 +30,20 @@ export class PackageManagement {
 
   @ViewChild('createForm') createForm!: NgForm;
 
-  constructor(private packagesService: Packages,
-    private statusHistoryService: StatusHistory
-  ) {
-    this.loadPackages();
-  }
+  private subscriptions = new Subscription();
+
+  // Pagination
+  currentPage = 1;
+  itemsPerPage = 10;
+  totalItems = 0;
+  totalPages = 0;
+
+  // Filters
+  statusFilter = '';
+  searchTerm = '';
+  courierFilter = '';
 
   newPackage: Partial<Package> = {
-    senderId: '',
     senderEmail: '',
     receiverName: '',
     receiverEmail: '',
@@ -61,19 +69,132 @@ export class PackageManagement {
   selectedCourierId: string | null = null;
   selectedPackage: Package | undefined = undefined;
   selectedPackageStatusHistory: StatusEvent[] = [];
-  couriers: { id: string; name: string }[] = []; // Adjust type as per your model
+  couriers: User[] = [];
+
+  packageStats: {
+    totalPackages: number;
+    pendingPackages: number;
+    inTransitPackages: number;
+    deliveredPackages: number;
+    cancelledPackages: number;
+    totalRevenue: number;
+  } = {
+    totalPackages: 0,
+    pendingPackages: 0,
+    inTransitPackages: 0,
+    deliveredPackages: 0,
+    cancelledPackages: 0,
+    totalRevenue: 0
+  };
+
+  constructor(private adminDashboardService: AdminDashboardService) {}
+
+  ngOnInit() {
+    this.loadPackages();
+    this.loadCouriers();
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.unsubscribe();
+  }
+
+  loadPackages() {
+    this.loading = true;
+    this.error = null;
+
+    const params = {
+      page: this.currentPage,
+      limit: this.itemsPerPage,
+      ...(this.statusFilter && { status: this.statusFilter }),
+      ...(this.searchTerm && { search: this.searchTerm })
+    };
+
+    const packagesSubscription = this.adminDashboardService.getAllPackages(params).subscribe({
+      next: (response) => {
+        console.log('Packages response:', response); // Debug log
+        
+        // Handle both wrapped and direct response formats
+        if (response && response.data) {
+          // API returns wrapped response: { message: "", data: [...] }
+          this.packages = Array.isArray(response.data) ? response.data : [];
+          this.totalItems = response.total || response.data.length || 0;
+          this.totalPages = response.totalPages || Math.ceil(this.totalItems / this.itemsPerPage);
+        } else if (Array.isArray(response)) {
+          // API returns direct array
+          this.packages = response;
+          this.totalItems = response.length;
+          this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
+        } else {
+          // Fallback for unexpected response format
+          console.warn('Unexpected response format:', response);
+          this.packages = [];
+          this.totalItems = 0;
+          this.totalPages = 0;
+        }
+        
+        this.loading = false;
+        this.calculatePackageStats();
+      },
+      error: (error) => {
+        console.error('Failed to load packages:', error);
+        this.error = 'Failed to load packages. Please try again.';
+        this.loading = false;
+        
+        // Set empty state on error
+        this.packages = [];
+        this.totalItems = 0;
+        this.totalPages = 0;
+      }
+    });
+
+    this.subscriptions.add(packagesSubscription);
+  }
+
+  loadCouriers() {
+    const couriersSubscription = this.adminDashboardService.getAllCouriers().subscribe({
+      next: (couriers) => {
+        this.couriers = couriers;
+      },
+      error: (error) => {
+        console.error('Failed to load couriers:', error);
+      }
+    });
+
+    this.subscriptions.add(couriersSubscription);
+  }
+
+  onPageChange(page: number) {
+    this.currentPage = page;
+    this.loadPackages();
+  }
+
+  onFilterChange() {
+    this.currentPage = 1;
+    this.loadPackages();
+  }
+
+  onSearch() {
+    this.currentPage = 1;
+    this.loadPackages();
+  }
+
+  clearFilters() {
+    this.statusFilter = '';
+    this.searchTerm = '';
+    this.courierFilter = '';
+    this.currentPage = 1;
+    this.loadPackages();
+  }
 
   submitCreatePackage(form: NgForm) {
     if (form.valid) {
       if (this.editMode && this.selectedPackageId) {
         this.editPackage(this.selectedPackageId, this.newPackage);
       } else {
-        const pkg: Partial<Package> = {
+        const pkg: any = {
           ...this.newPackage,
-          status: 'pending',
+          status: 'PENDING',
           isPaid: false,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
         };
         this.createPackage(pkg);
       }
@@ -85,80 +206,98 @@ export class PackageManagement {
     }
   }
 
-  loadPackages() {
-    this.loading = true;
-    this.packagesService.getPackages().subscribe(pkgs => {
-      this.packages = pkgs.map(pkg => ({
-        ...pkg,
-        senderName: pkg.sender
-          ? `${pkg.sender.firstName} ${pkg.sender.lastName}`
-          : pkg.senderName || '',
-        courierName: pkg.courier
-          ? `${pkg.courier.firstName} ${pkg.courier.lastName}`
-          : pkg.courierName || ''
-      }));
-      this.loading = false;
-    });
-  }
-
-  updateStatus(packageId: string, status: string) {
-    this.packagesService.updatePackageStatus(packageId, status).subscribe(() => {
-      this.loadPackages();
-    });
-  }
-
-  assignToCourier(packageId: string, courierId: string, courierName: string) {
-    this.packagesService.assignPackageToCourier(packageId, courierId).subscribe(() => {
-      this.loadPackages();
-    });
-  }
-
-  createPackage(pkg: Partial<Package>) {
-    this.packagesService.createPackage(pkg).subscribe({
+  createPackage(pkg: any) {
+    const createSubscription = this.adminDashboardService.createPackage(pkg).subscribe({
       next: (createdPkg) => {
-        // Optionally handle the created package (e.g., show a success message)
-        this.loadPackages(); // Refresh the list after creation
+        console.log('Package created successfully');
+        this.loadPackages();
       },
       error: (err) => {
-        // Handle error (e.g., show an error message)
         console.error('Failed to create package:', err);
+        this.error = 'Failed to create package. Please try again.';
       }
     });
+
+    this.subscriptions.add(createSubscription);
   }
 
   editPackage(packageId: string, pkg: Partial<Package>) {
-    this.packagesService.editPackage(packageId, pkg).subscribe(() => {
-      this.loadPackages();
+    
+    const updateSubscription = this.adminDashboardService.updatePackageStatus(packageId, {
+      status: pkg.status || 'PENDING',
+      notes: 'Package updated by admin'
+    }).subscribe({
+      next: () => {
+        console.log('Package updated successfully');
+        this.loadPackages();
+      },
+      error: (err) => {
+        console.error('Failed to update package:', err);
+        this.error = 'Failed to update package. Please try again.';
+      }
     });
+
+    this.subscriptions.add(updateSubscription);
+  }
+
+  updateStatus(packageId: string, status: string) {
+    const updateSubscription = this.adminDashboardService.updatePackageStatus(packageId, {
+      status,
+      notes: `Status updated to ${status} by admin`
+    }).subscribe({
+      next: () => {
+        console.log('Package status updated successfully');
+        this.loadPackages();
+      },
+      error: (err) => {
+        console.error('Failed to update package status:', err);
+        this.error = 'Failed to update package status. Please try again.';
+      }
+    });
+
+    this.subscriptions.add(updateSubscription);
+  }
+
+  assignToCourier(packageId: string, courierId: string) {
+    const assignSubscription = this.adminDashboardService.assignCourierToPackage(packageId, courierId).subscribe({
+      next: () => {
+        console.log('Courier assigned successfully');
+        this.loadPackages();
+      },
+      error: (err) => {
+        console.error('Failed to assign courier:', err);
+        this.error = 'Failed to assign courier. Please try again.';
+      }
+    });
+
+    this.subscriptions.add(assignSubscription);
+  }
+
+  cancelPackage(packageId: string) {
+    const cancelSubscription = this.adminDashboardService.cancelPackage(packageId).subscribe({
+      next: () => {
+        console.log('Package cancelled successfully');
+        this.loadPackages();
+      },
+      error: (err) => {
+        console.error('Failed to cancel package:', err);
+        this.error = 'Failed to cancel package. Please try again.';
+      }
+    });
+
+    this.subscriptions.add(cancelSubscription);
   }
 
   openCreateModal() {
     this.showCreateModal = true;
     this.editMode = false;
     this.selectedPackageId = null;
-    this.newPackage = {
-      senderId: '',
-      senderEmail: '',
-      receiverName: '',
-      receiverEmail: '',
-      receiverPhone: '',
-      receiverAddress: '',
-      receiverCity: '',
-      receiverState: '',
-      receiverZipCode: '',
-      receiverCountry: '',
-      weight: undefined,
-      description: '',
-      specialInstructions: '',
-      value: undefined,
-      price: undefined,
-      preferredPickupDate: '',
-      preferredDeliveryDate: '',
-    };
+    this.resetNewPackage();
   }
 
   closeCreateModal() {
     this.showCreateModal = false;
+    this.error = null;
   }
 
   openEditModal(pkg: Package) {
@@ -180,10 +319,8 @@ export class PackageManagement {
 
   confirmDeletePackage() {
     if (this.packageIdToDelete) {
-      this.packagesService.deletePackage(this.packageIdToDelete).subscribe(() => {
-        this.loadPackages();
-        this.closeDeleteModal();
-      });
+      this.cancelPackage(this.packageIdToDelete);
+      this.closeDeleteModal();
     }
   }
 
@@ -191,7 +328,6 @@ export class PackageManagement {
     this.packageIdToAssign = packageId;
     this.showAssignModal = true;
     this.selectedCourierId = null;
-    this.loadCouriers();
   }
 
   closeAssignModal() {
@@ -202,56 +338,28 @@ export class PackageManagement {
 
   assignPackageToCourier() {
     if (this.packageIdToAssign && this.selectedCourierId) {
-      const courier = this.couriers.find(c => c.id === this.selectedCourierId);
-      this.packagesService.assignPackageToCourier(
-        this.packageIdToAssign,
-        this.selectedCourierId
-      ).subscribe(() => {
-        this.loadPackages();
-        this.closeAssignModal();
-      });
+      this.assignToCourier(this.packageIdToAssign, this.selectedCourierId);
+      this.closeAssignModal();
     }
-  }
-
-  loadCouriers() {
-    this.packagesService.getCouriers().subscribe(couriers => {
-      this.couriers = couriers;
-    });
-  }
-
-  get loggedInAdminName(): string {
-    const user = localStorage.getItem('dropsecure_user');
-    return user ? JSON.parse(user).name : '';
-  }
-
- 
-  navItems = [
-    { label: 'Dashboard', icon: 'home-outline', route: '/admin/dashboard', roles: ['ADMIN'] },
-    { label: 'Packages', icon: 'cube-outline', route: '/admin/packages', roles: ['ADMIN'] },
-    { label: 'Users', icon: 'people-outline', route: '/admin/users', roles: ['ADMIN'] },
-    // { label: 'Couriers', icon: 'bicycle-outline', route: '/admin/couriers', roles: ['admin'] },
-    // { label: 'Analytics', icon: 'stats-chart-outline', route: '/admin/analytics', roles: ['admin'] },
-    // { label: 'Create Order', icon: 'add-circle-outline', route: '/admin/create-order', roles: ['admin'] }
-  ];
-
-  getPendingCount(): number {
-    return this.packages.filter(pkg => pkg.status === 'pending').length;
-  }
-
-  getInTransitCount(): number {
-    return this.packages.filter(pkg => pkg.status === 'in-transit').length;
-  }
-
-  getDeliveredCount(): number {
-    return this.packages.filter(pkg => pkg.status === 'delivered').length;
   }
 
   openDetailsModal(pkg: Package) {
     this.selectedPackage = pkg;
     this.showDetailsModal = true;
-    this.statusHistoryService.getStatusHistory(pkg.id).subscribe(history => {
-      this.selectedPackageStatusHistory = history;
+    
+    // Load package details
+    const detailsSubscription = this.adminDashboardService.getPackageById(pkg.id).subscribe({
+      next: (packageDetails) => {
+        this.selectedPackage = packageDetails;
+        // Note: You might need to add a method to get status history
+        this.selectedPackageStatusHistory = packageDetails.statusHistory || [];
+      },
+      error: (err) => {
+        console.error('Failed to load package details:', err);
+      }
     });
+
+    this.subscriptions.add(detailsSubscription);
   }
 
   closeDetailsModal() {
@@ -261,22 +369,11 @@ export class PackageManagement {
   }
 
   markAsPickedUp(pkg: Package) {
-    const user = localStorage.getItem('dropsecure_user');
-    const admin = user ? JSON.parse(user) : { id: '', name: '' };
-    this.statusHistoryService.changeStatus(
-      pkg.id,
-      'picked_up',
-      { id: admin.id, role: 'ADMIN', name: admin.name },
-      undefined,
-      'Marked as picked up by admin'
-    ).subscribe(() => {
-      this.loadPackages();
-    });
+    this.updateStatus(pkg.id, 'PICKED_UP');
   }
 
   resetNewPackage() {
     this.newPackage = {
-      senderId: '',
       senderEmail: '',
       receiverName: '',
       receiverEmail: '',
@@ -293,6 +390,97 @@ export class PackageManagement {
       price: undefined,
       preferredPickupDate: '',
       preferredDeliveryDate: '',
+    };
+  }
+
+  get loggedInAdminName(): string {
+    const userStr = localStorage.getItem('dropsecure_user');
+    if (!userStr) return '';
+    const user = JSON.parse(userStr);
+    return `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim() || user.email || '';
+  }
+
+  navItems = [
+    { label: 'Dashboard', icon: 'home-outline', route: '/admin/dashboard', roles: ['ADMIN'] },
+    { label: 'Packages', icon: 'cube-outline', route: '/admin/packages', roles: ['ADMIN'] },
+    { label: 'Users', icon: 'people-outline', route: '/admin/users', roles: ['ADMIN'] },
+    { label: 'Contact Forms', icon: 'mail-outline', route: '/admin/contacts', roles: ['ADMIN'] },
+  ];
+
+  // Stats methods for display
+  getPendingCount(): number {
+    return this.packages.filter(pkg => pkg.status === 'PENDING').length;
+  }
+
+  getInTransitCount(): number {
+    return this.packages.filter(pkg => 
+      ['PICKED_UP', 'IN_TRANSIT', 'OUT_FOR_DELIVERY'].includes(pkg.status)
+    ).length;
+  }
+
+  getDeliveredCount(): number {
+    return this.packages.filter(pkg => pkg.status === 'DELIVERED').length;
+  }
+
+  // Utility methods
+  getStatusColor(status: string): string {
+    const statusColors: { [key: string]: string } = {
+      'PENDING': 'warning',
+      'COURIER_ASSIGNED': 'primary',
+      'PICKED_UP': 'secondary',
+      'IN_TRANSIT': 'tertiary',
+      'OUT_FOR_DELIVERY': 'success',
+      'DELIVERED': 'success',
+      'CANCELLED': 'danger',
+      'RETURNED': 'medium'
+    };
+    return statusColors[status] || 'medium';
+  }
+
+  formatDate(dateString: string): string {
+    return new Date(dateString).toLocaleDateString();
+  }
+
+  formatCurrency(amount: number): string {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(amount);
+  }
+
+  // Pagination helper
+  getPaginationArray(): number[] {
+    const pages = [];
+    const startPage = Math.max(1, this.currentPage - 2);
+    const endPage = Math.min(this.totalPages, this.currentPage + 2);
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+    return pages;
+  }
+
+  // Add this method to calculate package stats
+  private calculatePackageStats() {
+    if (!this.packages || !Array.isArray(this.packages)) {
+      this.packageStats = {
+        totalPackages: 0,
+        pendingPackages: 0,
+        inTransitPackages: 0,
+        deliveredPackages: 0,
+        cancelledPackages: 0,
+        totalRevenue: 0
+      };
+      return;
+    }
+
+    this.packageStats = {
+      totalPackages: this.packages.length,
+      pendingPackages: this.packages.filter(pkg => ['CREATED', 'PENDING'].includes(pkg.status)).length,
+      inTransitPackages: this.packages.filter(pkg => ['PICKED_UP', 'IN_TRANSIT', 'OUT_FOR_DELIVERY'].includes(pkg.status)).length,
+      deliveredPackages: this.packages.filter(pkg => pkg.status === 'DELIVERED').length,
+      cancelledPackages: this.packages.filter(pkg => pkg.status === 'CANCELLED').length,
+      totalRevenue: this.packages.reduce((sum, pkg) => sum + (pkg.price || 0), 0)
     };
   }
 }

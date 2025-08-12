@@ -4,7 +4,7 @@ import * as L from 'leaflet';
 import { RouterModule } from '@angular/router';
 import { Sidebar } from '../../shared/sidebar/sidebar';
 import { IonicModule } from '@ionic/angular';
-import { StatusHistory } from '../../services/StatusHistory/status-history';
+import { StatusHistory } from '../../services/status-history/status-history';
 
 export interface RouteStop {
   lat: number;

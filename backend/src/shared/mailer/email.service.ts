@@ -33,9 +33,13 @@ export interface PackageCreatedContext {
   packageDetails: string;
   receiverName: string;
   price: number;
+  description?: string;
+  pickupAddress?: string;
   estimatedDelivery?: string;
   specialInstructions?: string;
-  description?: string; // Add description field
+  packageDescription?: string;
+  estimatedDeliveryDate?: string;
+  trackingUrl?: string;
 }
 
 export interface PickupContext {
@@ -165,9 +169,18 @@ export class EmailService {
       to,
       subject: 'DropSecure - Your Package Has Been Created',
       template: 'package-created',
-      context: context.description
-        ? { ...context, description: context.description }
-        : { ...context },
+      context: {
+        ...context,
+        // Map the context properties to match template variables
+        packageDescription:
+          context.description ||
+          context.packageDetails ||
+          'Package details not provided',
+        estimatedDeliveryDate: context.estimatedDelivery
+          ? new Date(context.estimatedDelivery).toLocaleDateString()
+          : 'To be determined',
+        trackingUrl: `${process.env.FRONTEND_URL || 'http://localhost:4200'}/track/${context.trackingNumber}`,
+      },
     };
     return this.sendEmail(emailOptions);
   }

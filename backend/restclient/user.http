@@ -1,6 +1,6 @@
 ### Variables
-@baseUrl = http://localhost:3000/api
-@adminToken = {{adminLogin.response.body.data.accessToken}}
+@baseUrl = https://dropsecure.onrender.com
+@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0MTg1NTU4NC0yYWI0LTRhZjMtOTQzMS0zMGE0NDA0OGU1YjciLCJlbWFpbCI6Im1lbGlzc2FtYWtlYmFAZ21haWwuY29tIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzU0OTg1NjM2LCJleHAiOjE3NTUwNzIwMzZ9.K0zQCVXkziAewNVGldPjXeWgvLzbwMXQ_CSJ6BbtIY4
 @userToken = {{userLogin.response.body.data.accessToken}}
 @userId = {{createUser.response.body.data.id}}
 
